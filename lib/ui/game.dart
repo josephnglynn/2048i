@@ -161,13 +161,6 @@ class MutableRectangle {
       MovementSpeed(first.left - second.left, first.top - second.top);
 }
 
-class TargetMovement {
-  int i;
-  int k;
-
-  TargetMovement(this.i, this.k);
-}
-
 class MovementSpeed {
   double x;
   double y;
@@ -191,10 +184,10 @@ class BoardElements {
   MutableRectangle dimensions;
 
   int value;
+  int futureValue = 0;
   bool moving = false;
+  bool skip = false;
 
-  MutableRectangle movingDimensions = MutableRectangle(0, 0, 0, 0);
-  TargetMovement targetMovement = TargetMovement(0, 0);
   MovementSpeed movementSpeed = MovementSpeed(0, 0);
 
   BoardElements(this.dimensions, this.value);
@@ -218,9 +211,52 @@ class BoardPainter extends CustomPainter {
   static void handleInput(Direction direction) {
     if (handlingMove) return;
     handlingMove = true;
+
     switch (direction) {
       case Direction.Up:
+        for (int i = 0; i < elements.length; ++i) {
+          for (int k = elements.length - 1; k >= 0; --k) {
+            if (elements[i][k].value == 0 || elements[i][k].skip)
+              continue; //DO NOTHING IF THE VALUE IS 0
+            int onlyTwoElements = 0;
+            int? position;
+            for (int q = 0; q < k; ++q) {
+              if (elements[i][q].value == 0) continue;
+              onlyTwoElements++;
+              position = q;
+            }
 
+            //COOL ONLY TWO ELEMENTS
+            if (onlyTwoElements == 1 && position != null) {
+
+              if (elements[i][position].value == elements[i][k].value) {
+                elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][position].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+                elements[i][position].futureValue = elements[i][k].value * 2;
+                elements[i][position].skip = true;
+                elements[i][k].moving = true;
+              } else {
+                elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][position + 1].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+                elements[i][k].futureValue = 0;
+                elements[i][position].skip = true;
+                elements[i][k].moving = true;
+              }
+              continue;
+            }
+
+            //Still Cool As No Elements
+            if (onlyTwoElements == 0) {
+              elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][0].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+              elements[i][k].futureValue = 0;
+              elements[i][0].futureValue = elements[i][k].value;
+              elements[i][k].moving = true;
+              continue;
+            }
+            //not cool at all
+
+
+          }
+
+        }
         break;
       case Direction.Left:
         // TODO: Handle this case.
@@ -229,7 +265,7 @@ class BoardPainter extends CustomPainter {
         // TODO: Handle this case.
         break;
       case Direction.Down:
-      // TODO: Handle this case.
+        // TODO: Handle this case.
         break;
     }
   }
@@ -323,12 +359,6 @@ class BoardPainter extends CustomPainter {
               tileWidth - ImportantStylesAndValues.Padding;
           elements[i][k].dimensions.height =
               tileHeight - ImportantStylesAndValues.Padding;
-          elements[i][k].movingDimensions.top *= scaleY;
-          elements[i][k].movingDimensions.left *= scaleX;
-          elements[i][k].movingDimensions.width =
-              tileWidth - ImportantStylesAndValues.Padding;
-          elements[i][k].movingDimensions.height =
-              tileHeight - ImportantStylesAndValues.Padding;
         }
       }
     }
@@ -355,9 +385,28 @@ class BoardPainter extends CustomPainter {
       if (handlingCounter > ImportantStylesAndValues.AnimationSpeed + deltaT) {
         handlingMove = false;
         handlingCounter = 0;
+        final tileWidth = size.width / whatByWhat;
+        final tileHeight = size.height / whatByWhat;
         for (int i = 0; i < whatByWhat; ++i) {
           for (int k = 0; k < whatByWhat; ++k) {
             elements[i][k].moving = false;
+            elements[i][k].dimensions = MutableRectangle(
+              tileWidth * i + ImportantStylesAndValues.HalfPadding,
+              tileHeight * k + ImportantStylesAndValues.HalfPadding,
+              tileWidth - ImportantStylesAndValues.Padding,
+              tileHeight - ImportantStylesAndValues.Padding,
+            );
+            elements[i][k].value = elements[i][k].futureValue;
+            elements[i][k].futureValue = 0;
+            elements[i][k].skip = false;
+          }
+        }
+      } else {
+        for (int i = 0; i < elements.length; ++i) {
+          for (int k = 0; k < elements.length; ++k) {
+            if (!elements[i][k].moving) continue;
+            elements[i][k].dimensions.top += elements[i][k].movementSpeed.y * deltaT;
+            elements[i][k].dimensions.left += elements[i][k].movementSpeed.x * deltaT;
           }
         }
       }

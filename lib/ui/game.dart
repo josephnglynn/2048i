@@ -188,8 +188,6 @@ class BoardElements {
   int value;
   int futureValue = 0;
   bool moving = false;
-  bool skip = false;
-  bool modified = false;
 
   MovementSpeed movementSpeed = MovementSpeed(0, 0);
 
@@ -211,6 +209,8 @@ class BoardPainter extends CustomPainter {
 
   BoardPainter(this.whatByWhat) : super(repaint: rePaint);
 
+  static void noChange (int i, int k) => elements[i][k].futureValue = elements[i][k].value;
+
   static void handleInput(Direction direction, int whatByWhat) {
     if (handlingMove) return;
     handlingMove = true;
@@ -218,128 +218,27 @@ class BoardPainter extends CustomPainter {
     switch (direction) {
       case Direction.Up:
         for (int i = 0; i < elements.length; ++i) {
-          for (int k = elements.length - 1; k >= 0; --k) {
-            if (elements[i][k].value == 0 || elements[i][k].skip)
-              continue; //DO NOTHING IF THE VALUE IS 0
-            int onlyTwoElements = 0;
-            int? position;
-            for (int q = 0; q < k; ++q) {
-              if (elements[i][q].value == 0) continue;
-              onlyTwoElements++;
-              position = q;
-            }
-
-            //COOL ONLY TWO ELEMENTS
-            if (onlyTwoElements == 1 && position != null) {
-              if (elements[i][position].value == elements[i][k].value) {
-                elements[i][k].movementSpeed = MutableRectangle.difference(
-                        elements[i][position].futurePosition ??
-                            elements[i][position].dimensions,
-                        elements[i][k].dimensions) /
-                    ImportantStylesAndValues.AnimationSpeed /
-                    2;
-                elements[i][position].futureValue = elements[i][k].value * 2;
-                elements[i][position].skip = true;
-                elements[i][k].moving = true;
-                elements[i][k].futurePosition =
-                    elements[i][position].futurePosition ??
-                        elements[i][position].dimensions;
-              } else {
-                elements[i][k].movementSpeed = MutableRectangle.difference(
-                        elements[i][position + 1].futurePosition ??
-                            elements[i][position + 1].dimensions,
-                        elements[i][k].dimensions) /
-                    ImportantStylesAndValues.AnimationSpeed /
-                    2;
-                if (!elements[i][k].modified) {
-                  elements[i][k].futureValue = 0;
-                }
-                elements[i][position + 1].futureValue = elements[i][k].value;
-                elements[i][position + 1].skip = true;
-                elements[i][k].moving = true;
-                elements[i][k].futurePosition =
-                    elements[i][position + 1].futurePosition ??
-                        elements[i][position + 1].dimensions;
-              }
+          for (int k = 0; k < elements.length; ++k) {
+            if (k == 0) {
+              noChange(i, k);
+              continue;
+            }; // AT TOP SO CAN'T Move Any HIGHER
+            if (elements[i][k-1].value == 0) {
+              //funky stuff
+              noChange(i, k);
               continue;
             }
-
-            //Still Cool As No Elements
-            if (onlyTwoElements == 0) {
-              elements[i][k].movementSpeed = MutableRectangle.difference(
-                      elements[i][0].futurePosition ??
-                          elements[i][0].dimensions,
-                      elements[i][k].dimensions) /
-                  ImportantStylesAndValues.AnimationSpeed /
-                  2;
-              if (!elements[i][k].modified) {
-                elements[i][k].futureValue = 0;
-              }
-              elements[i][0].futureValue = elements[i][k].value;
+            if (elements[i][k-1].value == elements[i][k].value) {
+              MutableRectangle position = elements[i][k-1].futurePosition?? elements[i][k-1].dimensions;
+              elements[i][k].futurePosition = position;
+              elements[i][k].movementSpeed = MutableRectangle.difference(position, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+              elements[i][k-1].futureValue = elements[i][k].value * 2;
               elements[i][k].moving = true;
-              elements[i][k].futurePosition =
-                  elements[i][0].futurePosition ?? elements[i][0].dimensions;
               continue;
             }
 
-            //Filled Up Column so can't do anything
-            if (onlyTwoElements == whatByWhat - 1) continue;
-
-            if (k == onlyTwoElements) {
-              if (elements[i][k].value == elements[i][k - 1].value) {
-                elements[i][k].movementSpeed = MutableRectangle.difference(
-                        elements[i][k - 1].futurePosition ??
-                            elements[i][k - 1].dimensions,
-                        elements[i][k].dimensions) /
-                    ImportantStylesAndValues.AnimationSpeed /
-                    2;
-                elements[i][k].futureValue = 0;
-                elements[i][k - 1].futureValue = elements[i][k].value * 2;
-                elements[i][k - 1].modified = true;
-                elements[i][k - 1].skip = true;
-                elements[i][k].moving = true;
-                elements[i][k].futurePosition =
-                    elements[i][k - 1].futurePosition ??
-                        elements[i][k - 1].dimensions;
-                continue;
-              }
-            }
-
-            //Quickly checking that the spaghetti code above didn't miss anything
-            bool missedSomething = false;
-            for (int q = k - 1; q >= 0; --q) {
-              if (elements[i][q].value != 0) {
-                if (elements[i][q].value == elements[i][k].value) {
-                  //Now Check Where Its Going
-
-                  elements[i][k].movementSpeed = MutableRectangle.difference(
-                          elements[i][q].futurePosition ??
-                              elements[i][q].dimensions,
-                          elements[i][k].dimensions) /
-                      ImportantStylesAndValues.AnimationSpeed /
-                      2;
-                  elements[i][k].futureValue = 0;
-                  elements[i][q].futureValue = elements[i][k].value * 2;
-                  elements[i][q].modified = true;
-                  elements[i][k].moving = true;
-                  missedSomething = true;
-                }
-                break;
-              }
-            }
-
-            if (missedSomething) continue;
-
-            //not cool at all Multiple elements
-            elements[i][k].movementSpeed = MutableRectangle.difference(
-                    elements[i][onlyTwoElements].dimensions,
-                    elements[i][k].dimensions) /
-                ImportantStylesAndValues.AnimationSpeed /
-                2;
-            elements[i][k].futureValue = 0;
-            elements[i][onlyTwoElements].futureValue = elements[i][k].value;
-            elements[i][onlyTwoElements].modified = true;
-            elements[i][k].moving = true;
+            //If its not equal to 0 or the number below then we won't be able to move this tile.
+            noChange(i, k);
           }
         }
         break;
@@ -498,8 +397,6 @@ class BoardPainter extends CustomPainter {
             );
             elements[i][k].value = elements[i][k].futureValue;
             elements[i][k].futureValue = 0;
-            elements[i][k].skip = false;
-            elements[i][k].modified = false;
           }
         }
       } else {

@@ -253,7 +253,7 @@ class BoardPainter extends CustomPainter {
                           position, elements[i][k].dimensions) /
                       ImportantStylesAndValues.AnimationSpeed /
                       2;
-                  elements[i][q].futureValue = elements[i][q].value == elements[i][k].value ? elements[i][k].value * 2 : elements[i][k].value;
+                  elements[i][q].futureValue = elements[i][q+1].value == elements[i][k].value ? elements[i][k].value * 2 : elements[i][k].value;
                   elements[i][k].moving = true;
                   elements[i][k].modified = true;
                   fixedIt = true;
@@ -362,7 +362,7 @@ class BoardPainter extends CustomPainter {
       ),
       2,
     );
-    x = 1;
+    x = 0;
     y = 3;
     elements[x][y] = BoardElements(
       MutableRectangle(

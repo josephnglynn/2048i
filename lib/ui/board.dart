@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:improved_2048/ui/types.dart';
 
-
 Map<int, Color> SquareColors = {
   0: Colors.orange.shade100,
   2: Colors.orange.shade200,
@@ -22,21 +21,23 @@ Map<int, Color> SquareColors = {
   2048: Colors.orange.shade900,
 };
 
-
 class BoardPainter extends CustomPainter {
   static final rePaint = new ChangeNotifier();
 
   static List<List<BoardTile>> board = [];
   static List<List<int>> elements = [];
+  static List<List<int>> newElements = [];
   static Size previous = Size(0, 0);
   static Random rng = Random();
   static bool handlingMove = false;
   static Stopwatch stopWatch = Stopwatch()..start();
   static double handlingCounter = 0;
+  static bool dead = false;
 
   int whatByWhat;
+  final Function navigateOnDeath;
 
-  BoardPainter(this.whatByWhat) : super(repaint: rePaint);
+  BoardPainter(this.whatByWhat, this.navigateOnDeath) : super(repaint: rePaint);
 
   static List<int> doStuff(List<int> row) {
     int originalLength = row.length;
@@ -69,23 +70,41 @@ class BoardPainter extends CustomPainter {
 
     switch (direction) {
       case Direction.Up:
-        elements = elements.map((e) => doStuff(e)).toList();
+        newElements = elements.map((e) => doStuff(e)).toList();
         addNewElement();
         break;
       case Direction.Left:
-        elements = inverseList(inverseList(elements).map((e) => doStuff(e)).toList());
+        newElements =
+            inverseList(inverseList(elements).map((e) => doStuff(e)).toList());
         addNewElement();
         break;
       case Direction.Right:
-        elements = inverseList(inverseList(elements).map((e) => doStuff(e.reversed.toList()).reversed.toList()).toList());
+        newElements = inverseList(inverseList(elements)
+            .map((e) => doStuff(e.reversed.toList()).reversed.toList())
+            .toList());
         addNewElement();
         break;
       case Direction.Down:
-        elements = elements.map((e) => doStuff(e.reversed.toList()).reversed.toList()).toList();
+        newElements = elements
+            .map((e) => doStuff(e.reversed.toList()).reversed.toList())
+            .toList();
         addNewElement();
         break;
     }
-    handlingMove = false;
+    if (haveTheyMadeAMistake()) {
+      dead = true;
+    }
+  }
+
+  static bool haveTheyMadeAMistake() {
+    for (int i = 0; i < elements.length; ++i) {
+      for (int k = 0; k < elements[i].length; ++k) {
+        if (elements[i][k] == 0) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   static void addNewElement() {
@@ -100,8 +119,9 @@ class BoardPainter extends CustomPainter {
 
     if (possiblePlaces.length == 0) return;
 
-    int index = possiblePlaces.length == 1 ? 0 : rng.nextInt(possiblePlaces.length - 1);
-    elements[possiblePlaces[index][0]][possiblePlaces[index][1]] = 2;
+    int index =
+        possiblePlaces.length == 1 ? 0 : rng.nextInt(possiblePlaces.length - 1);
+    newElements[possiblePlaces[index][0]][possiblePlaces[index][1]] = 2;
   }
 
   void cleanUp() {
@@ -132,9 +152,10 @@ class BoardPainter extends CustomPainter {
         elements[i].add(0);
       }
     }
+    newElements = elements;
     addNewElement();
     addNewElement();
-
+    elements = newElements;
   }
 
   void resizeBoard(Size newSize) {
@@ -174,6 +195,19 @@ class BoardPainter extends CustomPainter {
 
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
+
+    if (handlingMove) {
+      handlingCounter += deltaT;
+      if (dead)
+        SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+          navigateOnDeath();
+        });
+      if (handlingCounter > ImportantStylesAndValues.AnimationSpeed) {
+        elements = newElements;
+        handlingMove = false;
+        handlingCounter = 0;
+      }
+    }
 
     for (int i = 0; i < whatByWhat; ++i) {
       for (int k = 0; k < whatByWhat; ++k) {

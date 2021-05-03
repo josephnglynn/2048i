@@ -8,7 +8,7 @@ class ImportantStylesAndValues {
   static const double Padding = 5;
   static const double HalfPadding = Padding / 2;
 
-  static const double AnimationSpeed = 1;
+  static const double AnimationSpeed = 0.25;
 
   static const Color BackGroundColor = Color.fromRGBO(187, 173, 160, 1);
   static const Color clearTilesColor = Color.fromRGBO(205, 193, 180, 1);
@@ -26,22 +26,14 @@ class MutableRectangle {
 
   MutableRectangle(this.left, this.top, this.width, this.height);
 
-  static MovementSpeed difference(
-      MutableRectangle first, MutableRectangle second) =>
-      MovementSpeed(first.left - second.left, first.top - second.top);
 }
 
-class MovementSpeed {
+class AnimationIncrease {
   double x;
   double y;
 
-  MovementSpeed operator /(double scaleDecrease) {
-    this.x /= scaleDecrease;
-    this.y /= scaleDecrease;
-    return this;
-  }
 
-  MovementSpeed(this.x, this.y);
+  AnimationIncrease(this.x, this.y);
 }
 
 class BoardTile {
@@ -50,13 +42,3 @@ class BoardTile {
   BoardTile(this.dimensions);
 }
 
-class BoardElements {
-  MutableRectangle dimensions;
-  MutableRectangle? futurePosition;
-
-  int value;
-
-  MovementSpeed movementSpeed = MovementSpeed(0, 0);
-
-  BoardElements(this.dimensions, this.value);
-}

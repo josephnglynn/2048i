@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:improved_2048/ui/DeathPage.dart';
 import 'package:improved_2048/ui/types.dart';
 
 import 'board.dart';
@@ -120,7 +121,7 @@ class _GameState extends State<Game> {
                       BorderRadius.all(ImportantStylesAndValues.radius),
                 ),
                 child: CustomPaint(
-                  painter: BoardPainter(whatByWhat),
+                  painter: BoardPainter(whatByWhat, ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => DeathPage(),))),
                 ),
               ),
             ),

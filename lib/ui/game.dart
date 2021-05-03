@@ -237,7 +237,8 @@ class BoardPainter extends CustomPainter {
               } else {
                 elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][position + 1].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
                 elements[i][k].futureValue = 0;
-                elements[i][position].skip = true;
+                elements[i][position+1].futureValue = elements[i][k].value;
+                elements[i][position+1].skip = true;
                 elements[i][k].moving = true;
               }
               continue;
@@ -309,6 +310,8 @@ class BoardPainter extends CustomPainter {
       }
     }
     int x = rng.nextInt(whatByWhat - 1), y = rng.nextInt(whatByWhat - 1);
+    x = 0;
+    y = 0;
     elements[x][y] = BoardElements(
       MutableRectangle(
         tileWidth * x + ImportantStylesAndValues.HalfPadding,
@@ -316,7 +319,7 @@ class BoardPainter extends CustomPainter {
         tileWidth - ImportantStylesAndValues.Padding,
         tileHeight - ImportantStylesAndValues.Padding,
       ),
-      2,
+      4,
     );
     x = rng.nextInt(whatByWhat - 1);
     y = rng.nextInt(whatByWhat - 1);
@@ -324,6 +327,8 @@ class BoardPainter extends CustomPainter {
       x = rng.nextInt(whatByWhat - 1);
       y = rng.nextInt(whatByWhat - 1);
     }
+    x = 0;
+    y = 2;
     elements[x][y] = BoardElements(
       MutableRectangle(
         tileWidth * x + ImportantStylesAndValues.HalfPadding,

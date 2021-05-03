@@ -78,7 +78,7 @@ class _GameState extends State<Game> {
                   direction = Direction.Down;
                   break;
               }
-              if (direction != null) BoardPainter.handleInput(direction);
+              if (direction != null) BoardPainter.handleInput(direction, whatByWhat);
             },
             child: GestureDetector(
               onPanUpdate: (DragUpdateDetails dragUpdateDetails) {
@@ -99,15 +99,15 @@ class _GameState extends State<Game> {
 
                 if (changeInY > changeInX) {
                   if (dragUpdateDetails.delta.dy < 0) {
-                    BoardPainter.handleInput(Direction.Up);
+                    BoardPainter.handleInput(Direction.Up, whatByWhat);
                   } else {
-                    BoardPainter.handleInput(Direction.Down);
+                    BoardPainter.handleInput(Direction.Down, whatByWhat);
                   }
                 } else {
                   if (dragUpdateDetails.delta.dx < 0) {
-                    BoardPainter.handleInput(Direction.Left);
+                    BoardPainter.handleInput(Direction.Left, whatByWhat);
                   } else {
-                    BoardPainter.handleInput(Direction.Right);
+                    BoardPainter.handleInput(Direction.Right, whatByWhat);
                   }
                 }
               },
@@ -208,7 +208,7 @@ class BoardPainter extends CustomPainter {
 
   BoardPainter(this.whatByWhat) : super(repaint: rePaint);
 
-  static void handleInput(Direction direction) {
+  static void handleInput(Direction direction, int whatByWhat) {
     if (handlingMove) return;
     handlingMove = true;
 
@@ -252,7 +252,12 @@ class BoardPainter extends CustomPainter {
               elements[i][k].moving = true;
               continue;
             }
-            //not cool at all
+
+            //Filled Up Column so can't do anything
+            if (onlyTwoElements == whatByWhat - 1) continue;
+
+            //not cool at all Multiple elements
+
 
 
           }

@@ -78,7 +78,8 @@ class _GameState extends State<Game> {
                   direction = Direction.Down;
                   break;
               }
-              if (direction != null) BoardPainter.handleInput(direction, whatByWhat);
+              if (direction != null)
+                BoardPainter.handleInput(direction, whatByWhat);
             },
             child: GestureDetector(
               onPanUpdate: (DragUpdateDetails dragUpdateDetails) {
@@ -182,6 +183,7 @@ class BoardTile {
 
 class BoardElements {
   MutableRectangle dimensions;
+  MutableRectangle? futurePosition;
 
   int value;
   int futureValue = 0;
@@ -230,30 +232,53 @@ class BoardPainter extends CustomPainter {
             //COOL ONLY TWO ELEMENTS
             if (onlyTwoElements == 1 && position != null) {
               if (elements[i][position].value == elements[i][k].value) {
-                elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][position].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+                elements[i][k].movementSpeed = MutableRectangle.difference(
+                        elements[i][position].futurePosition ??
+                            elements[i][position].dimensions,
+                        elements[i][k].dimensions) /
+                    ImportantStylesAndValues.AnimationSpeed /
+                    2;
                 elements[i][position].futureValue = elements[i][k].value * 2;
                 elements[i][position].skip = true;
                 elements[i][k].moving = true;
+                elements[i][k].futurePosition =
+                    elements[i][position].futurePosition ??
+                        elements[i][position].dimensions;
               } else {
-                elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][position + 1].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+                elements[i][k].movementSpeed = MutableRectangle.difference(
+                        elements[i][position + 1].futurePosition ??
+                            elements[i][position + 1].dimensions,
+                        elements[i][k].dimensions) /
+                    ImportantStylesAndValues.AnimationSpeed /
+                    2;
                 if (!elements[i][k].modified) {
                   elements[i][k].futureValue = 0;
                 }
-                elements[i][position+1].futureValue = elements[i][k].value;
-                elements[i][position+1].skip = true;
+                elements[i][position + 1].futureValue = elements[i][k].value;
+                elements[i][position + 1].skip = true;
                 elements[i][k].moving = true;
+                elements[i][k].futurePosition =
+                    elements[i][position + 1].futurePosition ??
+                        elements[i][position + 1].dimensions;
               }
               continue;
             }
 
             //Still Cool As No Elements
             if (onlyTwoElements == 0) {
-              elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][0].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+              elements[i][k].movementSpeed = MutableRectangle.difference(
+                      elements[i][0].futurePosition ??
+                          elements[i][0].dimensions,
+                      elements[i][k].dimensions) /
+                  ImportantStylesAndValues.AnimationSpeed /
+                  2;
               if (!elements[i][k].modified) {
                 elements[i][k].futureValue = 0;
               }
               elements[i][0].futureValue = elements[i][k].value;
               elements[i][k].moving = true;
+              elements[i][k].futurePosition =
+                  elements[i][0].futurePosition ?? elements[i][0].dimensions;
               continue;
             }
 
@@ -261,27 +286,61 @@ class BoardPainter extends CustomPainter {
             if (onlyTwoElements == whatByWhat - 1) continue;
 
             if (k == onlyTwoElements) {
-              if (elements[i][k].value == elements[i][k-1].value) {
-                elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][k-1].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+              if (elements[i][k].value == elements[i][k - 1].value) {
+                elements[i][k].movementSpeed = MutableRectangle.difference(
+                        elements[i][k - 1].futurePosition ??
+                            elements[i][k - 1].dimensions,
+                        elements[i][k].dimensions) /
+                    ImportantStylesAndValues.AnimationSpeed /
+                    2;
                 elements[i][k].futureValue = 0;
-                elements[i][k-1].futureValue = elements[i][k].value * 2;
-                elements[i][k-1].modified = true;
-                elements[i][k-1].skip = true;
+                elements[i][k - 1].futureValue = elements[i][k].value * 2;
+                elements[i][k - 1].modified = true;
+                elements[i][k - 1].skip = true;
                 elements[i][k].moving = true;
+                elements[i][k].futurePosition =
+                    elements[i][k - 1].futurePosition ??
+                        elements[i][k - 1].dimensions;
                 continue;
               }
             }
 
+            //Quickly checking that the spaghetti code above didn't miss anything
+            bool missedSomething = false;
+            for (int q = k - 1; q >= 0; --q) {
+              if (elements[i][q].value != 0) {
+                if (elements[i][q].value == elements[i][k].value) {
+                  //Now Check Where Its Going
 
+                  elements[i][k].movementSpeed = MutableRectangle.difference(
+                          elements[i][q].futurePosition ??
+                              elements[i][q].dimensions,
+                          elements[i][k].dimensions) /
+                      ImportantStylesAndValues.AnimationSpeed /
+                      2;
+                  elements[i][k].futureValue = 0;
+                  elements[i][q].futureValue = elements[i][k].value * 2;
+                  elements[i][q].modified = true;
+                  elements[i][k].moving = true;
+                  missedSomething = true;
+                }
+                break;
+              }
+            }
+
+            if (missedSomething) continue;
 
             //not cool at all Multiple elements
-            elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][onlyTwoElements].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+            elements[i][k].movementSpeed = MutableRectangle.difference(
+                    elements[i][onlyTwoElements].dimensions,
+                    elements[i][k].dimensions) /
+                ImportantStylesAndValues.AnimationSpeed /
+                2;
             elements[i][k].futureValue = 0;
             elements[i][onlyTwoElements].futureValue = elements[i][k].value;
             elements[i][onlyTwoElements].modified = true;
             elements[i][k].moving = true;
           }
-
         }
         break;
       case Direction.Left:
@@ -447,8 +506,10 @@ class BoardPainter extends CustomPainter {
         for (int i = 0; i < elements.length; ++i) {
           for (int k = 0; k < elements.length; ++k) {
             if (!elements[i][k].moving) continue;
-            elements[i][k].dimensions.top += elements[i][k].movementSpeed.y * deltaT;
-            elements[i][k].dimensions.left += elements[i][k].movementSpeed.x * deltaT;
+            elements[i][k].dimensions.top +=
+                elements[i][k].movementSpeed.y * deltaT;
+            elements[i][k].dimensions.left +=
+                elements[i][k].movementSpeed.x * deltaT;
           }
         }
       }

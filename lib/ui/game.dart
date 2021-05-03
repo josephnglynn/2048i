@@ -188,6 +188,7 @@ class BoardElements {
   int value;
   int futureValue = 0;
   bool moving = false;
+  bool modified = false;
 
   MovementSpeed movementSpeed = MovementSpeed(0, 0);
 
@@ -209,7 +210,8 @@ class BoardPainter extends CustomPainter {
 
   BoardPainter(this.whatByWhat) : super(repaint: rePaint);
 
-  static void noChange (int i, int k) => elements[i][k].futureValue = elements[i][k].value;
+  static void noChange(int i, int k) =>
+      elements[i][k].futureValue = elements[i][k].value;
 
   static void handleInput(Direction direction, int whatByWhat) {
     if (handlingMove) return;
@@ -222,17 +224,58 @@ class BoardPainter extends CustomPainter {
             if (k == 0) {
               noChange(i, k);
               continue;
-            }; // AT TOP SO CAN'T Move Any HIGHER
-            if (elements[i][k-1].value == 0) {
-              //funky stuff
-              noChange(i, k);
+            }
+            // AT TOP SO CAN'T Move Any HIGHER
+            if (elements[i][k - 1].value == 0) {
+              //funky stuff ( Basically find the first number )
+              bool fixedIt = false;
+              for (int q = k - 1; q >= 0; --q) {
+                if (elements[i][q + 1].value != 0) {
+                  if (elements[i][q + 1].value != elements[i][k].value) {
+                    MutableRectangle position = elements[i][q].futurePosition ??
+                        elements[i][q + 1].dimensions;
+                    elements[i][k].futurePosition = position;
+                    elements[i][k].movementSpeed = MutableRectangle.difference(
+                            position, elements[i][k].dimensions) /
+                        ImportantStylesAndValues.AnimationSpeed /
+                        2;
+                    elements[i][q + 1].futureValue = elements[i][k].value * 2;
+                    elements[i][k].moving = true;
+                    elements[i][k].modified = true;
+                    fixedIt = true;
+                    break;
+                  }
+                  //first Non 0 value
+                  MutableRectangle position = elements[i][q].futurePosition ??
+                      elements[i][q].dimensions;
+                  elements[i][k].futurePosition = position;
+                  elements[i][k].movementSpeed = MutableRectangle.difference(
+                          position, elements[i][k].dimensions) /
+                      ImportantStylesAndValues.AnimationSpeed /
+                      2;
+                  elements[i][q].futureValue = elements[i][k].value * 2;
+                  print("${elements[i][k].value * 2}: 2 -- ");
+                  elements[i][k].moving = true;
+                  elements[i][k].modified = true;
+                  fixedIt = true;
+                  break;
+                }
+              }
+              if (!fixedIt) noChange(i, k);
               continue;
             }
-            if (elements[i][k-1].value == elements[i][k].value) {
-              MutableRectangle position = elements[i][k-1].futurePosition?? elements[i][k-1].dimensions;
+            if (elements[i][k - 1].value == elements[i][k].value ) {
+
+              MutableRectangle position = elements[i][k - 1].futurePosition ??
+                  elements[i][k - 1].dimensions;
               elements[i][k].futurePosition = position;
-              elements[i][k].movementSpeed = MutableRectangle.difference(position, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
-              elements[i][k-1].futureValue = elements[i][k].value * 2;
+              elements[i][k].movementSpeed = MutableRectangle.difference(
+                      position, elements[i][k].dimensions) /
+                  ImportantStylesAndValues.AnimationSpeed /
+                  2;
+              elements[i][k - 1].futureValue = elements[i][k].value * 2;
+              if (elements[i][k-1].modified)  elements[i][k - 1].futureValue = 0;
+              elements[i][k].modified = true;
               elements[i][k].moving = true;
               continue;
             }
@@ -397,6 +440,7 @@ class BoardPainter extends CustomPainter {
             );
             elements[i][k].value = elements[i][k].futureValue;
             elements[i][k].futureValue = 0;
+            elements[i][k].modified = false;
           }
         }
       } else {

@@ -187,6 +187,7 @@ class BoardElements {
   int futureValue = 0;
   bool moving = false;
   bool skip = false;
+  bool modified = false;
 
   MovementSpeed movementSpeed = MovementSpeed(0, 0);
 
@@ -228,7 +229,6 @@ class BoardPainter extends CustomPainter {
 
             //COOL ONLY TWO ELEMENTS
             if (onlyTwoElements == 1 && position != null) {
-
               if (elements[i][position].value == elements[i][k].value) {
                 elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][position].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
                 elements[i][position].futureValue = elements[i][k].value * 2;
@@ -236,7 +236,9 @@ class BoardPainter extends CustomPainter {
                 elements[i][k].moving = true;
               } else {
                 elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][position + 1].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
-                elements[i][k].futureValue = 0;
+                if (!elements[i][k].modified) {
+                  elements[i][k].futureValue = 0;
+                }
                 elements[i][position+1].futureValue = elements[i][k].value;
                 elements[i][position+1].skip = true;
                 elements[i][k].moving = true;
@@ -247,7 +249,9 @@ class BoardPainter extends CustomPainter {
             //Still Cool As No Elements
             if (onlyTwoElements == 0) {
               elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][0].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
-              elements[i][k].futureValue = 0;
+              if (!elements[i][k].modified) {
+                elements[i][k].futureValue = 0;
+              }
               elements[i][0].futureValue = elements[i][k].value;
               elements[i][k].moving = true;
               continue;
@@ -256,10 +260,26 @@ class BoardPainter extends CustomPainter {
             //Filled Up Column so can't do anything
             if (onlyTwoElements == whatByWhat - 1) continue;
 
+            if (k == onlyTwoElements) {
+              if (elements[i][k].value == elements[i][k-1].value) {
+                elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][k-1].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+                elements[i][k].futureValue = 0;
+                elements[i][k-1].futureValue = elements[i][k].value * 2;
+                elements[i][k-1].modified = true;
+                elements[i][k-1].skip = true;
+                elements[i][k].moving = true;
+                continue;
+              }
+            }
+
+
+
             //not cool at all Multiple elements
-
-
-
+            elements[i][k].movementSpeed = MutableRectangle.difference(elements[i][onlyTwoElements].dimensions, elements[i][k].dimensions) / ImportantStylesAndValues.AnimationSpeed / 2;
+            elements[i][k].futureValue = 0;
+            elements[i][onlyTwoElements].futureValue = elements[i][k].value;
+            elements[i][onlyTwoElements].modified = true;
+            elements[i][k].moving = true;
           }
 
         }
@@ -343,6 +363,17 @@ class BoardPainter extends CustomPainter {
       ),
       2,
     );
+    x = 0;
+    y = 3;
+    elements[x][y] = BoardElements(
+      MutableRectangle(
+        tileWidth * x + ImportantStylesAndValues.HalfPadding,
+        tileHeight * y + ImportantStylesAndValues.HalfPadding,
+        tileWidth - ImportantStylesAndValues.Padding,
+        tileHeight - ImportantStylesAndValues.Padding,
+      ),
+      2,
+    );
   }
 
   void resizeBoard(Size newSize) {
@@ -409,6 +440,7 @@ class BoardPainter extends CustomPainter {
             elements[i][k].value = elements[i][k].futureValue;
             elements[i][k].futureValue = 0;
             elements[i][k].skip = false;
+            elements[i][k].modified = false;
           }
         }
       } else {

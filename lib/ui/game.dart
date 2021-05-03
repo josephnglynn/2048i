@@ -239,7 +239,7 @@ class BoardPainter extends CustomPainter {
                             position, elements[i][k].dimensions) /
                         ImportantStylesAndValues.AnimationSpeed /
                         2;
-                    elements[i][q + 1].futureValue = elements[i][k].value * 2;
+                    elements[i][q + 1].futureValue = elements[i][q + 1].futureValue;
                     elements[i][k].moving = true;
                     elements[i][k].modified = true;
                     fixedIt = true;
@@ -253,8 +253,7 @@ class BoardPainter extends CustomPainter {
                           position, elements[i][k].dimensions) /
                       ImportantStylesAndValues.AnimationSpeed /
                       2;
-                  elements[i][q].futureValue = elements[i][k].value * 2;
-                  print("${elements[i][k].value * 2}: 2 -- ");
+                  elements[i][q].futureValue = elements[i][q].value == elements[i][k].value ? elements[i][k].value * 2 : elements[i][k].value;
                   elements[i][k].moving = true;
                   elements[i][k].modified = true;
                   fixedIt = true;
@@ -264,8 +263,7 @@ class BoardPainter extends CustomPainter {
               if (!fixedIt) noChange(i, k);
               continue;
             }
-            if (elements[i][k - 1].value == elements[i][k].value ) {
-
+            if (elements[i][k - 1].value == elements[i][k].value) {
               MutableRectangle position = elements[i][k - 1].futurePosition ??
                   elements[i][k - 1].dimensions;
               elements[i][k].futurePosition = position;
@@ -274,7 +272,8 @@ class BoardPainter extends CustomPainter {
                   ImportantStylesAndValues.AnimationSpeed /
                   2;
               elements[i][k - 1].futureValue = elements[i][k].value * 2;
-              if (elements[i][k-1].modified)  elements[i][k - 1].futureValue = 0;
+              if (elements[i][k - 1].modified)
+                elements[i][k - 1].futureValue = 0;
               elements[i][k].modified = true;
               elements[i][k].moving = true;
               continue;
@@ -292,7 +291,6 @@ class BoardPainter extends CustomPainter {
         // TODO: Handle this case.
         break;
       case Direction.Down:
-        // TODO: Handle this case.
         break;
     }
   }
@@ -364,7 +362,7 @@ class BoardPainter extends CustomPainter {
       ),
       2,
     );
-    x = 0;
+    x = 1;
     y = 3;
     elements[x][y] = BoardElements(
       MutableRectangle(

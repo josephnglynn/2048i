@@ -83,8 +83,20 @@ class _GameState extends State<Game> {
               BoardPainter.handleInput(direction, whatByWhat);
           },
           child: GestureDetector(
-            onHorizontalDragEnd: (details) => BoardPainter.handleInput(details.primaryVelocity! > 0 ? Direction.Left : Direction.Right, whatByWhat),
-            onVerticalDragEnd: (details) => BoardPainter.handleInput(details.primaryVelocity! > 0 ? Direction.Up : Direction.Down, whatByWhat),
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity == 0) return;
+              BoardPainter.handleInput(
+                  details.primaryVelocity! < 0
+                      ? Direction.Left
+                      : Direction.Right,
+                  whatByWhat);
+            },
+            onVerticalDragEnd: (details) {
+              if (details.primaryVelocity == 0) return;
+              BoardPainter.handleInput(
+                  details.primaryVelocity! < 0 ? Direction.Up : Direction.Down,
+                  whatByWhat);
+            },
             child: Container(
               width: width,
               height: height,

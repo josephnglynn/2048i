@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/ui/DeathPage.dart';
+import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/types.dart';
 
 import 'board.dart';
@@ -18,19 +19,6 @@ class _GameState extends State<Game> {
   final int whatByWhat;
 
   _GameState(this.whatByWhat);
-
-  List<List<int>> board = [];
-
-  @override
-  void initState() {
-    for (int i = 0; i < whatByWhat; ++i) {
-      board.add([]);
-      for (int k = 0; k < whatByWhat; ++k) {
-        board[i].add(0);
-      }
-    }
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,11 +102,15 @@ class _GameState extends State<Game> {
                 child: CustomPaint(
                   painter: BoardPainter(
                     whatByWhat,
-                    () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => DeathPage(),
-                      ),
-                    ),
+                    () {
+                      BoardPainter.cleanUp();
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(),
+                        ),
+                        (route) => false,
+                      );
+                    },
                   ),
                 ),
               ),

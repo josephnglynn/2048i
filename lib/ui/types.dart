@@ -8,7 +8,7 @@ class ImportantStylesAndValues {
   static const double Padding = 5;
   static const double HalfPadding = Padding / 2;
 
-  static const double NewTileAnimationLength = 0.1;
+  static const double NewTileAnimationLength = 0.4;
   static const double AnimationLength = 0.1;
 
   static const Color BackGroundColor = Color.fromRGBO(187, 173, 160, 1);
@@ -54,6 +54,7 @@ class BoardElement {
   int value;
   PreviousPosition? previousPosition;
   bool animateElement;
+  bool isNewTile;
 
-  BoardElement(this.value, this.animateElement);
+  BoardElement(this.value, this.animateElement, this.isNewTile);
 }

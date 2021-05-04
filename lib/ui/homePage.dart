@@ -22,7 +22,6 @@ class HomePage extends StatelessWidget {
           alignment: Alignment.center,
           child: TextButton(
             onPressed: () {
-              BoardPainter.cleanUp();
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => Game(4),

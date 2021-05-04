@@ -33,6 +33,7 @@ class BoardPainter extends CustomPainter {
   static bool handlingNewTile = false;
   static double handlingNewTileCounter = 0;
   static Stopwatch stopWatch = Stopwatch()..start();
+  static int points = 0;
 
   static bool dead = false;
 
@@ -55,8 +56,8 @@ class BoardPainter extends CustomPainter {
     }
     row = row.where((val) => val.value != 0).toList();
     int zeroesToInsert = originalLength - row.length;
-    row.addAll(
-        List.generate(zeroesToInsert, (index) => BoardElement(0, false)));
+    row.addAll(List.generate(
+        zeroesToInsert, (index) => BoardElement(0, false, false)));
     return row;
   }
 
@@ -73,11 +74,16 @@ class BoardPainter extends CustomPainter {
     if (handlingMove) return;
     handlingMove = true;
 
+    int totalValueBefore = 0;
+    for (int i =0 ; i < elements.length; ++i) {
+      for (int k = 0; k < elements.length; ++k) {
+        totalValueBefore += (k+i) * elements[i][k].value;
+      }
+    }
+
     switch (direction) {
       case Direction.Up:
-        for (int i = 0; i < elements.length; ++i) {
-          elements[i] = doStuff(elements[i]);
-        }
+        elements = elements.map((e) => doStuff(e)).toList();
         break;
       case Direction.Left:
         elements =
@@ -95,8 +101,17 @@ class BoardPainter extends CustomPainter {
         break;
     }
 
-    addNewElement();
-    handlingNewTile = true;
+    int totalValueAfterwards = 0;
+    for (int i =0 ; i < elements.length; ++i) {
+      for (int k = 0; k < elements.length; ++k) {
+        totalValueAfterwards += (k+i) * elements[i][k].value;
+      }
+    }
+
+    if (totalValueBefore != totalValueAfterwards) {
+      addNewElement();
+      handlingNewTile = true;
+    }
 
     if (haveTheyMadeAMistake()) {
       dead = true;
@@ -129,7 +144,7 @@ class BoardPainter extends CustomPainter {
     int index =
         possiblePlaces.length == 1 ? 0 : rng.nextInt(possiblePlaces.length - 1);
     elements[possiblePlaces[index][0]][possiblePlaces[index][1]] =
-        BoardElement(2, true);
+        BoardElement(2, true, true);
     elements[possiblePlaces[index][0]][possiblePlaces[index][1]]
         .previousPosition = PreviousPosition(
       possiblePlaces[index][0],
@@ -142,6 +157,8 @@ class BoardPainter extends CustomPainter {
     elements = [];
     handlingMove = false;
     handlingCounter = 0;
+    previous = Size(0, 0);
+    points = 0;
   }
 
   void generateBoard(Size size) {
@@ -162,14 +179,14 @@ class BoardPainter extends CustomPainter {
             ),
           ),
         );
-        elements[i].add(BoardElement(0, false));
+        elements[i].add(BoardElement(0, false, false));
         elements[i][k].previousPosition = PreviousPosition(i, k);
       }
     }
 
     addNewElement();
     addNewElement();
-  handlingNewTile = true;
+    handlingNewTile = true;
   }
 
   void resizeBoard(Size newSize) {
@@ -214,6 +231,7 @@ class BoardPainter extends CustomPainter {
       handlingCounter += deltaT;
       if (dead)
         SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+          cleanUp();
           navigateOnDeath();
         });
       if (handlingCounter > ImportantStylesAndValues.AnimationLength) {
@@ -229,8 +247,9 @@ class BoardPainter extends CustomPainter {
     }
 
     if (handlingNewTile) {
-      handlingNewTileCounter+= deltaT;
-      if (handlingNewTileCounter > ImportantStylesAndValues.NewTileAnimationLength) {
+      handlingNewTileCounter += deltaT;
+      if (handlingNewTileCounter >
+          ImportantStylesAndValues.NewTileAnimationLength) {
         handlingNewTile = false;
         handlingNewTileCounter = 0;
         for (int i = 0; i < elements.length; ++i) {
@@ -257,13 +276,21 @@ class BoardPainter extends CustomPainter {
         );
         if (elements[i][k].value != 0) {
           if (elements[i][k].animateElement) {
-            if (elements[i][k].previousPosition!.i == i &&
+            if (elements[i][k].isNewTile &&
+                elements[i][k].previousPosition!.i == i &&
                 elements[i][k].previousPosition!.k == k) {
-              final ratio = handlingNewTileCounter / ImportantStylesAndValues.NewTileAnimationLength;
+              final ratio = handlingNewTileCounter /
+                  ImportantStylesAndValues.NewTileAnimationLength;
               //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
               Rect rect = Rect.fromLTWH(
-                tileWidth * i + ImportantStylesAndValues.HalfPadding + tileWidth * 0.5 - (ratio * tileWidth * 0.5),
-                tileHeight * k + ImportantStylesAndValues.HalfPadding + tileHeight * 0.5 - (ratio * tileHeight * 0.5),
+                tileWidth * i +
+                    ImportantStylesAndValues.HalfPadding +
+                    tileWidth * 0.5 -
+                    (ratio * tileWidth * 0.5),
+                tileHeight * k +
+                    ImportantStylesAndValues.HalfPadding +
+                    tileHeight * 0.5 -
+                    (ratio * tileHeight * 0.5),
                 (tileWidth - ImportantStylesAndValues.Padding) * ratio,
                 (tileHeight - ImportantStylesAndValues.Padding) * ratio,
               );
@@ -272,7 +299,8 @@ class BoardPainter extends CustomPainter {
                   rect,
                   ImportantStylesAndValues.radius,
                 ),
-                Paint()..color = SquareColors[elements[i][k].value] ?? Colors.red,
+                Paint()
+                  ..color = SquareColors[elements[i][k].value] ?? Colors.red,
               );
               TextPainter scorePainter = TextPainter(
                 textDirection: TextDirection.rtl,
@@ -329,10 +357,12 @@ class BoardPainter extends CustomPainter {
       }
     }
 
-    SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
-      // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
-      rePaint.notifyListeners();
-    });
+    if (!dead) {
+      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+        // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+        rePaint.notifyListeners();
+      });
+    }
   }
 
   @override

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/ui/game.dart';
 
+import 'board.dart';
+
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -20,6 +22,7 @@ class HomePage extends StatelessWidget {
           alignment: Alignment.center,
           child: TextButton(
             onPressed: () {
+              BoardPainter.cleanUp();
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => Game(4),

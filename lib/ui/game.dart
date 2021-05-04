@@ -34,6 +34,10 @@ class _GameState extends State<Game> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    final smaller = width > height ? height : width;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -45,74 +49,47 @@ class _GameState extends State<Game> {
         elevation: 0,
       ),
       body: SafeArea(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          padding: EdgeInsets.all(80),
-          child: RawKeyboardListener(
-            focusNode: FocusNode(),
-            onKey: (value) {
-              Direction? direction;
-              switch (value.data.logicalKey.keyLabel) {
-                case "A":
-                  direction = Direction.Left;
-                  break;
-                case "W":
-                  direction = Direction.Up;
-                  break;
-                case "D":
-                  direction = Direction.Right;
-                  break;
-                case "S":
-                  direction = Direction.Down;
-                  break;
-                case "Arrow Left":
-                  direction = Direction.Left;
-                  break;
-                case "Arrow Up":
-                  direction = Direction.Up;
-                  break;
-                case "Arrow Right":
-                  direction = Direction.Right;
-                  break;
-                case "Arrow Down":
-                  direction = Direction.Down;
-                  break;
-              }
-              if (direction != null)
-                BoardPainter.handleInput(direction, whatByWhat);
-            },
-            child: GestureDetector(
-              onPanUpdate: (DragUpdateDetails dragUpdateDetails) {
-                final changeInX;
-                final changeInY;
-
-                if (dragUpdateDetails.delta.dx < 0) {
-                  changeInX = dragUpdateDetails.delta.dx * -1;
-                } else {
-                  changeInX = dragUpdateDetails.delta.dx;
-                }
-
-                if (dragUpdateDetails.delta.dy < 0) {
-                  changeInY = dragUpdateDetails.delta.dy * -1;
-                } else {
-                  changeInY = dragUpdateDetails.delta.dy;
-                }
-
-                if (changeInY > changeInX) {
-                  if (dragUpdateDetails.delta.dy < 0) {
-                    BoardPainter.handleInput(Direction.Up, whatByWhat);
-                  } else {
-                    BoardPainter.handleInput(Direction.Down, whatByWhat);
-                  }
-                } else {
-                  if (dragUpdateDetails.delta.dx < 0) {
-                    BoardPainter.handleInput(Direction.Left, whatByWhat);
-                  } else {
-                    BoardPainter.handleInput(Direction.Right, whatByWhat);
-                  }
-                }
-              },
+        child: RawKeyboardListener(
+          focusNode: FocusNode(),
+          onKey: (value) {
+            Direction? direction;
+            switch (value.data.logicalKey.keyLabel) {
+              case "A":
+                direction = Direction.Left;
+                break;
+              case "W":
+                direction = Direction.Up;
+                break;
+              case "D":
+                direction = Direction.Right;
+                break;
+              case "S":
+                direction = Direction.Down;
+                break;
+              case "Arrow Left":
+                direction = Direction.Left;
+                break;
+              case "Arrow Up":
+                direction = Direction.Up;
+                break;
+              case "Arrow Right":
+                direction = Direction.Right;
+                break;
+              case "Arrow Down":
+                direction = Direction.Down;
+                break;
+            }
+            if (direction != null)
+              BoardPainter.handleInput(direction, whatByWhat);
+          },
+          child: GestureDetector(
+            onHorizontalDragEnd: (details) => BoardPainter.handleInput(details.primaryVelocity! > 0 ? Direction.Left : Direction.Right, whatByWhat),
+            onVerticalDragEnd: (details) => BoardPainter.handleInput(details.primaryVelocity! > 0 ? Direction.Up : Direction.Down, whatByWhat),
+            child: Container(
+              width: width,
+              height: height,
+              padding: EdgeInsets.all(40),
+              alignment: Alignment.center,
               child: Container(
                 padding: EdgeInsets.all(ImportantStylesAndValues.HalfPadding),
                 decoration: BoxDecoration(
@@ -120,8 +97,17 @@ class _GameState extends State<Game> {
                   borderRadius:
                       BorderRadius.all(ImportantStylesAndValues.radius),
                 ),
+                width: smaller,
+                height: smaller,
                 child: CustomPaint(
-                  painter: BoardPainter(whatByWhat, ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => DeathPage(),))),
+                  painter: BoardPainter(
+                    whatByWhat,
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DeathPage(),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -131,4 +117,3 @@ class _GameState extends State<Game> {
     );
   }
 }
-

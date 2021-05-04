@@ -71,24 +71,20 @@ class BoardPainter extends CustomPainter {
     switch (direction) {
       case Direction.Up:
         newElements = elements.map((e) => doStuff(e)).toList();
-        addNewElement();
         break;
       case Direction.Left:
         newElements =
             inverseList(inverseList(elements).map((e) => doStuff(e)).toList());
-        addNewElement();
         break;
       case Direction.Right:
         newElements = inverseList(inverseList(elements)
             .map((e) => doStuff(e.reversed.toList()).reversed.toList())
             .toList());
-        addNewElement();
         break;
       case Direction.Down:
         newElements = elements
             .map((e) => doStuff(e.reversed.toList()).reversed.toList())
             .toList();
-        addNewElement();
         break;
     }
     if (haveTheyMadeAMistake()) {
@@ -206,6 +202,7 @@ class BoardPainter extends CustomPainter {
         elements = newElements;
         handlingMove = false;
         handlingCounter = 0;
+        addNewElement();
       }
     }
 

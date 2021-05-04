@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:improved_2048/ui/types.dart';
 
+import 'highScore.dart';
+
 Map<int, Color> SquareColors = {
   0: Colors.orange.shade100,
   2: Colors.orange.shade200,
@@ -266,6 +268,7 @@ class BoardPainter extends CustomPainter {
     }
 
     if (!hasSetScore) {
+      HighScore.setHighScore(points);
       SchedulerBinding.instance!.scheduleFrameCallback(
         (timeStamp) => setScore(),
       );

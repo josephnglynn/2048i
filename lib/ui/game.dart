@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/ui/DeathPage.dart';
+import 'package:improved_2048/ui/highScore.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/types.dart';
 
@@ -29,7 +30,7 @@ class _GameState extends State<Game> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "2048 -- Points: ${BoardPainter.points}",
+          "2048 -- Points: ${BoardPainter.points} -- HighScore: ${HighScore.highScore}",
           textAlign: TextAlign.center,
           style: TextStyle(color: Theme.of(context).textTheme.bodyText1!.color),
         ),

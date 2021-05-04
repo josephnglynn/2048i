@@ -9,7 +9,7 @@ class ImportantStylesAndValues {
   static const double HalfPadding = Padding / 2;
 
   static const double NewTileAnimationLength = 0.4;
-  static const double AnimationLength = 0.1;
+  static const double AnimationLength = 0.5 ;
 
   static const Color BackGroundColor = Color.fromRGBO(187, 173, 160, 1);
   static const Color clearTilesColor = Color.fromRGBO(205, 193, 180, 1);

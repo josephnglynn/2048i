@@ -29,7 +29,7 @@ class _GameState extends State<Game> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "2048",
+          "2048 -- Points: ${BoardPainter.points}",
           textAlign: TextAlign.center,
           style: TextStyle(color: Theme.of(context).textTheme.bodyText1!.color),
         ),
@@ -111,6 +111,7 @@ class _GameState extends State<Game> {
                         (route) => false,
                       );
                     },
+                    () => setState(() {}),
                   ),
                 ),
               ),

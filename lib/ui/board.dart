@@ -34,13 +34,15 @@ class BoardPainter extends CustomPainter {
   static double handlingNewTileCounter = 0;
   static Stopwatch stopWatch = Stopwatch()..start();
   static int points = 0;
-
+  static bool hasSetScore = false;
   static bool dead = false;
 
   int whatByWhat;
   final Function navigateOnDeath;
+  final Function setScore;
 
-  BoardPainter(this.whatByWhat, this.navigateOnDeath) : super(repaint: rePaint);
+  BoardPainter(this.whatByWhat, this.navigateOnDeath, this.setScore)
+      : super(repaint: rePaint);
 
   static List<BoardElement> doStuff(List<BoardElement> row) {
     int originalLength = row.length;
@@ -52,6 +54,8 @@ class BoardPainter extends CustomPainter {
         row[i].value = firstNum + secondNum;
         row[i].animateElement = true;
         row[i + 1].value = 0;
+        points += row[i].value;
+        hasSetScore = false;
       }
     }
     row = row.where((val) => val.value != 0).toList();
@@ -75,9 +79,9 @@ class BoardPainter extends CustomPainter {
     handlingMove = true;
 
     int totalValueBefore = 0;
-    for (int i =0 ; i < elements.length; ++i) {
+    for (int i = 0; i < elements.length; ++i) {
       for (int k = 0; k < elements.length; ++k) {
-        totalValueBefore += (k+i) * elements[i][k].value;
+        totalValueBefore += (k + i) * elements[i][k].value;
       }
     }
 
@@ -102,15 +106,16 @@ class BoardPainter extends CustomPainter {
     }
 
     int totalValueAfterwards = 0;
-    for (int i =0 ; i < elements.length; ++i) {
+    for (int i = 0; i < elements.length; ++i) {
       for (int k = 0; k < elements.length; ++k) {
-        totalValueAfterwards += (k+i) * elements[i][k].value;
+        totalValueAfterwards += (k + i) * elements[i][k].value;
       }
     }
 
     if (totalValueBefore != totalValueAfterwards) {
       addNewElement();
       handlingNewTile = true;
+      handlingMove = true;
     }
 
     if (haveTheyMadeAMistake()) {
@@ -260,6 +265,13 @@ class BoardPainter extends CustomPainter {
       }
     }
 
+    if (!hasSetScore) {
+      SchedulerBinding.instance!.scheduleFrameCallback(
+        (timeStamp) => setScore(),
+      );
+      hasSetScore = true;
+    }
+
     for (int i = 0; i < whatByWhat; ++i) {
       for (int k = 0; k < whatByWhat; ++k) {
         canvas.drawRRect(
@@ -276,11 +288,11 @@ class BoardPainter extends CustomPainter {
         );
         if (elements[i][k].value != 0) {
           if (elements[i][k].animateElement) {
+            final ratio = handlingNewTileCounter /
+                ImportantStylesAndValues.NewTileAnimationLength;
             if (elements[i][k].isNewTile &&
                 elements[i][k].previousPosition!.i == i &&
                 elements[i][k].previousPosition!.k == k) {
-              final ratio = handlingNewTileCounter /
-                  ImportantStylesAndValues.NewTileAnimationLength;
               //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
               Rect rect = Rect.fromLTWH(
                 tileWidth * i +
@@ -319,7 +331,38 @@ class BoardPainter extends CustomPainter {
                   rect.top + rect.height / 2 - scorePainter.height / 2,
                 ),
               );
+              continue;
             }
+            Rect rect = Rect.fromLTWH(
+              tileWidth * i + ImportantStylesAndValues.HalfPadding,
+              tileHeight * k + ImportantStylesAndValues.HalfPadding,
+              tileWidth - ImportantStylesAndValues.Padding,
+              tileHeight - ImportantStylesAndValues.Padding,
+            );
+            canvas.drawRRect(
+              RRect.fromRectAndRadius(
+                rect,
+                ImportantStylesAndValues.radius,
+              ),
+              Paint()..color = SquareColors[elements[i][k].value] ?? Colors.red,
+            );
+            TextPainter scorePainter = TextPainter(
+              textDirection: TextDirection.rtl,
+              text: TextSpan(
+                text: elements[i][k].value.toString(),
+                style: TextStyle(
+                  fontSize: 40,
+                ),
+              ),
+            );
+            scorePainter.layout();
+            scorePainter.paint(
+              canvas,
+              Offset(
+                rect.left + rect.width / 2 - scorePainter.width / 2,
+                rect.top + rect.height / 2 - scorePainter.height / 2,
+              ),
+            );
 
             continue;
           }

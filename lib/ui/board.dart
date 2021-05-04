@@ -8,7 +8,7 @@ import 'package:improved_2048/ui/types.dart';
 
 import 'highScore.dart';
 
-Map<int, Color> SquareColors = {
+Map<int, Color> squareColors = {
   0: Colors.orange.shade100,
   2: Colors.orange.shade200,
   4: Colors.orange.shade300,
@@ -315,7 +315,7 @@ class BoardPainter extends CustomPainter {
                   ImportantStylesAndValues.radius,
                 ),
                 Paint()
-                  ..color = SquareColors[elements[i][k].value] ?? Colors.red,
+                  ..color = squareColors[elements[i][k].value] ?? Colors.red,
               );
               TextPainter scorePainter = TextPainter(
                 textDirection: TextDirection.rtl,
@@ -347,7 +347,7 @@ class BoardPainter extends CustomPainter {
                 rect,
                 ImportantStylesAndValues.radius,
               ),
-              Paint()..color = SquareColors[elements[i][k].value] ?? Colors.red,
+              Paint()..color = squareColors[elements[i][k].value] ?? Colors.red,
             );
             TextPainter scorePainter = TextPainter(
               textDirection: TextDirection.rtl,
@@ -380,7 +380,7 @@ class BoardPainter extends CustomPainter {
               rect,
               ImportantStylesAndValues.radius,
             ),
-            Paint()..color = SquareColors[elements[i][k].value] ?? Colors.red,
+            Paint()..color = squareColors[elements[i][k].value] ?? Colors.red,
           );
           TextPainter scorePainter = TextPainter(
             textDirection: TextDirection.rtl,

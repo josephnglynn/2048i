@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:improved_2048/ui/DeathPage.dart';
 import 'package:improved_2048/ui/highScore.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/types.dart';

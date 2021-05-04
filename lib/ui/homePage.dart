@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/ui/game.dart';
 
-import 'board.dart';
 
 class HomePage extends StatelessWidget {
   @override

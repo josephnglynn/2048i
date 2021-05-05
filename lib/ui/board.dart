@@ -9,7 +9,6 @@ import 'package:improved_2048/ui/types.dart';
 
 import 'highScore.dart';
 
-
 class BoardPainter extends CustomPainter {
   static final rePaint = new ChangeNotifier();
 
@@ -120,6 +119,10 @@ class BoardPainter extends CustomPainter {
         if (elements[i][k].value == 0) {
           return false;
         }
+        if (
+            k + 1 < elements.length  && elements[i][k].value == elements[i][k + 1].value) return false;
+        if (i + 1 < elements.length &&
+            elements[i + 1][k].value == elements[i][k].value) return false;
       }
     }
     return true;
@@ -310,7 +313,9 @@ class BoardPainter extends CustomPainter {
                   ImportantValues.radius,
                 ),
                 Paint()
-                  ..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
+                  ..color = Settings.boardThemeValues
+                          .getSquareColors()[elements[i][k].value] ??
+                      Colors.red,
               );
               TextPainter scorePainter = TextPainter(
                 textDirection: TextDirection.rtl,
@@ -342,7 +347,10 @@ class BoardPainter extends CustomPainter {
                 rect,
                 ImportantValues.radius,
               ),
-              Paint()..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
+              Paint()
+                ..color = Settings.boardThemeValues
+                        .getSquareColors()[elements[i][k].value] ??
+                    Colors.red,
             );
             TextPainter scorePainter = TextPainter(
               textDirection: TextDirection.rtl,
@@ -375,7 +383,10 @@ class BoardPainter extends CustomPainter {
               rect,
               ImportantValues.radius,
             ),
-            Paint()..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
+            Paint()
+              ..color = Settings.boardThemeValues
+                      .getSquareColors()[elements[i][k].value] ??
+                  Colors.red,
           );
           TextPainter scorePainter = TextPainter(
             textDirection: TextDirection.rtl,

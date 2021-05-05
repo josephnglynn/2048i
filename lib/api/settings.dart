@@ -15,7 +15,7 @@ class Settings {
       case 1:
         boardThemeValues = SeanTheme();
         break;
-      case 3:
+      case 2:
         boardThemeValues = DefaultTheme();
         break;
     }
@@ -35,7 +35,6 @@ class Settings {
   static Future init() async {
     final prefs = await SharedPreferences.getInstance();
     _themeSetter(prefs.getInt("theme") ?? 0);
-
 
     fontSizeScale = prefs.getDouble("fontSizeScale") ?? 0.75;
   }

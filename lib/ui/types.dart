@@ -15,8 +15,8 @@ class ImportantValues {
   static const double Padding = 5;
   static const double HalfPadding = Padding / 2;
 
-  static const double NewTileAnimationLength = 0.4;
-  static const double AnimationLength = 0.5;
+  static const double NewTileAnimationLength = 0.2;
+  static const double AnimationLength = 0.25;
 }
 
 class MutableRectangle {

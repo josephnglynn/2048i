@@ -131,7 +131,12 @@ class _HomePageState extends State<HomePage> {
                   (route) => false,
                 );
               },
-              child: Text("PLAY GAME"),
+              child: Text(
+                "PLAY GAME",
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyText1!.color,
+                ),
+              ),
             ),
           ],
         ),

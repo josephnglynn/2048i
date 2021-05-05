@@ -18,27 +18,21 @@ class Game extends StatefulWidget {
 class _GameState extends State<Game> {
   static const double padding = 40;
   static const double times2Padding = padding * 2;
-  
-  final int whatByWhat;
-  _GameState(this.whatByWhat);
 
+  final int whatByWhat;
+  final Stopwatch stopwatch = Stopwatch()..start();
+
+  _GameState(this.whatByWhat);
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width - times2Padding;
-    final height = MediaQuery.of(context).size.height - times2Padding;
+    final width = MediaQuery.of(context).size.width - times2Padding - 50;
+    final height = MediaQuery.of(context).size.height - times2Padding - 50;
     final smaller = width > height ? height : width;
 
+    Future.delayed(Duration(seconds: 1), () => setState(() {}));
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "2048 -- Points: ${BoardPainter.points} -- HighScore: ${HighScore.highScore}",
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Theme.of(context).textTheme.bodyText1!.color),
-        ),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-      ),
       body: SafeArea(
         child: RawKeyboardListener(
           focusNode: FocusNode(),
@@ -88,38 +82,62 @@ class _GameState extends State<Game> {
                   details.primaryVelocity! < 0 ? Direction.Up : Direction.Down,
                   whatByWhat);
             },
-            child: Container(
-              padding: EdgeInsets.all(padding),
-              alignment: Alignment.center,
-              child: Container(
-                padding: EdgeInsets.all(ImportantValues.HalfPadding),
-                decoration: BoxDecoration(
-                  color: Settings.boardThemeValues.getBoardBackgroundColor(),
-                  borderRadius:
-                      BorderRadius.all(ImportantValues.radius),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: padding + 25, right: padding + 25, top: padding, bottom: padding / 2),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("score: ${BoardPainter.points}"),
+                      Text("highScore: ${HighScore.highScore}"),
+                    ],
+                  ),
                 ),
-                width: smaller,
-                height: smaller,
-                  child:  CustomPaint(
-                    painter: BoardPainter(
-                      whatByWhat,
-                          () {
-                        BoardPainter.cleanUp();
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => HomePage(),
-                          ),
-                              (route) => false,
-                        );
-                      },
-                          () => setState(() {}),
+                Container(
+                  padding: EdgeInsets.only(left: padding, right: padding),
+                  alignment: Alignment.center,
+                  child: Container(
+                    padding: EdgeInsets.all(ImportantValues.HalfPadding),
+                    decoration: BoxDecoration(
+                      color:
+                          Settings.boardThemeValues.getBoardBackgroundColor(),
+                      borderRadius: BorderRadius.all(ImportantValues.radius),
+                    ),
+                    width: smaller,
+                    height: smaller,
+                    child: CustomPaint(
+                      painter: BoardPainter(
+                        whatByWhat,
+                        () {
+                          BoardPainter.cleanUp();
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => HomePage(),
+                            ),
+                            (route) => false,
+                          );
+                        },
+                        () => setState(() {}),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                Padding(
+                  padding:
+                      EdgeInsets.only(right: smaller - 60, top: padding / 2),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("time: ${stopwatch.elapsed.inSeconds}"),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
         ),
+      ),
     );
   }
 }

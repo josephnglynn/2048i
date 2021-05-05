@@ -17,15 +17,17 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
+  static const double padding = 40;
+  static const double times2Padding = padding * 2;
+  
   final int whatByWhat;
-
   _GameState(this.whatByWhat);
 
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width - times2Padding;
+    final height = MediaQuery.of(context).size.height - times2Padding;
     final smaller = width > height ? height : width;
 
     return Scaffold(
@@ -88,7 +90,7 @@ class _GameState extends State<Game> {
                   whatByWhat);
             },
             child: Container(
-              padding: EdgeInsets.all(40),
+              padding: EdgeInsets.all(padding),
               alignment: Alignment.center,
               child: Container(
                 padding: EdgeInsets.all(ImportantValues.HalfPadding),

@@ -8,7 +8,7 @@ class ImportantValues {
   static void updateRadius(int size) {
     final power = pow(0.8, size);
     radius = Radius.circular(
-      power.toDouble() * 15,
+      power.toDouble() * 10,
     );
   }
 

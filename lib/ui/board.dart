@@ -9,20 +9,6 @@ import 'package:improved_2048/ui/types.dart';
 
 import 'highScore.dart';
 
-Map<int, Color> squareColors = {
-  0: Colors.orange.shade100,
-  2: Colors.green.shade200,
-  4: Colors.green.shade300,
-  8: Colors.green.shade400,
-  16: Colors.blue.shade500,
-  32: Colors.blue.shade600,
-  64: Colors.blue.shade600,
-  128: Colors.purple.shade700,
-  256: Colors.purple.shade700,
-  512: Colors.purple.shade800,
-  1024: Colors.orange.shade800,
-  2048: Colors.orange.shade900,
-};
 
 class BoardPainter extends CustomPainter {
   static final rePaint = new ChangeNotifier();
@@ -324,7 +310,7 @@ class BoardPainter extends CustomPainter {
                   ImportantValues.radius,
                 ),
                 Paint()
-                  ..color = squareColors[elements[i][k].value] ?? Colors.red,
+                  ..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
               );
               TextPainter scorePainter = TextPainter(
                 textDirection: TextDirection.rtl,
@@ -356,7 +342,7 @@ class BoardPainter extends CustomPainter {
                 rect,
                 ImportantValues.radius,
               ),
-              Paint()..color = squareColors[elements[i][k].value] ?? Colors.red,
+              Paint()..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
             );
             TextPainter scorePainter = TextPainter(
               textDirection: TextDirection.rtl,
@@ -389,7 +375,7 @@ class BoardPainter extends CustomPainter {
               rect,
               ImportantValues.radius,
             ),
-            Paint()..color = squareColors[elements[i][k].value] ?? Colors.red,
+            Paint()..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
           );
           TextPainter scorePainter = TextPainter(
             textDirection: TextDirection.rtl,

@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/board.dart';
 import 'package:improved_2048/ui/game.dart';
+import 'package:improved_2048/ui/settingsPage.dart';
 import 'package:improved_2048/ui/types.dart';
 
 class HomePage extends StatefulWidget {
@@ -108,15 +109,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: IconButton(
-        splashRadius: 1,
-        padding: EdgeInsets.only(top: 60),
-        icon: Icon(
-          Icons.settings,
-        ),
-        onPressed: () {},
-      ),
       bottomSheet: Padding(
         padding: EdgeInsets.all(20),
         child: Row(
@@ -134,6 +126,19 @@ class _HomePageState extends State<HomePage> {
               child: Text("PLAY GAME"),
             ),
           ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: IconButton(
+        splashRadius: 1,
+        padding: EdgeInsets.only(top: 60),
+        icon: Icon(
+          Icons.settings,
+        ),
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => SettingsPage(),
+          ),
         ),
       ),
     );

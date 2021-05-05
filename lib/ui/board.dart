@@ -234,7 +234,7 @@ class BoardPainter extends CustomPainter {
 
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
-    final fontSize = tileHeight * 0.75;
+    final fontSize = tileHeight * Settings.fontSizeScale;
 
     if (handlingMove) {
       handlingCounter += deltaT;

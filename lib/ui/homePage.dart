@@ -17,6 +17,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Settings.boardThemeValues.updateDarkTheme();
+
     double width = MediaQuery.of(context).size.width - 150;
     double height = MediaQuery.of(context).size.height - 150;
 

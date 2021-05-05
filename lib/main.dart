@@ -12,6 +12,7 @@ void main() async {
     MaterialApp(
       darkTheme: ThemeData.dark(),
       theme: ThemeData.light(),
+      themeMode: ThemeMode.dark,
       home: HomePage(),
     ),
   );

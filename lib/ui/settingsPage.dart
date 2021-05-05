@@ -9,7 +9,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   double fontSize = Settings.fontSizeScale;
-  int themeIndex = 0;
+  int themeIndex = Settings.themeIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         value: 2,
                       ),
                     ],
-                    onChanged: (value) => setState(() => themeIndex = value!),
+                    onChanged: (value) async {
+                      await Settings.setTheme(value!);
+                      setState(() => themeIndex = value);
+                    },
                   ),
                 ],
               ),

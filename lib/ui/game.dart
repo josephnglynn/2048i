@@ -104,6 +104,7 @@ class _GameState extends State<Game> {
                     whatByWhat);
               },
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
                     padding: EdgeInsets.only(

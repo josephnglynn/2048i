@@ -45,7 +45,9 @@ class BoardPainter extends CustomPainter {
   final Function setScore;
 
   BoardPainter(this.whatByWhat, this.navigateOnDeath, this.setScore)
-      : super(repaint: rePaint);
+      : super(repaint: rePaint) {
+    ImportantValues.updateRadius(whatByWhat);
+  }
 
   static List<BoardElement> doStuff(List<BoardElement> row) {
     int originalLength = row.length;
@@ -163,10 +165,16 @@ class BoardPainter extends CustomPainter {
   static void cleanUp() {
     board = [];
     elements = [];
+    previous = Size(0, 0);
+    rng = Random();
     handlingMove = false;
     handlingCounter = 0;
-    previous = Size(0, 0);
+    handlingNewTile = false;
+    handlingNewTileCounter = 0;
+    stopWatch = Stopwatch()..start();
     points = 0;
+    hasSetScore = false;
+    dead = false;
   }
 
   void generateBoard(Size size) {
@@ -257,8 +265,7 @@ class BoardPainter extends CustomPainter {
 
     if (handlingNewTile) {
       handlingNewTileCounter += deltaT;
-      if (handlingNewTileCounter >
-          ImportantValues.NewTileAnimationLength) {
+      if (handlingNewTileCounter > ImportantValues.NewTileAnimationLength) {
         handlingNewTile = false;
         handlingNewTileCounter = 0;
         for (int i = 0; i < elements.length; ++i) {
@@ -293,8 +300,8 @@ class BoardPainter extends CustomPainter {
         );
         if (elements[i][k].value != 0) {
           if (elements[i][k].animateElement) {
-            final ratio = handlingNewTileCounter /
-                ImportantValues.NewTileAnimationLength;
+            final ratio =
+                handlingNewTileCounter / ImportantValues.NewTileAnimationLength;
             if (elements[i][k].isNewTile &&
                 elements[i][k].previousPosition!.i == i &&
                 elements[i][k].previousPosition!.k == k) {

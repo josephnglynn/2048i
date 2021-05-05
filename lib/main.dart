@@ -11,7 +11,10 @@ void main() async {
   await HighScore.init();
   runApp(
     MaterialApp(
+darkTheme: ThemeData.dark(),
+themeMode: ThemeMode.system,
       home: HomePage(),
+
     )
   );
 }

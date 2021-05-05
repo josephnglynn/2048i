@@ -44,65 +44,71 @@ class _HomePageState extends State<HomePage> {
                 textAlign: TextAlign.center,
               ),
               Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                      padding: EdgeInsets.only(right: 20),
-                      onPressed: () {
-                        if (sizeOfGrid == 3) return;
-                        BoardPainter.dead = true;
-                        SchedulerBinding.instance!
-                            .scheduleFrameCallback((timeStamp) {
-                          BoardPainter.cleanUp();
-                          setState(() => sizeOfGrid--);
-                        });
-                      },
-                      icon: Icon(Icons.arrow_back_ios),
-                      splashRadius: 20,
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      child: Container(
-                        padding: EdgeInsets.all(ImportantValues.HalfPadding),
-                        decoration: BoxDecoration(
-                          color: Settings.boardThemeValues
-                              .getBoardBackgroundColor(),
-                          borderRadius:
-                              BorderRadius.all(ImportantValues.radius),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.only(right: 20),
+                          onPressed: () {
+                            if (sizeOfGrid == 3) return;
+                            BoardPainter.dead = true;
+                            SchedulerBinding.instance!
+                                .scheduleFrameCallback((timeStamp) {
+                              BoardPainter.cleanUp();
+                              setState(() => sizeOfGrid--);
+                            });
+                          },
+                          icon: Icon(Icons.arrow_back_ios),
+                          splashRadius: 20,
                         ),
-                        width: smaller,
-                        height: smaller,
-                        child: CustomPaint(
-                          painter: BoardPainter(sizeOfGrid, () {}, () {}),
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              "${sizeOfGrid}x$sizeOfGrid",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Theme.of(context).textTheme.bodyText1!.color,
-                                fontSize: 50,
-                              ),
+                        Container(
+                          alignment: Alignment.center,
+                          child: Container(
+                            padding:
+                                EdgeInsets.all(ImportantValues.HalfPadding),
+                            decoration: BoxDecoration(
+                              color: Settings.boardThemeValues
+                                  .getBoardBackgroundColor(),
+                              borderRadius:
+                                  BorderRadius.all(ImportantValues.radius),
+                            ),
+                            width: smaller,
+                            height: smaller,
+                            child: CustomPaint(
+                              painter: BoardPainter(sizeOfGrid, () {}, () {}),
                             ),
                           ),
                         ),
-                      ),
+                        IconButton(
+                          padding: EdgeInsets.only(left: 20),
+                          splashRadius: 20,
+                          onPressed: () {
+                            BoardPainter.dead = true;
+                            SchedulerBinding.instance!
+                                .scheduleFrameCallback((timeStamp) {
+                              BoardPainter.cleanUp();
+                              setState(() => sizeOfGrid++);
+                            });
+                          },
+                          icon: Icon(Icons.arrow_forward_ios),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      padding: EdgeInsets.only(left: 20),
-                      splashRadius: 20,
-                      onPressed: () {
-                        BoardPainter.dead = true;
-                        SchedulerBinding.instance!
-                            .scheduleFrameCallback((timeStamp) {
-                          BoardPainter.cleanUp();
-                          setState(() => sizeOfGrid++);
-                        });
-                      },
-                      icon: Icon(Icons.arrow_forward_ios),
+                    Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Text(
+                        "${sizeOfGrid}x$sizeOfGrid",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyText1!.color,
+                          fontSize: 20,
+                        ),
+                      ),
                     ),
                   ],
                 ),

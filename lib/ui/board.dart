@@ -9,20 +9,6 @@ import 'package:improved_2048/ui/types.dart';
 
 import 'highScore.dart';
 
-Map<int, Color> squareColors = {
-  0: Colors.orange.shade100,
-  2: Colors.green.shade200,
-  4: Colors.green.shade300,
-  8: Colors.green.shade400,
-  16: Colors.blue.shade500,
-  32: Colors.blue.shade600,
-  64: Colors.blue.shade600,
-  128: Colors.purple.shade700,
-  256: Colors.purple.shade700,
-  512: Colors.purple.shade800,
-  1024: Colors.orange.shade800,
-  2048: Colors.orange.shade900,
-};
 
 class BoardPainter extends CustomPainter {
   static final rePaint = new ChangeNotifier();
@@ -45,7 +31,9 @@ class BoardPainter extends CustomPainter {
   final Function setScore;
 
   BoardPainter(this.whatByWhat, this.navigateOnDeath, this.setScore)
-      : super(repaint: rePaint);
+      : super(repaint: rePaint) {
+    ImportantValues.updateRadius(whatByWhat);
+  }
 
   static List<BoardElement> doStuff(List<BoardElement> row) {
     int originalLength = row.length;
@@ -163,10 +151,16 @@ class BoardPainter extends CustomPainter {
   static void cleanUp() {
     board = [];
     elements = [];
+    previous = Size(0, 0);
+    rng = Random();
     handlingMove = false;
     handlingCounter = 0;
-    previous = Size(0, 0);
+    handlingNewTile = false;
+    handlingNewTileCounter = 0;
+    stopWatch = Stopwatch()..start();
     points = 0;
+    hasSetScore = false;
+    dead = false;
   }
 
   void generateBoard(Size size) {
@@ -257,8 +251,7 @@ class BoardPainter extends CustomPainter {
 
     if (handlingNewTile) {
       handlingNewTileCounter += deltaT;
-      if (handlingNewTileCounter >
-          ImportantValues.NewTileAnimationLength) {
+      if (handlingNewTileCounter > ImportantValues.NewTileAnimationLength) {
         handlingNewTile = false;
         handlingNewTileCounter = 0;
         for (int i = 0; i < elements.length; ++i) {
@@ -293,8 +286,8 @@ class BoardPainter extends CustomPainter {
         );
         if (elements[i][k].value != 0) {
           if (elements[i][k].animateElement) {
-            final ratio = handlingNewTileCounter /
-                ImportantValues.NewTileAnimationLength;
+            final ratio =
+                handlingNewTileCounter / ImportantValues.NewTileAnimationLength;
             if (elements[i][k].isNewTile &&
                 elements[i][k].previousPosition!.i == i &&
                 elements[i][k].previousPosition!.k == k) {
@@ -317,7 +310,7 @@ class BoardPainter extends CustomPainter {
                   ImportantValues.radius,
                 ),
                 Paint()
-                  ..color = squareColors[elements[i][k].value] ?? Colors.red,
+                  ..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
               );
               TextPainter scorePainter = TextPainter(
                 textDirection: TextDirection.rtl,
@@ -349,7 +342,7 @@ class BoardPainter extends CustomPainter {
                 rect,
                 ImportantValues.radius,
               ),
-              Paint()..color = squareColors[elements[i][k].value] ?? Colors.red,
+              Paint()..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
             );
             TextPainter scorePainter = TextPainter(
               textDirection: TextDirection.rtl,
@@ -382,7 +375,7 @@ class BoardPainter extends CustomPainter {
               rect,
               ImportantValues.radius,
             ),
-            Paint()..color = squareColors[elements[i][k].value] ?? Colors.red,
+            Paint()..color = Settings.boardThemeValues.getSquareColors()[elements[i][k].value] ?? Colors.red,
           );
           TextPainter scorePainter = TextPainter(
             textDirection: TextDirection.rtl,

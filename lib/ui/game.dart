@@ -4,7 +4,6 @@ import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/highScore.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/types.dart';
-
 import 'board.dart';
 
 class Game extends StatefulWidget {

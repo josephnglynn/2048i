@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                               "${sizeOfGrid}x$sizeOfGrid",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: Colors.grey.shade600,
+                                color: Theme.of(context).textTheme.bodyText1!.color,
                                 fontSize: 50,
                               ),
                             ),

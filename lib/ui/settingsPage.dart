@@ -37,7 +37,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text("Font Size Scale  :  $fontSize"),
                 SizedBox(
                   width: MediaQuery.of(context).size.width / 3,
-                  child: TextField(
+                  child: TextFormField(
+                    initialValue: fontSize.toString(),
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.number,
                     onChanged: (value) async {

@@ -15,6 +15,9 @@ class Settings {
       case 1:
         boardThemeValues = SeanTheme();
         break;
+      case 3:
+        boardThemeValues = DefaultTheme();
+        break;
     }
   }
 

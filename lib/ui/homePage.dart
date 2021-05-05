@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/ui/game.dart';
 
-
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -21,10 +20,11 @@ class HomePage extends StatelessWidget {
           alignment: Alignment.center,
           child: TextButton(
             onPressed: () {
-              Navigator.of(context).push(
+              Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                   builder: (context) => Game(4),
                 ),
+                (route) => false,
               );
             },
             child: Text("PLAY GAME"),

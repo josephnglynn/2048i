@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/highScore.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/types.dart';
@@ -19,6 +20,7 @@ class _GameState extends State<Game> {
   final int whatByWhat;
 
   _GameState(this.whatByWhat);
+
 
   @override
   Widget build(BuildContext context) {
@@ -86,39 +88,37 @@ class _GameState extends State<Game> {
                   whatByWhat);
             },
             child: Container(
-              width: width,
-              height: height,
               padding: EdgeInsets.all(40),
               alignment: Alignment.center,
               child: Container(
-                padding: EdgeInsets.all(ImportantStylesAndValues.HalfPadding),
+                padding: EdgeInsets.all(ImportantValues.HalfPadding),
                 decoration: BoxDecoration(
-                  color: ImportantStylesAndValues.BackGroundColor,
+                  color: Settings.boardThemeValues.getBoardBackgroundColor(),
                   borderRadius:
-                      BorderRadius.all(ImportantStylesAndValues.radius),
+                      BorderRadius.all(ImportantValues.radius),
                 ),
                 width: smaller,
                 height: smaller,
-                child: CustomPaint(
-                  painter: BoardPainter(
-                    whatByWhat,
-                    () {
-                      BoardPainter.cleanUp();
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => HomePage(),
-                        ),
-                        (route) => false,
-                      );
-                    },
-                    () => setState(() {}),
+                  child:  CustomPaint(
+                    painter: BoardPainter(
+                      whatByWhat,
+                          () {
+                        BoardPainter.cleanUp();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(),
+                          ),
+                              (route) => false,
+                        );
+                      },
+                          () => setState(() {}),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ),
     );
   }
 }

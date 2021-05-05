@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/types.dart';
 
 import 'highScore.dart';
@@ -179,10 +180,10 @@ class BoardPainter extends CustomPainter {
         board[i].add(
           BoardTile(
             MutableRectangle(
-              tileWidth * i + ImportantStylesAndValues.HalfPadding,
-              tileHeight * k + ImportantStylesAndValues.HalfPadding,
-              tileWidth - ImportantStylesAndValues.Padding,
-              tileHeight - ImportantStylesAndValues.Padding,
+              tileWidth * i + ImportantValues.HalfPadding,
+              tileHeight * k + ImportantValues.HalfPadding,
+              tileWidth - ImportantValues.Padding,
+              tileHeight - ImportantValues.Padding,
             ),
           ),
         );
@@ -204,10 +205,10 @@ class BoardPainter extends CustomPainter {
       for (int k = 0; k < whatByWhat; ++k) {
         board[i][k] = BoardTile(
           MutableRectangle(
-            tileWidth * i + ImportantStylesAndValues.HalfPadding,
-            tileHeight * k + ImportantStylesAndValues.HalfPadding,
-            tileWidth - ImportantStylesAndValues.Padding,
-            tileHeight - ImportantStylesAndValues.Padding,
+            tileWidth * i + ImportantValues.HalfPadding,
+            tileHeight * k + ImportantValues.HalfPadding,
+            tileWidth - ImportantValues.Padding,
+            tileHeight - ImportantValues.Padding,
           ),
         );
       }
@@ -241,7 +242,7 @@ class BoardPainter extends CustomPainter {
           cleanUp();
           navigateOnDeath();
         });
-      if (handlingCounter > ImportantStylesAndValues.AnimationLength) {
+      if (handlingCounter > ImportantValues.AnimationLength) {
         handlingMove = false;
         handlingCounter = 0;
         for (int i = 0; i < elements.length; ++i) {
@@ -256,7 +257,7 @@ class BoardPainter extends CustomPainter {
     if (handlingNewTile) {
       handlingNewTileCounter += deltaT;
       if (handlingNewTileCounter >
-          ImportantStylesAndValues.NewTileAnimationLength) {
+          ImportantValues.NewTileAnimationLength) {
         handlingNewTile = false;
         handlingNewTileCounter = 0;
         for (int i = 0; i < elements.length; ++i) {
@@ -285,34 +286,34 @@ class BoardPainter extends CustomPainter {
               board[i][k].dimensions.width,
               board[i][k].dimensions.height,
             ),
-            ImportantStylesAndValues.radius,
+            ImportantValues.radius,
           ),
-          ImportantStylesAndValues.clearTilesPaint,
+          Settings.boardThemeValues.getClearTilePaint(),
         );
         if (elements[i][k].value != 0) {
           if (elements[i][k].animateElement) {
             final ratio = handlingNewTileCounter /
-                ImportantStylesAndValues.NewTileAnimationLength;
+                ImportantValues.NewTileAnimationLength;
             if (elements[i][k].isNewTile &&
                 elements[i][k].previousPosition!.i == i &&
                 elements[i][k].previousPosition!.k == k) {
               //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
               Rect rect = Rect.fromLTWH(
                 tileWidth * i +
-                    ImportantStylesAndValues.HalfPadding +
+                    ImportantValues.HalfPadding +
                     tileWidth * 0.5 -
                     (ratio * tileWidth * 0.5),
                 tileHeight * k +
-                    ImportantStylesAndValues.HalfPadding +
+                    ImportantValues.HalfPadding +
                     tileHeight * 0.5 -
                     (ratio * tileHeight * 0.5),
-                (tileWidth - ImportantStylesAndValues.Padding) * ratio,
-                (tileHeight - ImportantStylesAndValues.Padding) * ratio,
+                (tileWidth - ImportantValues.Padding) * ratio,
+                (tileHeight - ImportantValues.Padding) * ratio,
               );
               canvas.drawRRect(
                 RRect.fromRectAndRadius(
                   rect,
-                  ImportantStylesAndValues.radius,
+                  ImportantValues.radius,
                 ),
                 Paint()
                   ..color = squareColors[elements[i][k].value] ?? Colors.red,
@@ -337,15 +338,15 @@ class BoardPainter extends CustomPainter {
               continue;
             }
             Rect rect = Rect.fromLTWH(
-              tileWidth * i + ImportantStylesAndValues.HalfPadding,
-              tileHeight * k + ImportantStylesAndValues.HalfPadding,
-              tileWidth - ImportantStylesAndValues.Padding,
-              tileHeight - ImportantStylesAndValues.Padding,
+              tileWidth * i + ImportantValues.HalfPadding,
+              tileHeight * k + ImportantValues.HalfPadding,
+              tileWidth - ImportantValues.Padding,
+              tileHeight - ImportantValues.Padding,
             );
             canvas.drawRRect(
               RRect.fromRectAndRadius(
                 rect,
-                ImportantStylesAndValues.radius,
+                ImportantValues.radius,
               ),
               Paint()..color = squareColors[elements[i][k].value] ?? Colors.red,
             );
@@ -370,15 +371,15 @@ class BoardPainter extends CustomPainter {
             continue;
           }
           Rect rect = Rect.fromLTWH(
-            tileWidth * i + ImportantStylesAndValues.HalfPadding,
-            tileHeight * k + ImportantStylesAndValues.HalfPadding,
-            tileWidth - ImportantStylesAndValues.Padding,
-            tileHeight - ImportantStylesAndValues.Padding,
+            tileWidth * i + ImportantValues.HalfPadding,
+            tileHeight * k + ImportantValues.HalfPadding,
+            tileWidth - ImportantValues.Padding,
+            tileHeight - ImportantValues.Padding,
           );
           canvas.drawRRect(
             RRect.fromRectAndRadius(
               rect,
-              ImportantStylesAndValues.radius,
+              ImportantValues.radius,
             ),
             Paint()..color = squareColors[elements[i][k].value] ?? Colors.red,
           );

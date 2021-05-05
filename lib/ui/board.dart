@@ -234,6 +234,7 @@ class BoardPainter extends CustomPainter {
 
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
+    final fontSize = tileHeight * 0.75;
 
     if (handlingMove) {
       handlingCounter += deltaT;
@@ -323,7 +324,7 @@ class BoardPainter extends CustomPainter {
                 text: TextSpan(
                   text: elements[i][k].value.toString(),
                   style: TextStyle(
-                    fontSize: 40 * ratio,
+                    fontSize: fontSize * ratio,
                   ),
                 ),
               );
@@ -355,7 +356,7 @@ class BoardPainter extends CustomPainter {
               text: TextSpan(
                 text: elements[i][k].value.toString(),
                 style: TextStyle(
-                  fontSize: 40,
+                  fontSize: fontSize,
                 ),
               ),
             );
@@ -388,7 +389,7 @@ class BoardPainter extends CustomPainter {
             text: TextSpan(
               text: elements[i][k].value.toString(),
               style: TextStyle(
-                fontSize: 40,
+                fontSize: fontSize,
               ),
             ),
           );

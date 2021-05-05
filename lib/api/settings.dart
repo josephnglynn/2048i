@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings {
   static late BoardThemeValues boardThemeValues;
+  static late double fontSizeScale;
 
 
   static Future init() async {
@@ -14,5 +15,7 @@ class Settings {
         boardThemeValues = DefaultTheme();
         break;
     }
+
+    fontSizeScale = prefs.getDouble("fontSizeScale") ?? 0.75;
   }
 }

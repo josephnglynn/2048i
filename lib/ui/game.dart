@@ -26,6 +26,7 @@ class _GameState extends State<Game> {
   _GameState(this.whatByWhat);
 
   void goBackToHomePage() {
+    
     BoardPainter.cleanUp();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
@@ -136,13 +137,10 @@ class _GameState extends State<Game> {
                         painter: BoardPainter(
                           whatByWhat,
                           () {
-                            BoardPainter.cleanUp();
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ),
-                              (route) => false,
-                            );
+                            BoardPainter.dead = true;
+        SchedulerBinding.instance!.scheduleFrameCallback(
+          (timeStamp) => goBackToHomePage(),
+        );
                           },
                           () => setState(() {}),
                         ),

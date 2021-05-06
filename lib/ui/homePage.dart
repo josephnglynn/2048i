@@ -30,127 +30,159 @@ class _HomePageState extends State<HomePage> {
     }
     final smaller = width > height ? height : width;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Text(
-                "Welcome to 2048 improved",
-                style: TextStyle(fontSize: 50),
-                textAlign: TextAlign.center,
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
+    void increaseGrid() {
+      BoardPainter.dead = true;
+      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+        BoardPainter.cleanUp();
+        setState(() => sizeOfGrid++);
+      });
+    }
+
+    void decreaseGrid() {
+      if (sizeOfGrid == 3) return;
+      BoardPainter.dead = true;
+      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+        BoardPainter.cleanUp();
+        setState(() => sizeOfGrid--);
+      });
+    }
+
+    return GestureDetector(
+      onVerticalDragEnd: (details) => details.velocity.pixelsPerSecond.dx < 0
+          ? increaseGrid()
+          : decreaseGrid(),
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: RawKeyboardListener(
+              focusNode: FocusNode(),
+              onKey: (value) {
+                if (!value.isKeyPressed(value.data.logicalKey)) return;
+                switch (value.data.logicalKey.keyLabel) {
+                  case "A":
+                    decreaseGrid();
+                    break;
+
+                  case "D":
+                    increaseGrid();
+                    break;
+
+                  case "Arrow Left":
+                    decreaseGrid();
+                    break;
+
+                  case "Arrow Right":
+                    increaseGrid();
+                    break;
+                }
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Text(
+                    "Welcome to 2048 improved",
+                    style: TextStyle(fontSize: 50),
+                    textAlign: TextAlign.center,
+                  ),
+                  Expanded(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        IconButton(
-                          padding: EdgeInsets.only(right: 20),
-                          onPressed: () {
-                            if (sizeOfGrid == 3) return;
-                            BoardPainter.dead = true;
-                            SchedulerBinding.instance!
-                                .scheduleFrameCallback((timeStamp) {
-                              BoardPainter.cleanUp();
-                              setState(() => sizeOfGrid--);
-                            });
-                          },
-                          icon: Icon(Icons.arrow_back_ios),
-                          splashRadius: 20,
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          child: Container(
-                            padding:
-                                EdgeInsets.all(ImportantValues.HalfPadding),
-                            decoration: BoxDecoration(
-                              color: Settings.boardThemeValues
-                                  .getBoardBackgroundColor(),
-                              borderRadius:
-                                  BorderRadius.all(ImportantValues.radius),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              padding: EdgeInsets.only(right: 20),
+                              onPressed: () => decreaseGrid(),
+                              icon: Icon(Icons.arrow_back_ios),
+                              splashRadius: 20,
                             ),
-                            width: smaller,
-                            height: smaller,
-                            child: CustomPaint(
-                              painter: BoardPainter(sizeOfGrid, () {}, () {}),
+                            Container(
+                              alignment: Alignment.center,
+                              child: Container(
+                                padding:
+                                    EdgeInsets.all(ImportantValues.halfPadding),
+                                decoration: BoxDecoration(
+                                  color: Settings.boardThemeValues
+                                      .getBoardBackgroundColor(),
+                                  borderRadius:
+                                      BorderRadius.all(ImportantValues.radius),
+                                ),
+                                width: smaller,
+                                height: smaller,
+                                child: CustomPaint(
+                                  painter:
+                                      BoardPainter(sizeOfGrid, () {}, () {}),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              padding: EdgeInsets.only(left: 20),
+                              splashRadius: 20,
+                              onPressed: () => increaseGrid(),
+                              icon: Icon(Icons.arrow_forward_ios),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                            "${sizeOfGrid}x$sizeOfGrid",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodyText1!.color,
+                              fontSize: 20,
                             ),
                           ),
                         ),
-                        IconButton(
-                          padding: EdgeInsets.only(left: 20),
-                          splashRadius: 20,
-                          onPressed: () {
-                            BoardPainter.dead = true;
-                            SchedulerBinding.instance!
-                                .scheduleFrameCallback((timeStamp) {
-                              BoardPainter.cleanUp();
-                              setState(() => sizeOfGrid++);
-                            });
-                          },
-                          icon: Icon(Icons.arrow_forward_ios),
-                        ),
                       ],
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Text(
-                        "${sizeOfGrid}x$sizeOfGrid",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyText1!.color,
-                          fontSize: 20,
-                        ),
-                      ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        bottomSheet: Padding(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => Game(sizeOfGrid),
                     ),
-                  ],
+                    (route) => false,
+                  );
+                },
+                child: Text(
+                  "PLAY GAME",
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyText1!.color,
+                  ),
                 ),
               ),
             ],
           ),
         ),
-      ),
-      bottomSheet: Padding(
-        padding: EdgeInsets.all(20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => Game(sizeOfGrid),
-                  ),
-                  (route) => false,
-                );
-              },
-              child: Text(
-                "PLAY GAME",
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyText1!.color,
-                ),
-              ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        floatingActionButton: IconButton(
+          splashRadius: 1,
+          padding: EdgeInsets.only(top: 60),
+          icon: Icon(
+            Icons.settings,
+          ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => SettingsPage(),
             ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: IconButton(
-        splashRadius: 1,
-        padding: EdgeInsets.only(top: 60),
-        icon: Icon(
-          Icons.settings,
-        ),
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => SettingsPage(),
           ),
         ),
       ),

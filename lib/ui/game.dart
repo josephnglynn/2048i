@@ -125,7 +125,7 @@ class _GameState extends State<Game> {
                     padding: EdgeInsets.only(left: padding, right: padding),
                     alignment: Alignment.center,
                     child: Container(
-                      padding: EdgeInsets.all(ImportantValues.HalfPadding),
+                      padding: EdgeInsets.all(ImportantValues.halfPadding),
                       decoration: BoxDecoration(
                         color:
                             Settings.boardThemeValues.getBoardBackgroundColor(),

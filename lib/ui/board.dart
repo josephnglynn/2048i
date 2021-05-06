@@ -33,6 +33,7 @@ class BoardPainter extends CustomPainter {
   BoardPainter(this.whatByWhat, this.navigateOnDeath, this.setScore)
       : super(repaint: rePaint) {
     ImportantValues.updateRadius(whatByWhat);
+    ImportantValues.updatePadding(whatByWhat);
   }
 
   static List<BoardElement> doStuff(List<BoardElement> row) {
@@ -182,10 +183,10 @@ class BoardPainter extends CustomPainter {
         board[i].add(
           BoardTile(
             MutableRectangle(
-              tileWidth * i + ImportantValues.HalfPadding,
-              tileHeight * k + ImportantValues.HalfPadding,
-              tileWidth - ImportantValues.Padding,
-              tileHeight - ImportantValues.Padding,
+              tileWidth * i + ImportantValues.halfPadding,
+              tileHeight * k + ImportantValues.halfPadding,
+              tileWidth - ImportantValues.padding,
+              tileHeight - ImportantValues.padding,
             ),
           ),
         );
@@ -207,10 +208,10 @@ class BoardPainter extends CustomPainter {
       for (int k = 0; k < whatByWhat; ++k) {
         board[i][k] = BoardTile(
           MutableRectangle(
-            tileWidth * i + ImportantValues.HalfPadding,
-            tileHeight * k + ImportantValues.HalfPadding,
-            tileWidth - ImportantValues.Padding,
-            tileHeight - ImportantValues.Padding,
+            tileWidth * i + ImportantValues.halfPadding,
+            tileHeight * k + ImportantValues.halfPadding,
+            tileWidth - ImportantValues.padding,
+            tileHeight - ImportantValues.padding,
           ),
         );
       }
@@ -303,15 +304,15 @@ class BoardPainter extends CustomPainter {
               //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
               Rect rect = Rect.fromLTWH(
                 tileWidth * i +
-                    ImportantValues.HalfPadding +
+                    ImportantValues.halfPadding +
                     tileWidth * 0.5 -
                     (ratio * tileWidth * 0.5),
                 tileHeight * k +
-                    ImportantValues.HalfPadding +
+                    ImportantValues.halfPadding +
                     tileHeight * 0.5 -
                     (ratio * tileHeight * 0.5),
-                (tileWidth - ImportantValues.Padding) * ratio,
-                (tileHeight - ImportantValues.Padding) * ratio,
+                (tileWidth - ImportantValues.padding) * ratio,
+                (tileHeight - ImportantValues.padding) * ratio,
               );
               canvas.drawRRect(
                 RRect.fromRectAndRadius(
@@ -343,10 +344,10 @@ class BoardPainter extends CustomPainter {
               continue;
             }
             Rect rect = Rect.fromLTWH(
-              tileWidth * i + ImportantValues.HalfPadding,
-              tileHeight * k + ImportantValues.HalfPadding,
-              tileWidth - ImportantValues.Padding,
-              tileHeight - ImportantValues.Padding,
+              tileWidth * i + ImportantValues.halfPadding,
+              tileHeight * k + ImportantValues.halfPadding,
+              tileWidth - ImportantValues.padding,
+              tileHeight - ImportantValues.padding,
             );
             canvas.drawRRect(
               RRect.fromRectAndRadius(
@@ -379,10 +380,10 @@ class BoardPainter extends CustomPainter {
             continue;
           }
           Rect rect = Rect.fromLTWH(
-            tileWidth * i + ImportantValues.HalfPadding,
-            tileHeight * k + ImportantValues.HalfPadding,
-            tileWidth - ImportantValues.Padding,
-            tileHeight - ImportantValues.Padding,
+            tileWidth * i + ImportantValues.halfPadding,
+            tileHeight * k + ImportantValues.halfPadding,
+            tileWidth - ImportantValues.padding,
+            tileHeight - ImportantValues.padding,
           );
           canvas.drawRRect(
             RRect.fromRectAndRadius(

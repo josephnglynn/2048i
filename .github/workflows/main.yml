@@ -33,7 +33,7 @@ jobs:
           prerelease: false
 
 
-  Android-And-Linux:
+  Android-And-Linux-And-Web:
     needs: create_release
     runs-on: ubuntu-latest
     steps:
@@ -99,6 +99,13 @@ jobs:
           asset_name: linux-x64.zip
           asset_path: ./linux-x64.zip
           asset_content_type: application/zip
+      - name: Build Web
+        run: flutter build web
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: public # The branch the action should deploy to.
+          folder: build/web # The folder the action should deploy.        
 
 
   IOS-and-MacOS:

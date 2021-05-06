@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class HighScore {
   static int highScore = 0;
-  static int _whatByWhat = 4;
+  static int _whatByWhat = 1;
 
   static Future getHighScore(int whatByWhat) async {
     final prefs = await SharedPreferences.getInstance();

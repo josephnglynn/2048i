@@ -4,3 +4,5 @@
 
 An improved version of 2048.
 
+## Check out web version
+https://josephnglynn.github.io/Improved-2048/

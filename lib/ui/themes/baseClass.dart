@@ -79,9 +79,9 @@ class DefaultTheme implements BoardThemeValues {
     64: Colors.orange.shade700,
     128: Colors.orange.shade800,
     256: Colors.orange.shade900,
-    512: Colors.tealAccent.shade100,
-    1024: Colors.tealAccent.shade200,
-    2048: Colors.tealAccent.shade400,
+    512: Colors.tealAccent.shade200,
+    1024: Colors.tealAccent.shade400,
+    2048: Colors.tealAccent.shade700,
   }, {
     0: Colors.orange.shade200,
     2: Colors.orange.shade300,
@@ -91,9 +91,9 @@ class DefaultTheme implements BoardThemeValues {
     32: Colors.orange.shade700,
     64: Colors.orange.shade800,
     128: Colors.orange.shade900,
-    256: Colors.tealAccent.shade100,
-    512: Colors.tealAccent.shade200,
-    1024: Colors.tealAccent.shade400,
+    256: Colors.tealAccent.shade200,
+    512: Colors.tealAccent.shade400,
+    1024: Colors.tealAccent.shade700,
     2048: Colors.tealAccent.shade700,
   });
 

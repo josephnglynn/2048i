@@ -10,7 +10,6 @@ import 'package:improved_2048/ui/types.dart';
 import 'highScore.dart';
 
 class BoardPainter extends CustomPainter {
-
   static List<List<BoardTile>> board = [];
   static List<List<BoardElement>> elements = [];
   static List<List<BoardElement>> undoElements = [];
@@ -42,7 +41,7 @@ class BoardPainter extends CustomPainter {
 
   static void undoMove() => undo = true;
 
-  static void _undoMove () {
+  static void _undoMove() {
     elements = [];
     for (int i = 0; i < undoElements.length; ++i) {
       elements.add([]);
@@ -89,7 +88,6 @@ class BoardPainter extends CustomPainter {
     if (handlingMove) return;
     handlingMove = true;
 
-
     int totalValueBefore = 0;
     undoElements = [];
 
@@ -120,8 +118,6 @@ class BoardPainter extends CustomPainter {
             .toList();
         break;
     }
-
-
 
     int totalValueAfterwards = 0;
     for (int i = 0; i < elements.length; ++i) {
@@ -258,8 +254,6 @@ class BoardPainter extends CustomPainter {
 
     if (previous != size) wrongSize(size);
 
-
-
     if (dead) {
       SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
         navigateOnDeath();
@@ -267,12 +261,10 @@ class BoardPainter extends CustomPainter {
       return;
     }
 
-
     if (undo) {
       undo = false;
       _undoMove();
     }
-
 
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
@@ -355,7 +347,12 @@ class BoardPainter extends CustomPainter {
                 Paint()
                   ..color = Settings.boardThemeValues
                           .getSquareColors()[elements[i][k].value] ??
-                      Colors.red,
+                      Color.fromRGBO(
+                        elements[i][k].value % 255,
+                        elements[i][k].value % 255,
+                        elements[i][k].value % 255,
+                        1,
+                      ),
               );
               TextPainter scorePainter = TextPainter(
                 textDirection: TextDirection.rtl,
@@ -390,7 +387,12 @@ class BoardPainter extends CustomPainter {
               Paint()
                 ..color = Settings.boardThemeValues
                         .getSquareColors()[elements[i][k].value] ??
-                    Colors.red,
+                    Color.fromRGBO(
+                      elements[i][k].value % 255,
+                      elements[i][k].value % 255,
+                      elements[i][k].value % 255,
+                      1,
+                    ),
             );
             TextPainter scorePainter = TextPainter(
               textDirection: TextDirection.rtl,
@@ -426,7 +428,12 @@ class BoardPainter extends CustomPainter {
             Paint()
               ..color = Settings.boardThemeValues
                       .getSquareColors()[elements[i][k].value] ??
-                  Colors.red,
+                  Color.fromRGBO(
+                    elements[i][k].value % 255,
+                    elements[i][k].value % 255,
+                    elements[i][k].value % 255,
+                    1,
+                  ),
           );
           TextPainter scorePainter = TextPainter(
             textDirection: TextDirection.rtl,

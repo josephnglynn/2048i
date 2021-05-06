@@ -24,6 +24,7 @@ class BoardPainter extends CustomPainter {
   static int points = 0;
   static bool hasSetScore = false;
   static bool dead = false;
+  static int largestNumberLength = 1;
 
   int whatByWhat;
   final Function navigateOnDeath;
@@ -43,6 +44,9 @@ class BoardPainter extends CustomPainter {
       if (firstNum == secondNum) {
         row[i].value = firstNum + secondNum;
         row[i].animateElement = true;
+        if (row[i].value.toString().length > largestNumberLength) {
+          largestNumberLength = row[i].value.toString().length;
+        }
         row[i + 1].value = 0;
         points += row[i].value;
         hasSetScore = false;
@@ -164,6 +168,7 @@ class BoardPainter extends CustomPainter {
     points = 0;
     hasSetScore = false;
     dead = false;
+    largestNumberLength = 1;
   }
 
   void generateBoard(Size size) {
@@ -231,7 +236,7 @@ class BoardPainter extends CustomPainter {
 
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
-    final fontSize = tileHeight * Settings.fontSizeScale;
+    final fontSize = tileHeight * Settings.fontSizeScale / largestNumberLength;
 
     if (handlingMove) {
       handlingCounter += deltaT;
@@ -266,7 +271,7 @@ class BoardPainter extends CustomPainter {
     }
 
     if (!hasSetScore) {
-      HighScore.setHighScore(points);
+      HighScore.setHighScore(points, whatByWhat);
       SchedulerBinding.instance!.scheduleFrameCallback(
         (timeStamp) => setScore(),
       );
@@ -275,6 +280,7 @@ class BoardPainter extends CustomPainter {
 
     for (int i = 0; i < whatByWhat; ++i) {
       for (int k = 0; k < whatByWhat; ++k) {
+
         canvas.drawRRect(
           RRect.fromRectAndRadius(
             Rect.fromLTWH(

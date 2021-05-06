@@ -10,27 +10,29 @@ import 'package:improved_2048/ui/types.dart';
 import 'highScore.dart';
 
 class BoardPainter extends CustomPainter {
-  static final rePaint = new ChangeNotifier();
 
   static List<List<BoardTile>> board = [];
   static List<List<BoardElement>> elements = [];
   static List<List<BoardElement>> undoElements = [];
-  static Size previous = Size(0, 0);
   static Random rng = Random();
-  static bool handlingMove = false;
-  static double handlingCounter = 0;
-  static bool handlingNewTile = false;
-  static double handlingNewTileCounter = 0;
-  static Stopwatch stopWatch = Stopwatch()..start();
+  static Size previous = Size(0, 0);
   static int points = 0;
-  static bool hasSetScore = false;
-  static bool dead = false;
+  static double handlingCounter = 0;
   static int largestNumberLength = 1;
+  static double handlingNewTileCounter = 0;
+  static bool dead = false;
   static bool undo = false;
+  static bool handlingMove = false;
+  static bool hasSetScore = false;
+  static bool handlingNewTile = false;
+  static Stopwatch stopWatch = Stopwatch()..start();
 
-  int whatByWhat;
+  static final rePaint = new ChangeNotifier();
+
   final Function navigateOnDeath;
   final Function setScore;
+
+  int whatByWhat;
 
   BoardPainter(this.whatByWhat, this.navigateOnDeath, this.setScore)
       : super(repaint: rePaint) {

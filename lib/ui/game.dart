@@ -26,7 +26,6 @@ class _GameState extends State<Game> {
   _GameState(this.whatByWhat);
 
   void goBackToHomePage() {
-    
     BoardPainter.cleanUp();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
@@ -35,6 +34,10 @@ class _GameState extends State<Game> {
       (route) => false,
     );
   }
+
+  /*
+  *
+  *            */
 
   @override
   Widget build(BuildContext context) {
@@ -46,63 +49,59 @@ class _GameState extends State<Game> {
       Future.delayed(Duration(seconds: 1), () => setState(() {}));
 
     return WillPopScope(
-      child: Scaffold(
-        body: SafeArea(
-          child: RawKeyboardListener(
-            focusNode: FocusNode(),
-            onKey: (value) {
-              Direction? direction;
-              switch (value.data.logicalKey.keyLabel) {
-                case "A":
-                  direction = Direction.Left;
-                  break;
-                case "W":
-                  direction = Direction.Up;
-                  break;
-                case "D":
-                  direction = Direction.Right;
-                  break;
-                case "S":
-                  direction = Direction.Down;
-                  break;
-                case "Arrow Left":
-                  direction = Direction.Left;
-                  break;
-                case "Arrow Up":
-                  direction = Direction.Up;
-                  break;
-                case "Arrow Right":
-                  direction = Direction.Right;
-                  break;
-                case "Arrow Down":
-                  direction = Direction.Down;
-                  break;
-                case "Escape":
-                  BoardPainter.dead = true;
-                  SchedulerBinding.instance!.scheduleFrameCallback(
-                    (timeStamp) => goBackToHomePage(),
-                  );
-                  break;
-              }
-              if (direction != null)
-                BoardPainter.handleInput(direction, whatByWhat);
-            },
-            child: GestureDetector(
-              onHorizontalDragEnd: (details) {
-                if (details.primaryVelocity == 0) return;
-                BoardPainter.handleInput(
-                    details.primaryVelocity! < 0
-                        ? Direction.Left
-                        : Direction.Right,
-                    whatByWhat);
-              },
-              onVerticalDragEnd: (details) {
-                if (details.primaryVelocity == 0) return;
-                BoardPainter.handleInput(
-                    details.primaryVelocity! < 0
-                        ? Direction.Up
-                        : Direction.Down,
-                    whatByWhat);
+      child: GestureDetector(
+        onHorizontalDragEnd: (details) {
+          if (details.primaryVelocity == 0) return;
+          BoardPainter.handleInput(
+              details.primaryVelocity! < 0 ? Direction.Left : Direction.Right,
+              whatByWhat);
+        },
+        onVerticalDragEnd: (details) {
+          if (details.primaryVelocity == 0) return;
+          BoardPainter.handleInput(
+              details.primaryVelocity! < 0 ? Direction.Up : Direction.Down,
+              whatByWhat);
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: RawKeyboardListener(
+              focusNode: FocusNode(),
+              onKey: (value) {
+                Direction? direction;
+                switch (value.data.logicalKey.keyLabel) {
+                  case "A":
+                    direction = Direction.Left;
+                    break;
+                  case "W":
+                    direction = Direction.Up;
+                    break;
+                  case "D":
+                    direction = Direction.Right;
+                    break;
+                  case "S":
+                    direction = Direction.Down;
+                    break;
+                  case "Arrow Left":
+                    direction = Direction.Left;
+                    break;
+                  case "Arrow Up":
+                    direction = Direction.Up;
+                    break;
+                  case "Arrow Right":
+                    direction = Direction.Right;
+                    break;
+                  case "Arrow Down":
+                    direction = Direction.Down;
+                    break;
+                  case "Escape":
+                    BoardPainter.dead = true;
+                    SchedulerBinding.instance!.scheduleFrameCallback(
+                      (timeStamp) => goBackToHomePage(),
+                    );
+                    break;
+                }
+                if (direction != null)
+                  BoardPainter.handleInput(direction, whatByWhat);
               },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -138,9 +137,9 @@ class _GameState extends State<Game> {
                           whatByWhat,
                           () {
                             BoardPainter.dead = true;
-        SchedulerBinding.instance!.scheduleFrameCallback(
-          (timeStamp) => goBackToHomePage(),
-        );
+                            SchedulerBinding.instance!.scheduleFrameCallback(
+                              (timeStamp) => goBackToHomePage(),
+                            );
                           },
                           () => setState(() {}),
                         ),

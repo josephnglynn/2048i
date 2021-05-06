@@ -52,22 +52,7 @@ jobs:
         run: flutter pub get
       - name: Build Android
         run: flutter build apk --split-per-abi
-      - name: Build Linux
-        run: flutter build linux
-
-      - name: Build Linux Release Zip
-        run: zip -r linux-x64.zip build/linux/x64/release/bundle
-
-      - name: Upload Linux Build
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_name: linux-x64.zip
-          asset_path: ./linux-x64.zip
-          asset_content_type: application/zip
-
+        
       - name: Upload Android arm64-v8a Build
         uses: actions/upload-release-asset@v1
         env:
@@ -97,6 +82,24 @@ jobs:
           asset_name: android-x86_64.apk
           asset_path: ./build/app/outputs/flutter-apk/app-x86_64-release.apk
           asset_content_type: application/vnd.android.package-archive
+        
+        
+      - name: Build Linux
+        run: flutter build linux
+
+      - name: Build Linux Release Zip
+        run: zip -r linux-x64.zip build/linux/x64/release/bundle
+
+      - name: Upload Linux Build
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_name: linux-x64.zip
+          asset_path: ./linux-x64.zip
+          asset_content_type: application/zip
+
 
   IOS-and-MacOS:
     needs: create_release

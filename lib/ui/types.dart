@@ -6,7 +6,7 @@ enum Direction { Left, Right, Up, Down }
 class ImportantValues {
   static  Radius radius = Radius.circular(5);
   static void updateRadius(int size) {
-    final power = pow(0.95, size * size);
+    final power = pow(0.8, size);
     radius = Radius.circular(
       power.toDouble() * 10,
     );

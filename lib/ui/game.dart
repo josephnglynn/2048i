@@ -17,32 +17,42 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
-  static const double padding = 40;
+  static const double padding = 20;
   static const double times2Padding = padding * 2;
 
   final int whatByWhat;
-  final Stopwatch stopwatch = Stopwatch()..start();
+  Stopwatch? stopwatch = Stopwatch()..start();
 
   _GameState(this.whatByWhat);
 
+
   void goBackToHomePage() {
-    BoardPainter.cleanUp();
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => HomePage(),
-      ),
-      (route) => false,
-    );
+    SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+      BoardPainter.cleanUp();
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => HomePage(whatByWhat),
+        ),
+            (route) => false,
+      );
+    });
   }
 
-  /*
-  *
-  *            */
+  void reset() => SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+        BoardPainter.cleanUp();
+      });
+
+  @override
+  void dispose() {
+    stopwatch!.stop();
+    stopwatch = null;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width - times2Padding - 50;
-    final height = MediaQuery.of(context).size.height - times2Padding - 50;
+    final width = MediaQuery.of(context).size.width - times2Padding;
+    final height = MediaQuery.of(context).size.height - times2Padding - 50 - 50;
     final smaller = width > height ? height : width;
 
     if (!BoardPainter.dead)
@@ -108,10 +118,11 @@ class _GameState extends State<Game> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(
-                        left: padding + 25,
-                        right: padding + 25,
-                        top: padding,
-                        bottom: padding / 2),
+                      left: padding,
+                      right: padding,
+                      top: padding,
+                      bottom: padding / 2,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -147,15 +158,46 @@ class _GameState extends State<Game> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        EdgeInsets.only(right: smaller - 60, top: padding / 2),
+                    padding: EdgeInsets.only(
+                      left: padding,
+                      right: padding,
+                      top: padding / 2,
+                      bottom: padding,
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("time: ${stopwatch.elapsed.inSeconds}"),
+                        Text("time: ${stopwatch!.elapsed.inSeconds}"),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () => SchedulerBinding.instance!
+                                  .scheduleFrameCallback(
+                                (timeStamp) => BoardPainter.undoMove(),
+                              ),
+                              padding: EdgeInsets.zero,
+                              alignment: Alignment.topCenter,
+                              icon: Icon(
+                                Icons.refresh,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => SchedulerBinding.instance!
+                                  .scheduleFrameCallback(
+                                (timeStamp) => reset(),
+                              ),
+                              padding: EdgeInsets.zero,
+                              alignment: Alignment.topCenter,
+                              icon: Icon(
+                                Icons.autorenew,
+                              ),
+                            ),
+                          ],
+                        )
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

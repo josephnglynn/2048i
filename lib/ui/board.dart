@@ -14,6 +14,7 @@ class BoardPainter extends CustomPainter {
 
   static List<List<BoardTile>> board = [];
   static List<List<BoardElement>> elements = [];
+  static List<List<BoardElement>> undoElements = [];
   static Size previous = Size(0, 0);
   static Random rng = Random();
   static bool handlingMove = false;
@@ -25,6 +26,7 @@ class BoardPainter extends CustomPainter {
   static bool hasSetScore = false;
   static bool dead = false;
   static int largestNumberLength = 1;
+  static bool undo = false;
 
   int whatByWhat;
   final Function navigateOnDeath;
@@ -34,6 +36,18 @@ class BoardPainter extends CustomPainter {
       : super(repaint: rePaint) {
     ImportantValues.updateRadius(whatByWhat);
     ImportantValues.updatePadding(whatByWhat);
+  }
+
+  static void undoMove() => undo = true;
+
+  static void _undoMove () {
+    elements = [];
+    for (int i = 0; i < undoElements.length; ++i) {
+      elements.add([]);
+      for (int k = 0; k < undoElements.length; ++k) {
+        elements[i].addAll(undoElements[i]);
+      }
+    }
   }
 
   static List<BoardElement> doStuff(List<BoardElement> row) {
@@ -73,10 +87,15 @@ class BoardPainter extends CustomPainter {
     if (handlingMove) return;
     handlingMove = true;
 
+
     int totalValueBefore = 0;
+    undoElements = [];
+
     for (int i = 0; i < elements.length; ++i) {
+      undoElements.add([]);
       for (int k = 0; k < elements.length; ++k) {
         totalValueBefore += (k + i) * elements[i][k].value;
+        undoElements[i].addAll(elements[i]);
       }
     }
 
@@ -99,6 +118,8 @@ class BoardPainter extends CustomPainter {
             .toList();
         break;
     }
+
+
 
     int totalValueAfterwards = 0;
     for (int i = 0; i < elements.length; ++i) {
@@ -124,8 +145,8 @@ class BoardPainter extends CustomPainter {
         if (elements[i][k].value == 0) {
           return false;
         }
-        if (
-            k + 1 < elements.length  && elements[i][k].value == elements[i][k + 1].value) return false;
+        if (k + 1 < elements.length &&
+            elements[i][k].value == elements[i][k + 1].value) return false;
         if (i + 1 < elements.length &&
             elements[i + 1][k].value == elements[i][k].value) return false;
       }
@@ -165,7 +186,7 @@ class BoardPainter extends CustomPainter {
     handlingCounter = 0;
     handlingNewTile = false;
     handlingNewTileCounter = 0;
-    stopWatch = Stopwatch()..start();
+    stopWatch.reset();
     points = 0;
     hasSetScore = false;
     dead = false;
@@ -235,17 +256,28 @@ class BoardPainter extends CustomPainter {
 
     if (previous != size) wrongSize(size);
 
+
+
+    if (dead) {
+      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+        navigateOnDeath();
+      });
+      return;
+    }
+
+
+    if (undo) {
+      undo = false;
+      _undoMove();
+    }
+
+
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
     final fontSize = tileHeight * Settings.fontSizeScale / largestNumberLength;
 
     if (handlingMove) {
       handlingCounter += deltaT;
-      if (dead)
-        SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
-          cleanUp();
-          navigateOnDeath();
-        });
       if (handlingCounter > ImportantValues.AnimationLength) {
         handlingMove = false;
         handlingCounter = 0;
@@ -281,7 +313,6 @@ class BoardPainter extends CustomPainter {
 
     for (int i = 0; i < whatByWhat; ++i) {
       for (int k = 0; k < whatByWhat; ++k) {
-
         canvas.drawRRect(
           RRect.fromRectAndRadius(
             Rect.fromLTWH(

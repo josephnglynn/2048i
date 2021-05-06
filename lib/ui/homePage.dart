@@ -8,12 +8,17 @@ import 'package:improved_2048/ui/settingsPage.dart';
 import 'package:improved_2048/ui/types.dart';
 
 class HomePage extends StatefulWidget {
+  final int sizeOfGrid;
+  HomePage(this.sizeOfGrid);
+
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState(sizeOfGrid);
 }
 
 class _HomePageState extends State<HomePage> {
-  int sizeOfGrid = 4;
+  int sizeOfGrid;
+  _HomePageState(this.sizeOfGrid);
+
 
   @override
   Widget build(BuildContext context) {

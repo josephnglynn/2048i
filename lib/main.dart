@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:improved_2048/ui/highScore.dart';
 import 'package:improved_2048/ui/homePage.dart';
 
 import 'api/settings.dart';

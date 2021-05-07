@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:improved_2048/ui/themes/baseClass.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,5 +49,39 @@ class Settings {
     _themeSetter(prefs.getInt("theme") ?? 0);
     fontSizeScale = prefs.getDouble("fontSizeScale") ?? 0.75;
     showMovesInsteadOfTime = prefs.getBool("showMovesInsteadOfTime") ?? false;
+  }
+}
+
+
+class ImportantValues {
+  static Radius radius = Radius.circular(5);
+  static double padding = 5;
+  static double halfPadding = padding / 2;
+
+  static late double newTileAnimationLength = 0.45;
+  static late double animationLength = 0.4;
+
+  static void updateRadius(int size) {
+    if (size > 10) {
+      radius = Radius.circular(0);
+      return;
+    }
+    final power = pow(0.8, size);
+    radius = Radius.circular(
+      power.toDouble() * 10,
+    );
+  }
+
+  static void updatePadding(int size) {
+    final newPadding = pow(0.8, size).toDouble() * 10;
+    padding = newPadding;
+    halfPadding = newPadding / 2;
+  }
+
+
+  static Future init() async {
+    final prefs = await SharedPreferences.getInstance();
+    newTileAnimationLength = prefs.getDouble("newTileAnimationLength") ?? 0.1;
+    animationLength = prefs.getDouble("animationLength") ?? 0.25;
   }
 }

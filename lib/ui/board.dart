@@ -15,15 +15,14 @@ class BoardPainter extends CustomPainter {
   static Size _previous = Size(0, 0);
   static int moves = 0;
   static int points = 0;
-  static double _handlingCounter = 0;
   static int _largestNumberLength = 1;
+  static double _handlingCounter = 0;
   static double _handlingNewTileCounter = 0;
   static bool dead = false;
   static bool _undo = false;
   static bool showDeath = false;
   static bool _hasSetScore = false;
   static bool _handlingNewTile = false;
-  static bool _handlingMove = false;
   static bool _handlingMoveOfTiles = false;
   static Stopwatch _stopWatch = Stopwatch()..start();
 
@@ -53,6 +52,7 @@ class BoardPainter extends CustomPainter {
             _undoElements[i][k].value,
             _undoElements[i][k].animateElement,
             _undoElements[i][k].isNewTile,
+            _undoElements[i][k].isMerged,
           ),
         );
       }
@@ -72,6 +72,7 @@ class BoardPainter extends CustomPainter {
       if (firstNum == secondNum) {
         row[i].value = firstNum + secondNum;
         row[i].animateElement = true;
+        row[i].isMerged = true;
         if (row[i].value.toString().length > _largestNumberLength) {
           _largestNumberLength = row[i].value.toString().length;
         }
@@ -87,6 +88,7 @@ class BoardPainter extends CustomPainter {
         zeroesToInsert,
         (index) => BoardElement(
           0,
+          false,
           false,
           false,
         ),
@@ -105,7 +107,7 @@ class BoardPainter extends CustomPainter {
   }
 
   static void handleInput(Direction direction, int whatByWhat) {
-    if (_handlingMoveOfTiles || showDeath) return;
+    if (_handlingMoveOfTiles || showDeath || _handlingNewTile) return;
     _handlingMoveOfTiles = true;
 
     moves++;
@@ -122,6 +124,7 @@ class BoardPainter extends CustomPainter {
             _elements[i][k].value,
             _elements[i][k].animateElement,
             _elements[i][k].isNewTile,
+            _elements[i][k].isMerged,
           ),
         );
       }
@@ -152,7 +155,8 @@ class BoardPainter extends CustomPainter {
       for (int k = 0; k < _elements.length; ++k) {
         totalValueAfterwards += (k + i) * _elements[i][k].value;
         if (_elements[i][k].previousPosition == null) continue;
-        if (_elements[i][k].previousPosition!.i != i  || _elements[i][k].previousPosition!.k != k) {
+        if (_elements[i][k].previousPosition!.i != i ||
+            _elements[i][k].previousPosition!.k != k) {
           _elements[i][k].animateElement = true;
         }
       }
@@ -160,7 +164,6 @@ class BoardPainter extends CustomPainter {
 
     if (totalValueBefore != totalValueAfterwards) {
       _addNewElement();
-      _handlingNewTile = true;
       _handlingMoveOfTiles = true;
     }
 
@@ -200,9 +203,9 @@ class BoardPainter extends CustomPainter {
         ? 0
         : _rng.nextInt(possiblePlaces.length - 1);
     _elements[possiblePlaces[index][0]][possiblePlaces[index][1]] =
-        BoardElement(2, true, true);
+        BoardElement(2, true, true, false);
     _elements[possiblePlaces[index][0]][possiblePlaces[index][1]]
-        .previousPosition = PreviousPosition(
+        .previousPosition = Position(
       possiblePlaces[index][0],
       possiblePlaces[index][1],
     );
@@ -216,7 +219,6 @@ class BoardPainter extends CustomPainter {
     _stopWatch.reset();
     _handlingCounter = 0;
     _hasSetScore = false;
-    _handlingMove = false;
     _handlingNewTile = false;
     _handlingMoveOfTiles = false;
     _largestNumberLength = 1;
@@ -246,8 +248,15 @@ class BoardPainter extends CustomPainter {
             ),
           ),
         );
-        _elements[i].add(BoardElement(0, false, false));
-        _elements[i][k].previousPosition = PreviousPosition(i, k);
+        _elements[i].add(
+          BoardElement(
+            0,
+            false,
+            false,
+            false,
+          ),
+        );
+        _elements[i][k].previousPosition = Position(i, k);
       }
     }
 
@@ -303,37 +312,35 @@ class BoardPainter extends CustomPainter {
       _undoMove();
     }
 
-    if (_handlingMove) {
-      _handlingMove = false;
-      setStuffOnParent();
-    }
-
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
     final fontSize = tileHeight * Settings.fontSizeScale / _largestNumberLength;
 
     if (_handlingMoveOfTiles) {
       _handlingCounter += deltaT;
-      if (_handlingCounter > ImportantValues.AnimationLength) {
+      if (_handlingCounter > ImportantValues.animationLength) {
         _handlingMoveOfTiles = false;
         _handlingCounter = 0;
         for (int i = 0; i < _elements.length; ++i) {
           for (int k = 0; k < _elements.length; ++k) {
-            _elements[i][k].animateElement = false;
-            _elements[i][k].previousPosition = PreviousPosition(i, k);
+            _elements[i][k].previousPosition = Position(i, k);
+            _elements[i][k].isMerged = false;
           }
         }
+        _handlingNewTile = true;
       }
     }
 
     if (_handlingNewTile) {
       _handlingNewTileCounter += deltaT;
-      if (_handlingNewTileCounter > ImportantValues.NewTileAnimationLength) {
+      if (_handlingNewTileCounter > ImportantValues.newTileAnimationLength) {
         _handlingNewTile = false;
         _handlingNewTileCounter = 0;
+
         for (int i = 0; i < _elements.length; ++i) {
           for (int k = 0; k < _elements.length; ++k) {
             _elements[i][k].animateElement = false;
+            _elements[i][k].isNewTile = false;
           }
         }
       }
@@ -361,25 +368,30 @@ class BoardPainter extends CustomPainter {
           ),
           Settings.boardThemeValues.getClearTilePaint(),
         );
+      }
+    }
+
+    for (int i = 0; i < whatByWhat; ++i) {
+      for (int k = 0; k < whatByWhat; ++k) {
         if (_elements[i][k].value != 0) {
           if (_elements[i][k].animateElement) {
-            final ratio = _handlingNewTileCounter /
-                ImportantValues.NewTileAnimationLength;
-            if (_elements[i][k].isNewTile &&
-                _elements[i][k].previousPosition!.i == i &&
-                _elements[i][k].previousPosition!.k == k) {
+            final newTileRatio = _handlingNewTileCounter /
+                ImportantValues.newTileAnimationLength;
+            final normalRatio =
+                _handlingCounter / ImportantValues.animationLength;
+            if (_elements[i][k].isNewTile) {
               //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
               Rect rect = Rect.fromLTWH(
                 tileWidth * i +
                     ImportantValues.halfPadding +
                     tileWidth * 0.5 -
-                    (ratio * tileWidth * 0.5),
+                    (newTileRatio * tileWidth * 0.5),
                 tileHeight * k +
                     ImportantValues.halfPadding +
                     tileHeight * 0.5 -
-                    (ratio * tileHeight * 0.5),
-                (tileWidth - ImportantValues.padding) * ratio,
-                (tileHeight - ImportantValues.padding) * ratio,
+                    (newTileRatio * tileHeight * 0.5),
+                (tileWidth - ImportantValues.padding) * newTileRatio,
+                (tileHeight - ImportantValues.padding) * newTileRatio,
               );
               canvas.drawRRect(
                 RRect.fromRectAndRadius(
@@ -401,7 +413,7 @@ class BoardPainter extends CustomPainter {
                 text: TextSpan(
                   text: _elements[i][k].value.toString(),
                   style: TextStyle(
-                    fontSize: fontSize * ratio,
+                    fontSize: fontSize * newTileRatio,
                   ),
                 ),
               );
@@ -415,12 +427,76 @@ class BoardPainter extends CustomPainter {
               );
               continue;
             }
-            Rect rect = Rect.fromLTWH(
-              tileWidth * i + ImportantValues.halfPadding,
-              tileHeight * k + ImportantValues.halfPadding,
-              tileWidth - ImportantValues.padding,
-              tileHeight - ImportantValues.padding,
-            );
+            if (_elements[i][k].isMerged) {
+              //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
+              Rect rect = Rect.fromLTWH(
+                tileWidth * i +
+                    ImportantValues.halfPadding +
+                    tileWidth * 0.5 -
+                    (normalRatio * tileWidth * 0.5),
+                tileHeight * k +
+                    ImportantValues.halfPadding +
+                    tileHeight * 0.5 -
+                    (normalRatio * tileHeight * 0.5),
+                (tileWidth - ImportantValues.padding) * normalRatio,
+                (tileHeight - ImportantValues.padding) * normalRatio,
+              );
+              canvas.drawRRect(
+                RRect.fromRectAndRadius(
+                  rect,
+                  ImportantValues.radius,
+                ),
+                Paint()
+                  ..color = Settings.boardThemeValues
+                          .getSquareColors()[_elements[i][k].value] ??
+                      Color.fromRGBO(
+                        _elements[i][k].value % 255,
+                        _elements[i][k].value % 255,
+                        _elements[i][k].value % 255,
+                        1,
+                      ),
+              );
+              TextPainter scorePainter = TextPainter(
+                textDirection: TextDirection.rtl,
+                text: TextSpan(
+                  text: _elements[i][k].value.toString(),
+                  style: TextStyle(
+                    fontSize: fontSize * normalRatio,
+                  ),
+                ),
+              );
+              scorePainter.layout();
+              scorePainter.paint(
+                canvas,
+                Offset(
+                  rect.left + rect.width / 2 - scorePainter.width / 2,
+                  rect.top + rect.height / 2 - scorePainter.height / 2,
+                ),
+              );
+              continue;
+            }
+
+            Rect rect = _elements[i][k].previousPosition != null
+                ? Rect.fromLTWH(
+                    tileWidth *
+                            (_elements[i][k].previousPosition!.i +
+                                (i - _elements[i][k].previousPosition!.i) *
+                                    normalRatio) +
+                        ImportantValues.halfPadding,
+                    tileHeight *
+                            (_elements[i][k].previousPosition!.k +
+                                (k - _elements[i][k].previousPosition!.k) *
+                                    normalRatio) +
+                        ImportantValues.halfPadding,
+                    tileWidth - ImportantValues.padding,
+                    tileHeight - ImportantValues.padding,
+                  )
+                : Rect.fromLTWH(
+                    tileWidth * i + ImportantValues.halfPadding,
+                    tileHeight * k + ImportantValues.halfPadding,
+                    tileWidth - ImportantValues.padding,
+                    tileHeight - ImportantValues.padding,
+                  );
             canvas.drawRRect(
               RRect.fromRectAndRadius(
                 rect,

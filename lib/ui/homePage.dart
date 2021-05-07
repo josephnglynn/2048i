@@ -5,7 +5,6 @@ import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/board.dart';
 import 'package:improved_2048/ui/game.dart';
 import 'package:improved_2048/ui/settingsPage.dart';
-import 'package:improved_2048/ui/types.dart';
 
 class HomePage extends StatefulWidget {
   final int sizeOfGrid;

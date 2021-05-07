@@ -62,14 +62,16 @@ class _GameState extends State<Game> {
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity == 0) return;
           BoardPainter.handleInput(
-              details.primaryVelocity! < 0 ? Direction.Left : Direction.Right,
-              whatByWhat);
+            details.primaryVelocity! < 0 ? Direction.Left : Direction.Right,
+            whatByWhat,
+          );
         },
         onVerticalDragEnd: (details) {
           if (details.primaryVelocity == 0) return;
           BoardPainter.handleInput(
-              details.primaryVelocity! < 0 ? Direction.Up : Direction.Down,
-              whatByWhat);
+            details.primaryVelocity! < 0 ? Direction.Up : Direction.Down,
+            whatByWhat,
+          );
         },
         child: Scaffold(
           body: SafeArea(
@@ -110,7 +112,10 @@ class _GameState extends State<Game> {
                     break;
                 }
                 if (direction != null)
-                  BoardPainter.handleInput(direction, whatByWhat);
+                  BoardPainter.handleInput(
+                    direction,
+                    whatByWhat,
+                  );
               },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

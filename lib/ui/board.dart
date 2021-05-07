@@ -1,12 +1,10 @@
 import 'dart:math';
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/types.dart';
-
 import 'highScore.dart';
 
 class BoardPainter extends CustomPainter {

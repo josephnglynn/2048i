@@ -95,7 +95,7 @@ class BoardPainter extends CustomPainter {
       undoElements.add([]);
       for (int k = 0; k < elements.length; ++k) {
         totalValueBefore += (k + i) * elements[i][k].value;
-        undoElements[i].addAll(elements[i]);
+        undoElements[i].add(elements[i][k]);
       }
     }
 

@@ -107,6 +107,54 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                      "Movement Animation Length  :  ${ImportantValues.animationLength}"),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: TextFormField(
+                      initialValue: ImportantValues.animationLength.toString(),
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) async {
+                        if (value.length < 1) return;
+                        final asNumber = double.parse(value);
+                        await ImportantValues.setAnimationLength(asNumber);
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                      "New Tile Animation Length  :  ${ImportantValues.newTileAnimationLength}"),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: TextFormField(
+                      initialValue: ImportantValues.newTileAnimationLength.toString(),
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) async {
+                        if (value.length < 1) return;
+                        final asNumber = double.parse(value);
+                        await ImportantValues.setNewTileAnimationLength(asNumber);
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

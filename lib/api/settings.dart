@@ -79,6 +79,18 @@ class ImportantValues {
   }
 
 
+  static Future setAnimationLength(double value) async  {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setDouble("animationLength", value);
+    animationLength = value;
+  }
+
+  static Future setNewTileAnimationLength(double value) async  {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setDouble("newTileAnimationLength", value);
+    newTileAnimationLength = value;
+  }
+
   static Future init() async {
     final prefs = await SharedPreferences.getInstance();
     newTileAnimationLength = prefs.getDouble("newTileAnimationLength") ?? 0.1;

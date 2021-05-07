@@ -6,7 +6,7 @@ import 'api/settings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Settings.init();
-  SystemChrome.setEnabledSystemUIOverlays([])
+  SystemChrome.setEnabledSystemUIOverlays([]);
   runApp(
     MaterialApp(
       darkTheme: ThemeData.dark(),

@@ -5,6 +5,7 @@ class Settings {
   static late BoardThemeValues boardThemeValues;
   static late double fontSizeScale;
   static late int themeIndex;
+  static late bool showMovesInsteadOfTime;
 
   static void _themeSetter(int themeNumber) {
     themeIndex = themeNumber;
@@ -32,11 +33,18 @@ class Settings {
     await prefs.setDouble("fontSizeScale", _fontSizeScale);
     fontSizeScale =  _fontSizeScale;
   }
+  
+  static Future setShowMovesInsteadOfTime(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("showMovesInsteadOfTime", value);
+    Settings.showMovesInsteadOfTime = value;
+  }
 
   static Future init() async {
     final prefs = await SharedPreferences.getInstance();
-    _themeSetter(prefs.getInt("theme") ?? 0);
 
+    _themeSetter(prefs.getInt("theme") ?? 0);
     fontSizeScale = prefs.getDouble("fontSizeScale") ?? 0.75;
+    showMovesInsteadOfTime = prefs.getBool("showMovesInsteadOfTime") ?? false;
   }
 }

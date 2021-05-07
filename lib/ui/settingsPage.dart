@@ -91,6 +91,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text("Show Number Of Moves Instead Of Time"),
+                  Switch(
+                    value: Settings.showMovesInsteadOfTime,
+                    onChanged: (value) async {
+                      await Settings.setShowMovesInsteadOfTime(value);
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

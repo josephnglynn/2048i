@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:improved_2048/ui/homePage.dart';
-import 'api/settings.dart';
+import 'package:improved_2048/api/settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Settings.init();
+  await ImportantValues.init();
   runApp(
     MaterialApp(
       darkTheme: ThemeData.dark(),

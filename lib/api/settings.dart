@@ -58,8 +58,8 @@ class ImportantValues {
   static double padding = 5;
   static double halfPadding = padding / 2;
 
-  static late double newTileAnimationLength = 0.45;
-  static late double animationLength = 0.4;
+  static late double newTileAnimationLength;
+  static late double animationLength;
 
   static void updateRadius(int size) {
     if (size > 10) {
@@ -94,6 +94,6 @@ class ImportantValues {
   static Future init() async {
     final prefs = await SharedPreferences.getInstance();
     newTileAnimationLength = prefs.getDouble("newTileAnimationLength") ?? 0.1;
-    animationLength = prefs.getDouble("animationLength") ?? 0.25;
+    animationLength = prefs.getDouble("animationLength") ?? 0.1;
   }
 }

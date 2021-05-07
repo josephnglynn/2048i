@@ -46,7 +46,7 @@ class BoardPainter extends CustomPainter {
     for (int i = 0; i < undoElements.length; ++i) {
       elements.add([]);
       for (int k = 0; k < undoElements.length; ++k) {
-        elements[i].addAll(undoElements[i]);
+        elements[i].add(undoElements[i][k]);
       }
     }
   }

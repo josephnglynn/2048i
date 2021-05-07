@@ -8,48 +8,62 @@ import 'package:improved_2048/ui/types.dart';
 import 'highScore.dart';
 
 class BoardPainter extends CustomPainter {
-  static List<List<BoardTile>> board = [];
-  static List<List<BoardElement>> elements = [];
-  static List<List<BoardElement>> undoElements = [];
-  static Random rng = Random();
-  static Size previous = Size(0, 0);
+  static List<List<BoardTile>> _board = [];
+  static List<List<BoardElement>> _elements = [];
+  static List<List<BoardElement>> _undoElements = [];
+  static Random _rng = Random();
+  static Size _previous = Size(0, 0);
+  static int moves = 0;
   static int points = 0;
-  static double handlingCounter = 0;
-  static int largestNumberLength = 1;
-  static double handlingNewTileCounter = 0;
+  static double _handlingCounter = 0;
+  static int _largestNumberLength = 1;
+  static double _handlingNewTileCounter = 0;
   static bool dead = false;
-  static bool undo = false;
-  static bool handlingMove = false;
-  static bool hasSetScore = false;
-  static bool handlingNewTile = false;
-  static Stopwatch stopWatch = Stopwatch()..start();
+  static bool _undo = false;
+  static bool showDeath = false;
+  static bool _hasSetScore = false;
+  static bool _handlingNewTile = false;
+  static bool _handlingMove = false;
+  static bool _handlingMoveOfTiles = false;
+  static Stopwatch _stopWatch = Stopwatch()..start();
 
-  static final rePaint = new ChangeNotifier();
+  static final _rePaint = new ChangeNotifier();
 
   final Function navigateOnDeath;
-  final Function setScore;
+  final Function setStuffOnParent;
 
   int whatByWhat;
 
-  BoardPainter(this.whatByWhat, this.navigateOnDeath, this.setScore)
-      : super(repaint: rePaint) {
+  BoardPainter(this.whatByWhat, this.navigateOnDeath, this.setStuffOnParent)
+      : super(repaint: _rePaint) {
     ImportantValues.updateRadius(whatByWhat);
     ImportantValues.updatePadding(whatByWhat);
   }
 
-  static void undoMove() => undo = true;
+  static void undoMove() => _undo = true;
 
-  static void _undoMove() {
-    elements = [];
-    for (int i = 0; i < undoElements.length; ++i) {
-      elements.add([]);
-      for (int k = 0; k < undoElements.length; ++k) {
-        elements[i].add(undoElements[i][k]);
+  void _undoMove() {
+    moves--;
+    _elements = [];
+    for (int i = 0; i < _undoElements.length; ++i) {
+      _elements.add([]);
+      for (int k = 0; k < _undoElements.length; ++k) {
+        _elements[i].add(
+          BoardElement(
+            _undoElements[i][k].value,
+            _undoElements[i][k].animateElement,
+            _undoElements[i][k].isNewTile,
+          ),
+        );
       }
     }
+    showDeath = false;
+    SchedulerBinding.instance!.scheduleFrameCallback(
+      (timeStamp) => setStuffOnParent(),
+    );
   }
 
-  static List<BoardElement> doStuff(List<BoardElement> row) {
+  static List<BoardElement> _doStuff(List<BoardElement> row) {
     int originalLength = row.length;
     row = row.where((val) => val.value != 0).toList();
     for (int i = 0; i < row.length - 1; i++) {
@@ -58,22 +72,30 @@ class BoardPainter extends CustomPainter {
       if (firstNum == secondNum) {
         row[i].value = firstNum + secondNum;
         row[i].animateElement = true;
-        if (row[i].value.toString().length > largestNumberLength) {
-          largestNumberLength = row[i].value.toString().length;
+        if (row[i].value.toString().length > _largestNumberLength) {
+          _largestNumberLength = row[i].value.toString().length;
         }
         row[i + 1].value = 0;
         points += row[i].value;
-        hasSetScore = false;
+        _hasSetScore = false;
       }
     }
     row = row.where((val) => val.value != 0).toList();
     int zeroesToInsert = originalLength - row.length;
-    row.addAll(List.generate(
-        zeroesToInsert, (index) => BoardElement(0, false, false)));
+    row.addAll(
+      List.generate(
+        zeroesToInsert,
+        (index) => BoardElement(
+          0,
+          false,
+          false,
+        ),
+      ),
+    );
     return row;
   }
 
-  static List<List<BoardElement>> inverseList(
+  static List<List<BoardElement>> _inverseList(
       List<List<BoardElement>> listToBeInverted) {
     List<List<BoardElement>> invertedList = [];
     for (int i = 0; i < listToBeInverted.length; ++i) {
@@ -83,78 +105,86 @@ class BoardPainter extends CustomPainter {
   }
 
   static void handleInput(Direction direction, int whatByWhat) {
-    if (handlingMove) return;
-    handlingMove = true;
+    if (_handlingMoveOfTiles || showDeath) return;
+    _handlingMoveOfTiles = true;
+
+    moves++;
 
     int totalValueBefore = 0;
-    undoElements = [];
+    _undoElements = [];
 
-    for (int i = 0; i < elements.length; ++i) {
-      undoElements.add([]);
-      for (int k = 0; k < elements.length; ++k) {
-        totalValueBefore += (k + i) * elements[i][k].value;
-        undoElements[i].add(elements[i][k]);
+    for (int i = 0; i < _elements.length; ++i) {
+      _undoElements.add([]);
+      for (int k = 0; k < _elements.length; ++k) {
+        totalValueBefore += (k + i) * _elements[i][k].value;
+        _undoElements[i].add(
+          BoardElement(
+            _elements[i][k].value,
+            _elements[i][k].animateElement,
+            _elements[i][k].isNewTile,
+          ),
+        );
       }
     }
 
     switch (direction) {
       case Direction.Up:
-        elements = elements.map((e) => doStuff(e)).toList();
+        _elements = _elements.map((e) => _doStuff(e)).toList();
         break;
       case Direction.Left:
-        elements =
-            inverseList(inverseList(elements).map((e) => doStuff(e)).toList());
+        _elements = _inverseList(
+            _inverseList(_elements).map((e) => _doStuff(e)).toList());
         break;
       case Direction.Right:
-        elements = inverseList(inverseList(elements)
-            .map((e) => doStuff(e.reversed.toList()).reversed.toList())
+        _elements = _inverseList(_inverseList(_elements)
+            .map((e) => _doStuff(e.reversed.toList()).reversed.toList())
             .toList());
         break;
       case Direction.Down:
-        elements = elements
-            .map((e) => doStuff(e.reversed.toList()).reversed.toList())
+        _elements = _elements
+            .map((e) => _doStuff(e.reversed.toList()).reversed.toList())
             .toList();
         break;
     }
 
     int totalValueAfterwards = 0;
-    for (int i = 0; i < elements.length; ++i) {
-      for (int k = 0; k < elements.length; ++k) {
-        totalValueAfterwards += (k + i) * elements[i][k].value;
+    for (int i = 0; i < _elements.length; ++i) {
+      for (int k = 0; k < _elements.length; ++k) {
+        totalValueAfterwards += (k + i) * _elements[i][k].value;
       }
     }
 
     if (totalValueBefore != totalValueAfterwards) {
-      addNewElement();
-      handlingNewTile = true;
-      handlingMove = true;
+      _addNewElement();
+      _handlingNewTile = true;
+      _handlingMoveOfTiles = true;
     }
 
-    if (haveTheyMadeAMistake()) {
-      dead = true;
+    if (_haveTheyMadeAMistake()) {
+      showDeath = true;
     }
   }
 
-  static bool haveTheyMadeAMistake() {
-    for (int i = 0; i < elements.length; ++i) {
-      for (int k = 0; k < elements[i].length; ++k) {
-        if (elements[i][k].value == 0) {
+  static bool _haveTheyMadeAMistake() {
+    for (int i = 0; i < _elements.length; ++i) {
+      for (int k = 0; k < _elements[i].length; ++k) {
+        if (_elements[i][k].value == 0) {
           return false;
         }
-        if (k + 1 < elements.length &&
-            elements[i][k].value == elements[i][k + 1].value) return false;
-        if (i + 1 < elements.length &&
-            elements[i + 1][k].value == elements[i][k].value) return false;
+        if (k + 1 < _elements.length &&
+            _elements[i][k].value == _elements[i][k + 1].value) return false;
+        if (i + 1 < _elements.length &&
+            _elements[i + 1][k].value == _elements[i][k].value) return false;
       }
     }
     return true;
   }
 
-  static void addNewElement() {
+  static void _addNewElement() {
     List<List<int>> possiblePlaces = [];
-    for (int i = 0; i < elements.length; ++i) {
-      for (int k = 0; k < elements[i].length; ++k) {
-        if (elements[i][k].value == 0) {
+    for (int i = 0; i < _elements.length; ++i) {
+      for (int k = 0; k < _elements[i].length; ++k) {
+        if (_elements[i][k].value == 0) {
           possiblePlaces.add([i, k]);
         }
       }
@@ -162,11 +192,12 @@ class BoardPainter extends CustomPainter {
 
     if (possiblePlaces.length == 0) return;
 
-    int index =
-        possiblePlaces.length == 1 ? 0 : rng.nextInt(possiblePlaces.length - 1);
-    elements[possiblePlaces[index][0]][possiblePlaces[index][1]] =
+    int index = possiblePlaces.length == 1
+        ? 0
+        : _rng.nextInt(possiblePlaces.length - 1);
+    _elements[possiblePlaces[index][0]][possiblePlaces[index][1]] =
         BoardElement(2, true, true);
-    elements[possiblePlaces[index][0]][possiblePlaces[index][1]]
+    _elements[possiblePlaces[index][0]][possiblePlaces[index][1]]
         .previousPosition = PreviousPosition(
       possiblePlaces[index][0],
       possiblePlaces[index][1],
@@ -174,30 +205,34 @@ class BoardPainter extends CustomPainter {
   }
 
   static void cleanUp() {
-    board = [];
-    elements = [];
-    previous = Size(0, 0);
-    rng = Random();
-    handlingMove = false;
-    handlingCounter = 0;
-    handlingNewTile = false;
-    handlingNewTileCounter = 0;
-    stopWatch.reset();
+    _board = [];
+    _elements = [];
+    _previous = Size(0, 0);
+    _rng = Random();
+    _stopWatch.reset();
+    _handlingCounter = 0;
+    _hasSetScore = false;
+    _handlingMove = false;
+    _handlingNewTile = false;
+    _handlingMoveOfTiles = false;
+    _largestNumberLength = 1;
+    _handlingNewTileCounter = 0;
+
+    moves = 0;
     points = 0;
-    hasSetScore = false;
     dead = false;
-    largestNumberLength = 1;
+    showDeath = false;
   }
 
-  void generateBoard(Size size) {
+  void _generateBoard(Size size) {
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
 
     for (int i = 0; i < whatByWhat; ++i) {
-      board.add([]);
-      elements.add([]);
+      _board.add([]);
+      _elements.add([]);
       for (int k = 0; k < whatByWhat; ++k) {
-        board[i].add(
+        _board[i].add(
           BoardTile(
             MutableRectangle(
               tileWidth * i + ImportantValues.halfPadding,
@@ -207,23 +242,23 @@ class BoardPainter extends CustomPainter {
             ),
           ),
         );
-        elements[i].add(BoardElement(0, false, false));
-        elements[i][k].previousPosition = PreviousPosition(i, k);
+        _elements[i].add(BoardElement(0, false, false));
+        _elements[i][k].previousPosition = PreviousPosition(i, k);
       }
     }
 
-    addNewElement();
-    addNewElement();
-    handlingNewTile = true;
+    _addNewElement();
+    _addNewElement();
+    _handlingNewTile = true;
   }
 
-  void resizeBoard(Size newSize) {
+  void _resizeBoard(Size newSize) {
     final tileWidth = newSize.width / whatByWhat;
     final tileHeight = newSize.height / whatByWhat;
 
     for (int i = 0; i < whatByWhat; ++i) {
       for (int k = 0; k < whatByWhat; ++k) {
-        board[i][k] = BoardTile(
+        _board[i][k] = BoardTile(
           MutableRectangle(
             tileWidth * i + ImportantValues.halfPadding,
             tileHeight * k + ImportantValues.halfPadding,
@@ -235,22 +270,22 @@ class BoardPainter extends CustomPainter {
     }
   }
 
-  void wrongSize(Size newSize) {
-    if (board.isEmpty) {
-      generateBoard(newSize);
+  void _wrongSize(Size newSize) {
+    if (_board.isEmpty) {
+      _generateBoard(newSize);
     } else {
-      resizeBoard(newSize);
+      _resizeBoard(newSize);
     }
 
-    previous = newSize;
+    _previous = newSize;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final deltaT = stopWatch.elapsedMilliseconds / 1000;
-    stopWatch.reset();
+    final deltaT = _stopWatch.elapsedMilliseconds / 1000;
+    _stopWatch.reset();
 
-    if (previous != size) wrongSize(size);
+    if (_previous != size) _wrongSize(size);
 
     if (dead) {
       SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
@@ -259,48 +294,53 @@ class BoardPainter extends CustomPainter {
       return;
     }
 
-    if (undo) {
-      undo = false;
+    if (_undo) {
+      _undo = false;
       _undoMove();
+    }
+
+    if (_handlingMove) {
+      _handlingMove = false;
+      setStuffOnParent();
     }
 
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
-    final fontSize = tileHeight * Settings.fontSizeScale / largestNumberLength;
+    final fontSize = tileHeight * Settings.fontSizeScale / _largestNumberLength;
 
-    if (handlingMove) {
-      handlingCounter += deltaT;
-      if (handlingCounter > ImportantValues.AnimationLength) {
-        handlingMove = false;
-        handlingCounter = 0;
-        for (int i = 0; i < elements.length; ++i) {
-          for (int k = 0; k < elements.length; ++k) {
-            elements[i][k].animateElement = false;
-            elements[i][k].previousPosition = PreviousPosition(i, k);
+    if (_handlingMoveOfTiles) {
+      _handlingCounter += deltaT;
+      if (_handlingCounter > ImportantValues.AnimationLength) {
+        _handlingMoveOfTiles = false;
+        _handlingCounter = 0;
+        for (int i = 0; i < _elements.length; ++i) {
+          for (int k = 0; k < _elements.length; ++k) {
+            _elements[i][k].animateElement = false;
+            _elements[i][k].previousPosition = PreviousPosition(i, k);
           }
         }
       }
     }
 
-    if (handlingNewTile) {
-      handlingNewTileCounter += deltaT;
-      if (handlingNewTileCounter > ImportantValues.NewTileAnimationLength) {
-        handlingNewTile = false;
-        handlingNewTileCounter = 0;
-        for (int i = 0; i < elements.length; ++i) {
-          for (int k = 0; k < elements.length; ++k) {
-            elements[i][k].animateElement = false;
+    if (_handlingNewTile) {
+      _handlingNewTileCounter += deltaT;
+      if (_handlingNewTileCounter > ImportantValues.NewTileAnimationLength) {
+        _handlingNewTile = false;
+        _handlingNewTileCounter = 0;
+        for (int i = 0; i < _elements.length; ++i) {
+          for (int k = 0; k < _elements.length; ++k) {
+            _elements[i][k].animateElement = false;
           }
         }
       }
     }
 
-    if (!hasSetScore) {
+    if (!_hasSetScore) {
       HighScore.setHighScore(points, whatByWhat);
       SchedulerBinding.instance!.scheduleFrameCallback(
-        (timeStamp) => setScore(),
+        (timeStamp) => setStuffOnParent(),
       );
-      hasSetScore = true;
+      _hasSetScore = true;
     }
 
     for (int i = 0; i < whatByWhat; ++i) {
@@ -308,22 +348,22 @@ class BoardPainter extends CustomPainter {
         canvas.drawRRect(
           RRect.fromRectAndRadius(
             Rect.fromLTWH(
-              board[i][k].dimensions.left,
-              board[i][k].dimensions.top,
-              board[i][k].dimensions.width,
-              board[i][k].dimensions.height,
+              _board[i][k].dimensions.left,
+              _board[i][k].dimensions.top,
+              _board[i][k].dimensions.width,
+              _board[i][k].dimensions.height,
             ),
             ImportantValues.radius,
           ),
           Settings.boardThemeValues.getClearTilePaint(),
         );
-        if (elements[i][k].value != 0) {
-          if (elements[i][k].animateElement) {
-            final ratio =
-                handlingNewTileCounter / ImportantValues.NewTileAnimationLength;
-            if (elements[i][k].isNewTile &&
-                elements[i][k].previousPosition!.i == i &&
-                elements[i][k].previousPosition!.k == k) {
+        if (_elements[i][k].value != 0) {
+          if (_elements[i][k].animateElement) {
+            final ratio = _handlingNewTileCounter /
+                ImportantValues.NewTileAnimationLength;
+            if (_elements[i][k].isNewTile &&
+                _elements[i][k].previousPosition!.i == i &&
+                _elements[i][k].previousPosition!.k == k) {
               //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
               Rect rect = Rect.fromLTWH(
                 tileWidth * i +
@@ -344,18 +384,18 @@ class BoardPainter extends CustomPainter {
                 ),
                 Paint()
                   ..color = Settings.boardThemeValues
-                          .getSquareColors()[elements[i][k].value] ??
+                          .getSquareColors()[_elements[i][k].value] ??
                       Color.fromRGBO(
-                        elements[i][k].value % 255,
-                        elements[i][k].value % 255,
-                        elements[i][k].value % 255,
+                        _elements[i][k].value % 255,
+                        _elements[i][k].value % 255,
+                        _elements[i][k].value % 255,
                         1,
                       ),
               );
               TextPainter scorePainter = TextPainter(
                 textDirection: TextDirection.rtl,
                 text: TextSpan(
-                  text: elements[i][k].value.toString(),
+                  text: _elements[i][k].value.toString(),
                   style: TextStyle(
                     fontSize: fontSize * ratio,
                   ),
@@ -384,18 +424,18 @@ class BoardPainter extends CustomPainter {
               ),
               Paint()
                 ..color = Settings.boardThemeValues
-                        .getSquareColors()[elements[i][k].value] ??
+                        .getSquareColors()[_elements[i][k].value] ??
                     Color.fromRGBO(
-                      elements[i][k].value % 255,
-                      elements[i][k].value % 255,
-                      elements[i][k].value % 255,
+                      _elements[i][k].value % 255,
+                      _elements[i][k].value % 255,
+                      _elements[i][k].value % 255,
                       1,
                     ),
             );
             TextPainter scorePainter = TextPainter(
               textDirection: TextDirection.rtl,
               text: TextSpan(
-                text: elements[i][k].value.toString(),
+                text: _elements[i][k].value.toString(),
                 style: TextStyle(
                   fontSize: fontSize,
                 ),
@@ -425,18 +465,18 @@ class BoardPainter extends CustomPainter {
             ),
             Paint()
               ..color = Settings.boardThemeValues
-                      .getSquareColors()[elements[i][k].value] ??
+                      .getSquareColors()[_elements[i][k].value] ??
                   Color.fromRGBO(
-                    elements[i][k].value % 255,
-                    elements[i][k].value % 255,
-                    elements[i][k].value % 255,
+                    _elements[i][k].value % 255,
+                    _elements[i][k].value % 255,
+                    _elements[i][k].value % 255,
                     1,
                   ),
           );
           TextPainter scorePainter = TextPainter(
             textDirection: TextDirection.rtl,
             text: TextSpan(
-              text: elements[i][k].value.toString(),
+              text: _elements[i][k].value.toString(),
               style: TextStyle(
                 fontSize: fontSize,
               ),
@@ -457,7 +497,7 @@ class BoardPainter extends CustomPainter {
     if (!dead) {
       SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
         // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
-        rePaint.notifyListeners();
+        _rePaint.notifyListeners();
       });
     }
   }

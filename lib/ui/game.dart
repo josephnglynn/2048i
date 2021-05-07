@@ -25,7 +25,6 @@ class _GameState extends State<Game> {
 
   _GameState(this.whatByWhat);
 
-
   void goBackToHomePage() {
     SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
       BoardPainter.cleanUp();
@@ -33,7 +32,7 @@ class _GameState extends State<Game> {
         MaterialPageRoute(
           builder: (context) => HomePage(whatByWhat),
         ),
-            (route) => false,
+        (route) => false,
       );
     });
   }
@@ -152,8 +151,27 @@ class _GameState extends State<Game> {
                               (timeStamp) => goBackToHomePage(),
                             );
                           },
-                          () => setState(() {}),
+                          () => setState(() {print("SET STATE CALLED");}),
                         ),
+                        child: BoardPainter.showDeath
+                            ? Container(
+                                alignment: Alignment.center,
+                                child: TweenAnimationBuilder<double>(
+                                  tween: Tween(begin: 0, end: 1),
+                                  duration: Duration(seconds: 3),
+                                  builder: (context, value, child) => Text(
+                                    "Game Over",
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1!
+                                            .color!
+                                            .withOpacity(value),
+                                        fontSize: 40),
+                                  ),
+                                ),
+                              )
+                            : Container(),
                       ),
                     ),
                   ),
@@ -168,7 +186,11 @@ class _GameState extends State<Game> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("time: ${stopwatch!.elapsed.inSeconds}"),
+                        Text(
+                          Settings.showMovesInsteadOfTime
+                              ? "moves: ${BoardPainter.moves}"
+                              : "time: ${stopwatch!.elapsed.inSeconds}",
+                        ),
                         Row(
                           children: [
                             IconButton(

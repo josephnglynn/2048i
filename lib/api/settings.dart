@@ -27,9 +27,10 @@ class Settings {
     _themeSetter(themeNumber);
   }
 
-  static Future setFontSize(double fontSizeScale) async {
+  static Future setFontSize(double _fontSizeScale) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble("fontSizeScale", fontSizeScale);
+    await prefs.setDouble("fontSizeScale", _fontSizeScale);
+    fontSizeScale =  _fontSizeScale;
   }
 
   static Future init() async {

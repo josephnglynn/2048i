@@ -151,6 +151,10 @@ class BoardPainter extends CustomPainter {
     for (int i = 0; i < _elements.length; ++i) {
       for (int k = 0; k < _elements.length; ++k) {
         totalValueAfterwards += (k + i) * _elements[i][k].value;
+        if (_elements[i][k].previousPosition == null) continue;
+        if (_elements[i][k].previousPosition!.i != i  || _elements[i][k].previousPosition!.k != k) {
+          _elements[i][k].animateElement = true;
+        }
       }
     }
 

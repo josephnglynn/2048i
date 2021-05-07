@@ -151,7 +151,7 @@ class _GameState extends State<Game> {
                               (timeStamp) => goBackToHomePage(),
                             );
                           },
-                          () => setState(() {print("SET STATE CALLED");}),
+                          () => setState(() {}),
                         ),
                         child: BoardPainter.showDeath
                             ? Container(

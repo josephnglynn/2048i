@@ -232,6 +232,7 @@ class __SetThemeNameState extends State<_SetThemeName> {
         child: Padding(
           padding: EdgeInsets.all(10),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Please enter a name for this theme"),
               Padding(
@@ -254,6 +255,17 @@ class __SetThemeNameState extends State<_SetThemeName> {
                   SnackBar(
                     content: Text(
                       "Theme Name Must Be Longer Than 3 Characters",
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              if (!await Settings.canUseName(textEditingController.text)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Theme name is taken",
                     ),
                     backgroundColor: Colors.red,
                   ),

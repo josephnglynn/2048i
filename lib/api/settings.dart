@@ -21,10 +21,10 @@ class Settings {
   
   static Future shareCurrentThemeToOtherApps() async {
     String fileName = "${boardThemeValues.getThemeName()}.json";
-    String filePath  = join( (await getApplicationDocumentsDirectory()).path, fileName);
+    String filePath  = join( (await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory()).path, fileName);
     File file = File(filePath);
     if (!await file.exists()) {
-      await file.create();
+      await file.create(recursive: true);
     }
     await file.writeAsString(boardThemeValues.toJson());
     Share.shareFiles([filePath]);
@@ -32,13 +32,25 @@ class Settings {
 
   static Future<String> exportTheme() async {
     String fileName = "${boardThemeValues.getThemeName()}.json";
-    String filePath  = join( (await getApplicationDocumentsDirectory()).path, fileName);
+    String filePath  = join( (await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory()).path, fileName);
     File file = File(filePath);
     if (!await file.exists()) {
-      await file.create();
+      await file.create(recursive: true);
+      print("CREATING FILE");
     }
     await file.writeAsString(boardThemeValues.toJson());
     return filePath;
+  }
+
+  static Future<bool> canUseName(String name) async {
+    if (name == "DefaultTheme" || name == "MaterialTheme" || name == "Default Theme" || name == "Material Theme") return false;
+    List<SquareColors> otherThemes = await getOtherSavedThemes();
+    for (int i = 0; i < otherThemes.length; ++i) {
+      if (otherThemes[i].themeName == name) {
+        return false;
+      }
+    }
+    return true;
   }
 
   static Future setShowMovesInsteadOfTime(bool value) async {
@@ -86,17 +98,6 @@ class Settings {
         .firstWhere((element) => element.themeName == name));
   }
 
-  static Future setThemeAsNonInstalledOneFromPath(String location) async {
-    final prefs = await SharedPreferences.getInstance();
-    try {
-      SquareColors squareColors = SquareColors.fromJson(await File(location).readAsString());
-      prefs.setStringList("themes", [squareColors.toJson()]..addAll(await getOtherSavedThemesAsString()));
-      prefs.setString("CurrentTheme", squareColors.themeName);
-      boardThemeValues = FromStorageTheme(squareColors);
-    } catch(e) {
-      print(e);
-    }
-  }
 
   static Future init() async {
     final prefs = await SharedPreferences.getInstance();

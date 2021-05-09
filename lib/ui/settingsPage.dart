@@ -3,8 +3,10 @@ import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/api/settings.dart';
+import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/themeEditor.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
+import 'package:path_provider/path_provider.dart';
 
 class _GetThemesType {
   List<DropdownMenuItem<String>> themes;
@@ -22,7 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
   double fontSize = Settings.fontSizeScale;
 
   Future exportTheme() async {
-    String filePath =  await Settings.exportTheme();
+    String filePath = await Settings.exportTheme();
     var dialog = AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),
@@ -92,7 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Font Size Scale  :  $fontSize"),
+                Text("Font Size Scale"),
                 SizedBox(
                   width: MediaQuery.of(context).size.width / 3,
                   child: TextFormField(
@@ -122,8 +124,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                    "Movement Animation Length  :  ${ImportantValues.animationLength}"),
+                Text("Movement Animation Length"),
                 SizedBox(
                   width: MediaQuery.of(context).size.width / 3,
                   child: TextFormField(
@@ -144,7 +145,8 @@ class _SettingsPageState extends State<SettingsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                    "New Tile Animation Length  :  ${ImportantValues.newTileAnimationLength}"),
+                  "New Tile Animation Length",
+                ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width / 3,
                   child: TextFormField(
@@ -205,7 +207,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
                   onPressed: () {
@@ -261,7 +263,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       title: Text("Where from?"),
                       content: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.max,
                         children: [
@@ -269,13 +271,32 @@ class _SettingsPageState extends State<SettingsPage> {
                             onPressed: () async {
                               String? path = await FilesystemPicker.open(
                                 context: context,
-                                rootDirectory: Directory("/"),
+                                rootDirectory:
+                                    await getExternalStorageDirectory() ??
+                                        await getApplicationDocumentsDirectory(),
                                 title: "Get Color Scheme",
                                 fsType: FilesystemType.file,
                                 pickText: "Use this color scheme",
                               );
-                              await Settings.setThemeAsNonInstalledOneFromPath(
-                                  path!);
+                              Navigator.of(context).pop();
+                              File file = File(path!);
+                              String contents = await file.readAsString();
+                              SquareColors sC = SquareColors.fromJson(contents);
+                              if (!await Settings.canUseName(sC.themeName)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        "Sorry that theme is already installed"),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => HomePage(4),
+                                ),
+                              );
                             },
                             child: Text(
                               "STORAGE",
@@ -306,7 +327,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: Platform.isIOS || Platform.isAndroid
                   ? [
                       TextButton(
@@ -321,8 +342,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ]
                   : [
                       TextButton(
-                        onPressed: () async =>
-                            await exportTheme(),
+                        onPressed: () async => await exportTheme(),
                         child: Text("Export theme"),
                       ),
                     ],

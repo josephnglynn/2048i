@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:get_storage/get_storage.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
 class Settings {
@@ -13,6 +12,7 @@ class Settings {
   static late int themeIndex;
   static late bool showMovesInsteadOfTime;
   static late GetStorage storage;
+  static late String storageDirectoryPath;
 
   static Future setFontSize(double _fontSizeScale) async {
     Settings.storage.write("fontSizeScale", _fontSizeScale);
@@ -21,11 +21,7 @@ class Settings {
 
   static Future shareCurrentThemeToOtherApps() async {
     String fileName = "${boardThemeValues.getThemeName()}.json";
-    String filePath = join(
-        (await getExternalStorageDirectory() ??
-                await getApplicationDocumentsDirectory())
-            .path,
-        fileName);
+    String filePath = join(storageDirectoryPath, fileName);
     File file = File(filePath);
     if (!await file.exists()) {
       await file.create(recursive: true);
@@ -36,11 +32,7 @@ class Settings {
 
   static Future<String> exportTheme() async {
     String fileName = "${boardThemeValues.getThemeName()}.json";
-    String filePath = join(
-        (await getExternalStorageDirectory() ??
-                await getApplicationDocumentsDirectory())
-            .path,
-        fileName);
+    String filePath = join(storageDirectoryPath, fileName);
     File file = File(filePath);
     if (!await file.exists()) {
       await file.create(recursive: true);
@@ -107,6 +99,15 @@ class Settings {
   static Future init() async {
     storage = GetStorage();
 
+
+    try {
+      storageDirectoryPath = (await getExternalStorageDirectory() ??
+              await getApplicationDocumentsDirectory())
+          .path;
+    } catch (e) {
+      storageDirectoryPath = (await getApplicationDocumentsDirectory()).path;
+    }
+
     String? themeName = storage.read("CurrentTheme");
     if (themeName == null) {
       storage.read("MaterialTheme") ?? false
@@ -156,7 +157,8 @@ class ImportantValues {
   }
 
   static Future init() async {
-    newTileAnimationLength = Settings.storage.read("newTileAnimationLength") ?? 0.1;
+    newTileAnimationLength =
+        Settings.storage.read("newTileAnimationLength") ?? 0.1;
     animationLength = Settings.storage.read("animationLength") ?? 0.1;
   }
 }

@@ -271,9 +271,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             onPressed: () async {
                               String? path = await FilesystemPicker.open(
                                 context: context,
-                                rootDirectory:
-                                    await getExternalStorageDirectory() ??
-                                        await getApplicationDocumentsDirectory(),
+                                rootDirectory: Directory(Settings.storageDirectoryPath),
                                 title: "Get Color Scheme",
                                 fsType: FilesystemType.file,
                                 pickText: "Use this color scheme",

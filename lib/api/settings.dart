@@ -20,7 +20,7 @@ class Settings {
   }
 
   static Future shareCurrentThemeToOtherApps() async {
-    String fileName = "${boardThemeValues.getThemeName()}.json";
+    String fileName = "${boardThemeValues.getThemeName()}";
     String filePath = join(storageDirectoryPath, fileName);
     File file = File(filePath);
     if (!await file.exists()) {
@@ -31,7 +31,7 @@ class Settings {
   }
 
   static Future<String> exportTheme() async {
-    String fileName = "${boardThemeValues.getThemeName()}.json";
+    String fileName = "${boardThemeValues.getThemeName()}";
     String filePath = join(storageDirectoryPath, fileName);
     File file = File(filePath);
     if (!await file.exists()) {

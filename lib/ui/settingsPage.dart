@@ -248,7 +248,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       title: Text("Where from?"),
                       content: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.max,
                         children: [
@@ -277,13 +277,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                             child: Text(
                               "EDITOR",
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              "ONLINE",
                               textAlign: TextAlign.center,
                             ),
                           ),

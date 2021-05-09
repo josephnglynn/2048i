@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/themeEditor.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class _GetThemesType {
   List<DropdownMenuItem<String>> themes;
@@ -22,6 +21,21 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   double fontSize = Settings.fontSizeScale;
 
+  Future exportTheme() async {
+    String filePath =  await Settings.exportTheme();
+    var dialog = AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      title: Text("Exporting Theme"),
+      content: Text("Location: $filePath"),
+    );
+    await showDialog(
+      context: context,
+      builder: (context) => dialog,
+    );
+  }
+
   Future<_GetThemesType> getThemes() async {
     List<DropdownMenuItem<String>> themes = [
       DropdownMenuItem(
@@ -37,7 +51,6 @@ class _SettingsPageState extends State<SettingsPage> {
         value: "MaterialTheme",
       ),
     ];
-    final prefs = await SharedPreferences.getInstance();
     List<SquareColors> storageThemes = await Settings.getOtherSavedThemes();
     storageThemes.forEach((element) {
       themes.add(
@@ -291,7 +304,29 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Text("Add Custom Theme"),
                 ),
               ],
-            )
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: Platform.isIOS || Platform.isAndroid
+                  ? [
+                      TextButton(
+                        onPressed: () async =>
+                            await Settings.shareCurrentThemeToOtherApps(),
+                        child: Text("Share current theme"),
+                      ),
+                      TextButton(
+                        onPressed: () async => await exportTheme(),
+                        child: Text("Export theme"),
+                      ),
+                    ]
+                  : [
+                      TextButton(
+                        onPressed: () async =>
+                            await exportTheme(),
+                        child: Text("Export theme"),
+                      ),
+                    ],
+            ),
           ],
         ),
       ),

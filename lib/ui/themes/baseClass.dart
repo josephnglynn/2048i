@@ -69,6 +69,7 @@ class SquareColors {
 
 abstract class BoardThemeFunctions {
   void updateDarkTheme();
+  String toJson();
 
   Map<int, Color> getSquareColors();
 }
@@ -129,6 +130,9 @@ class DefaultTheme implements BoardThemeValues {
 
   @override
   String getThemeName() => _squareColors.themeName;
+
+  @override
+  String toJson() => _squareColors.toJson();
 }
 
 class MaterialTheme implements BoardThemeValues {
@@ -181,6 +185,9 @@ class MaterialTheme implements BoardThemeValues {
 
   @override
   String getThemeName() => _squareColors.themeName;
+
+  @override
+  String toJson() => _squareColors.toJson();
 }
 
 class FromStorageTheme implements BoardThemeValues {
@@ -223,4 +230,7 @@ class FromStorageTheme implements BoardThemeValues {
 
   @override
   String getThemeName() => _squareColors.themeName;
+
+  @override
+  String toJson() => _squareColors.toJson();
 }

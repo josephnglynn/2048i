@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/homePage.dart';
-import 'package:improved_2048/ui/settingsPage.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

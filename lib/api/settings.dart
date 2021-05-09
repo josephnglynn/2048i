@@ -2,6 +2,9 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:improved_2048/ui/themes/baseClass.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings {
@@ -14,6 +17,28 @@ class Settings {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble("fontSizeScale", _fontSizeScale);
     fontSizeScale = _fontSizeScale;
+  }
+  
+  static Future shareCurrentThemeToOtherApps() async {
+    String fileName = "${boardThemeValues.getThemeName()}.json";
+    String filePath  = join( (await getApplicationDocumentsDirectory()).path, fileName);
+    File file = File(filePath);
+    if (!await file.exists()) {
+      await file.create();
+    }
+    await file.writeAsString(boardThemeValues.toJson());
+    Share.shareFiles([filePath]);
+  }
+
+  static Future<String> exportTheme() async {
+    String fileName = "${boardThemeValues.getThemeName()}.json";
+    String filePath  = join( (await getApplicationDocumentsDirectory()).path, fileName);
+    File file = File(filePath);
+    if (!await file.exists()) {
+      await file.create();
+    }
+    await file.writeAsString(boardThemeValues.toJson());
+    return filePath;
   }
 
   static Future setShowMovesInsteadOfTime(bool value) async {

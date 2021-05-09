@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/types.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'highScore.dart';
 
 class BoardPainter extends CustomPainter {
@@ -37,6 +40,44 @@ class BoardPainter extends CustomPainter {
       : super(repaint: _rePaint) {
     ImportantValues.updateRadius(whatByWhat);
     ImportantValues.updatePadding(whatByWhat);
+  }
+
+  static Future<List<List<BoardElement>>?> _checkCache(int whatByWhat) async {
+    final box = GetStorage();
+    List<List<int>>? integers = box.read("board$whatByWhat");
+    if (integers == null) return null;
+    List<List<BoardElement>> boardElements = [];
+    for (int i = 0; i < integers.length; ++i) {
+      boardElements.add([]);
+      for (int k = 0; k < integers[i].length; ++k) {
+        boardElements[i].add(
+          BoardElement(
+            integers[i][k],
+            false,
+            false,
+            false,
+          ),
+        );
+      }
+    }
+    return boardElements;
+  }
+
+  static Future saveToCache(int whatByWhat) async {
+    final box = GetStorage();
+    List<List<int>> integers = [];
+    for (int i = 0; i < _elements.length; ++i) {
+      integers.add([]);
+      for (int k = 0; k < _elements[i].length; ++k) {
+        integers[i].add(_elements[i][k].value);
+      }
+    }
+    await box.write("board$whatByWhat", integers);
+  }
+
+  static Future clearCache(int whatByWhat) async {
+    final box = GetStorage();
+    await box.remove("board$whatByWhat");
   }
 
   static void undoMove() => _undo = true;
@@ -106,7 +147,7 @@ class BoardPainter extends CustomPainter {
     return invertedList;
   }
 
-  static void handleInput(Direction direction, int whatByWhat) {
+  static Future handleInput(Direction direction, int whatByWhat) async {
     if (_handlingMoveOfTiles || showDeath || _handlingNewTile) return;
     _handlingMoveOfTiles = true;
 
@@ -170,6 +211,8 @@ class BoardPainter extends CustomPainter {
     if (_haveTheyMadeAMistake()) {
       showDeath = true;
     }
+
+    await saveToCache(whatByWhat);
   }
 
   static bool _haveTheyMadeAMistake() {
@@ -233,6 +276,14 @@ class BoardPainter extends CustomPainter {
   void _generateBoard(Size size) {
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
+
+    _checkCache(whatByWhat).then((value) {
+      if (value != null) {
+        SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+          _elements = value;
+        });
+      }
+    });
 
     for (int i = 0; i < whatByWhat; ++i) {
       _board.add([]);
@@ -301,7 +352,7 @@ class BoardPainter extends CustomPainter {
     if (_previous != size) _wrongSize(size);
 
     if (dead) {
-      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) async {
         navigateOnDeath();
       });
       return;
@@ -354,7 +405,8 @@ class BoardPainter extends CustomPainter {
       _hasSetScore = true;
     }
 
-    final clearTilePaint = Paint()..color = Settings.boardThemeValues.getSquareColors()[1] ?? Colors.grey;
+    final clearTilePaint = Paint()
+      ..color = Settings.boardThemeValues.getSquareColors()[1] ?? Colors.grey;
 
     for (int i = 0; i < whatByWhat; ++i) {
       for (int k = 0; k < whatByWhat; ++k) {
@@ -368,7 +420,7 @@ class BoardPainter extends CustomPainter {
             ),
             ImportantValues.radius,
           ),
-         clearTilePaint,
+          clearTilePaint,
         );
       }
     }

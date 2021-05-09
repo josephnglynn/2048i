@@ -37,8 +37,9 @@ class _GameState extends State<Game> {
     });
   }
 
-  void reset() => SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
+  void reset() => SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) async {
         BoardPainter.cleanUp();
+        await BoardPainter.clearCache(whatByWhat);
       });
 
   @override
@@ -59,16 +60,16 @@ class _GameState extends State<Game> {
 
     return WillPopScope(
       child: GestureDetector(
-        onHorizontalDragEnd: (details) {
+        onHorizontalDragEnd: (details) async {
           if (details.primaryVelocity == 0) return;
-          BoardPainter.handleInput(
+          await BoardPainter.handleInput(
             details.primaryVelocity! < 0 ? Direction.Left : Direction.Right,
             whatByWhat,
           );
         },
-        onVerticalDragEnd: (details) {
+        onVerticalDragEnd: (details) async {
           if (details.primaryVelocity == 0) return;
-          BoardPainter.handleInput(
+          await BoardPainter.handleInput(
             details.primaryVelocity! < 0 ? Direction.Up : Direction.Down,
             whatByWhat,
           );
@@ -77,7 +78,7 @@ class _GameState extends State<Game> {
           body: SafeArea(
             child: RawKeyboardListener(
               focusNode: FocusNode(),
-              onKey: (value) {
+              onKey: (value) async {
                 Direction? direction;
                 switch (value.data.logicalKey.keyLabel) {
                   case "A":
@@ -112,7 +113,7 @@ class _GameState extends State<Game> {
                     break;
                 }
                 if (direction != null)
-                  BoardPainter.handleInput(
+                  await BoardPainter.handleInput(
                     direction,
                     whatByWhat,
                   );
@@ -141,8 +142,7 @@ class _GameState extends State<Game> {
                     child: Container(
                       padding: EdgeInsets.all(ImportantValues.halfPadding),
                       decoration: BoxDecoration(
-                        color:
-                            Settings.boardThemeValues.getSquareColors()[0],
+                        color: Settings.boardThemeValues.getSquareColors()[0],
                         borderRadius: BorderRadius.all(ImportantValues.radius),
                       ),
                       width: smaller,

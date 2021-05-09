@@ -1,13 +1,10 @@
-import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/types.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'highScore.dart';
 
 class BoardPainter extends CustomPainter {
@@ -43,8 +40,7 @@ class BoardPainter extends CustomPainter {
   }
 
   static Future<List<List<BoardElement>>?> _checkCache(int whatByWhat) async {
-    final box = GetStorage();
-    List<List<int>>? integers = box.read("board$whatByWhat");
+    List<List<int>>? integers = Settings.box.read("board$whatByWhat");
     if (integers == null) return null;
     List<List<BoardElement>> boardElements = [];
     for (int i = 0; i < integers.length; ++i) {
@@ -64,7 +60,6 @@ class BoardPainter extends CustomPainter {
   }
 
   static Future saveToCache(int whatByWhat) async {
-    final box = GetStorage();
     List<List<int>> integers = [];
     for (int i = 0; i < _elements.length; ++i) {
       integers.add([]);
@@ -72,12 +67,11 @@ class BoardPainter extends CustomPainter {
         integers[i].add(_elements[i][k].value);
       }
     }
-    await box.write("board$whatByWhat", integers);
+    await Settings.box.write("board$whatByWhat", integers);
   }
 
   static Future clearCache(int whatByWhat) async {
-    final box = GetStorage();
-    await box.remove("board$whatByWhat");
+    await Settings.box.remove("board$whatByWhat");
   }
 
   static void undoMove() => _undo = true;

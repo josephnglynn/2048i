@@ -1,27 +1,31 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
+import 'package:get_storage/get_storage.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings {
   static late BoardThemeValues boardThemeValues;
   static late double fontSizeScale;
   static late int themeIndex;
   static late bool showMovesInsteadOfTime;
+  static late GetStorage box;
 
   static Future setFontSize(double _fontSizeScale) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble("fontSizeScale", _fontSizeScale);
+    Settings.box.write("fontSizeScale", _fontSizeScale);
     fontSizeScale = _fontSizeScale;
   }
-  
+
   static Future shareCurrentThemeToOtherApps() async {
     String fileName = "${boardThemeValues.getThemeName()}.json";
-    String filePath  = join( (await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory()).path, fileName);
+    String filePath = join(
+        (await getExternalStorageDirectory() ??
+                await getApplicationDocumentsDirectory())
+            .path,
+        fileName);
     File file = File(filePath);
     if (!await file.exists()) {
       await file.create(recursive: true);
@@ -32,7 +36,11 @@ class Settings {
 
   static Future<String> exportTheme() async {
     String fileName = "${boardThemeValues.getThemeName()}.json";
-    String filePath  = join( (await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory()).path, fileName);
+    String filePath = join(
+        (await getExternalStorageDirectory() ??
+                await getApplicationDocumentsDirectory())
+            .path,
+        fileName);
     File file = File(filePath);
     if (!await file.exists()) {
       await file.create(recursive: true);
@@ -43,7 +51,10 @@ class Settings {
   }
 
   static Future<bool> canUseName(String name) async {
-    if (name == "DefaultTheme" || name == "MaterialTheme" || name == "Default Theme" || name == "Material Theme") return false;
+    if (name == "DefaultTheme" ||
+        name == "MaterialTheme" ||
+        name == "Default Theme" ||
+        name == "Material Theme") return false;
     List<SquareColors> otherThemes = await getOtherSavedThemes();
     for (int i = 0; i < otherThemes.length; ++i) {
       if (otherThemes[i].themeName == name) {
@@ -54,31 +65,28 @@ class Settings {
   }
 
   static Future setShowMovesInsteadOfTime(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool("showMovesInsteadOfTime", value);
+    await box.write("showMovesInsteadOfTime", value);
     Settings.showMovesInsteadOfTime = value;
   }
 
   static Future setThemeAsPreInstalledOne(int whichTheme) async {
-    final prefs = await SharedPreferences.getInstance();
     try {
-      await prefs.remove("CurrentTheme");
+      await box.remove("CurrentTheme");
     } catch (e) {
       print(e);
     }
     if (whichTheme == 0) {
-      await prefs.setBool("MaterialTheme", false);
+      await box.write("MaterialTheme", false);
       boardThemeValues = DefaultTheme();
     }
     if (whichTheme == 1) {
-      await prefs.setBool("MaterialTheme", true);
+      await box.write("MaterialTheme", true);
       boardThemeValues = MaterialTheme();
     }
   }
 
   static Future<List<SquareColors>> getOtherSavedThemes() async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> otherThemes = prefs.getStringList("themes") ?? [];
+    List<String> otherThemes = box.read("themes") ?? [];
     List<SquareColors> squareColorsList = [];
     otherThemes.forEach((element) {
       squareColorsList.add(SquareColors.fromJson(element));
@@ -87,31 +95,28 @@ class Settings {
   }
 
   static Future<List<String>> getOtherSavedThemesAsString() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList("themes") ?? [];
+    return box.read("themes") ?? [];
   }
 
   static Future setThemeAsNonInstalledOneFromName(String name) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString("CurrentTheme", name);
+    await box.write("CurrentTheme", name);
     boardThemeValues = FromStorageTheme((await getOtherSavedThemes())
         .firstWhere((element) => element.themeName == name));
   }
 
-
   static Future init() async {
-    final prefs = await SharedPreferences.getInstance();
+    box = GetStorage();
 
-    String? themeName = prefs.getString("CurrentTheme");
+    String? themeName = box.read("CurrentTheme");
     if (themeName == null) {
-      prefs.getBool("MaterialTheme") ?? false
+      box.read("MaterialTheme") ?? false
           ? await setThemeAsPreInstalledOne(1)
           : await setThemeAsPreInstalledOne(0);
     } else {
       await setThemeAsNonInstalledOneFromName(themeName);
     }
-    fontSizeScale = prefs.getDouble("fontSizeScale") ?? 0.75;
-    showMovesInsteadOfTime = prefs.getBool("showMovesInsteadOfTime") ?? false;
+    fontSizeScale = box.read("fontSizeScale") ?? 0.75;
+    showMovesInsteadOfTime = box.read("showMovesInsteadOfTime") ?? false;
   }
 }
 
@@ -141,20 +146,17 @@ class ImportantValues {
   }
 
   static Future setAnimationLength(double value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setDouble("animationLength", value);
+    await Settings.box.write("animationLength", value);
     animationLength = value;
   }
 
   static Future setNewTileAnimationLength(double value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setDouble("newTileAnimationLength", value);
+    await Settings.box.write("newTileAnimationLength", value);
     newTileAnimationLength = value;
   }
 
   static Future init() async {
-    final prefs = await SharedPreferences.getInstance();
-    newTileAnimationLength = prefs.getDouble("newTileAnimationLength") ?? 0.1;
-    animationLength = prefs.getDouble("animationLength") ?? 0.1;
+    newTileAnimationLength = Settings.box.read("newTileAnimationLength") ?? 0.1;
+    animationLength = Settings.box.read("animationLength") ?? 0.1;
   }
 }

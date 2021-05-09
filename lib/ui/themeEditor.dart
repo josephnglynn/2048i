@@ -5,7 +5,6 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeEditor extends StatefulWidget {
   final SquareColors? squareColors;
@@ -173,7 +172,6 @@ class _ThemeEditorState extends State<ThemeEditor> {
                   );
                   return;
                 }
-                final prefs = await SharedPreferences.getInstance();
                 List<SquareColors> otherPlaces =
                 await Settings.getOtherSavedThemes();
                 List<String> asStrings = [];
@@ -184,7 +182,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
                     asStrings.add(element.toJson());
                   }
                 });
-                await prefs.setStringList("themes", asStrings);
+                await  Settings.box.write("themes", asStrings);
                 await Settings.init();
                 Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
@@ -272,14 +270,13 @@ class __SetThemeNameState extends State<_SetThemeName> {
                 );
                 return;
               }
-              final prefs = await SharedPreferences.getInstance();
               List<String> otherPlaces =
                   await Settings.getOtherSavedThemesAsString();
               squareColors.themeName = textEditingController.text;
               otherPlaces.add(
                 squareColors.toJson(),
               );
-              await prefs.setStringList("themes", otherPlaces);
+              await  Settings.box.write("themes", otherPlaces);
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                     builder: (context) => HomePage(4),

@@ -46,6 +46,10 @@ class BoardPainter extends CustomPainter {
     for (int i = 0; i < integers.length; ++i) {
       boardElements.add([]);
       for (int k = 0; k < integers[i].length; ++k) {
+        int length = integers[i][k].toString().length;
+        if (length > _largestNumberLength) {
+          _largestNumberLength = length;
+        }
         boardElements[i].add(
           BoardElement(
             integers[i][k],

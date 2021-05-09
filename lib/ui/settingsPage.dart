@@ -6,7 +6,6 @@ import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/themeEditor.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
-import 'package:path_provider/path_provider.dart';
 
 class _GetThemesType {
   List<DropdownMenuItem<String>> themes;

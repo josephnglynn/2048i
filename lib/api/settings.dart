@@ -1,6 +1,6 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
-
 import 'package:improved_2048/ui/themes/baseClass.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,48 +10,84 @@ class Settings {
   static late int themeIndex;
   static late bool showMovesInsteadOfTime;
 
-  static void _themeSetter(int themeNumber) {
-    themeIndex = themeNumber;
-    switch (themeNumber) {
-      case 0:
-        boardThemeValues = DefaultTheme();
-        break;
-      case 1:
-        boardThemeValues = SeanTheme();
-        break;
-      case 2:
-        boardThemeValues = DefaultTheme();
-        break;
-    }
-  }
-
-  static Future setTheme(int themeNumber) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt("theme", themeNumber);
-    _themeSetter(themeNumber);
-  }
-
   static Future setFontSize(double _fontSizeScale) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble("fontSizeScale", _fontSizeScale);
-    fontSizeScale =  _fontSizeScale;
+    fontSizeScale = _fontSizeScale;
   }
-  
+
   static Future setShowMovesInsteadOfTime(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool("showMovesInsteadOfTime", value);
     Settings.showMovesInsteadOfTime = value;
   }
 
+  static Future setThemeAsPreInstalledOne(int whichTheme) async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      await prefs.remove("CurrentTheme");
+    } catch (e) {
+      print(e);
+    }
+    if (whichTheme == 0) {
+      await prefs.setBool("MaterialTheme", false);
+      boardThemeValues = DefaultTheme();
+    }
+    if (whichTheme == 1) {
+      await prefs.setBool("MaterialTheme", true);
+      boardThemeValues = MaterialTheme();
+    }
+  }
+
+  static Future<List<SquareColors>> getOtherSavedThemes() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> otherThemes = prefs.getStringList("themes") ?? [];
+    List<SquareColors> squareColorsList = [];
+    otherThemes.forEach((element) {
+      squareColorsList.add(SquareColors.fromJson(element));
+    });
+    return squareColorsList;
+  }
+
+  static Future<List<String>> getOtherSavedThemesAsString() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList("themes") ?? [];
+  }
+
+  static Future setThemeAsNonInstalledOneFromName(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("CurrentTheme", name);
+    boardThemeValues = FromStorageTheme((await getOtherSavedThemes())
+        .firstWhere((element) => element.themeName == name));
+  }
+
+  static Future setThemeAsNonInstalledOneFromPath(String location) async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      SquareColors squareColors = SquareColors.fromJson(await File(location).readAsString());
+      prefs.setStringList("themes", [squareColors.toJson()]..addAll(await getOtherSavedThemesAsString()));
+      prefs.setString("CurrentTheme", squareColors.themeName);
+      boardThemeValues = FromStorageTheme(squareColors);
+    } catch(e) {
+      print(e);
+    }
+  }
+
   static Future init() async {
     final prefs = await SharedPreferences.getInstance();
 
-    _themeSetter(prefs.getInt("theme") ?? 0);
+    String? themeName = prefs.getString("CurrentTheme");
+    if (themeName == null) {
+      prefs.getBool("MaterialTheme") ?? false
+          ? await setThemeAsPreInstalledOne(1)
+          : await setThemeAsPreInstalledOne(0);
+    } else {
+      await setThemeAsNonInstalledOneFromName(themeName);
+    }
     fontSizeScale = prefs.getDouble("fontSizeScale") ?? 0.75;
     showMovesInsteadOfTime = prefs.getBool("showMovesInsteadOfTime") ?? false;
   }
 }
-
 
 class ImportantValues {
   static Radius radius = Radius.circular(5);
@@ -78,14 +114,13 @@ class ImportantValues {
     halfPadding = newPadding / 2;
   }
 
-
-  static Future setAnimationLength(double value) async  {
+  static Future setAnimationLength(double value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setDouble("animationLength", value);
     animationLength = value;
   }
 
-  static Future setNewTileAnimationLength(double value) async  {
+  static Future setNewTileAnimationLength(double value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setDouble("newTileAnimationLength", value);
     newTileAnimationLength = value;

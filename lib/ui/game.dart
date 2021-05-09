@@ -142,7 +142,7 @@ class _GameState extends State<Game> {
                       padding: EdgeInsets.all(ImportantValues.halfPadding),
                       decoration: BoxDecoration(
                         color:
-                            Settings.boardThemeValues.getBoardBackgroundColor(),
+                            Settings.boardThemeValues.getSquareColors()[0],
                         borderRadius: BorderRadius.all(ImportantValues.radius),
                       ),
                       width: smaller,

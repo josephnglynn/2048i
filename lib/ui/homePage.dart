@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                                     EdgeInsets.all(ImportantValues.halfPadding),
                                 decoration: BoxDecoration(
                                   color: Settings.boardThemeValues
-                                      .getBoardBackgroundColor(),
+                                      .getSquareColors()[0],
                                   borderRadius:
                                       BorderRadius.all(ImportantValues.radius),
                                 ),

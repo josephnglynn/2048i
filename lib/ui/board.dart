@@ -354,6 +354,8 @@ class BoardPainter extends CustomPainter {
       _hasSetScore = true;
     }
 
+    final clearTilePaint = Paint()..color = Settings.boardThemeValues.getSquareColors()[1] ?? Colors.grey;
+
     for (int i = 0; i < whatByWhat; ++i) {
       for (int k = 0; k < whatByWhat; ++k) {
         canvas.drawRRect(
@@ -366,7 +368,7 @@ class BoardPainter extends CustomPainter {
             ),
             ImportantValues.radius,
           ),
-          Settings.boardThemeValues.getClearTilePaint(),
+         clearTilePaint,
         );
       }
     }

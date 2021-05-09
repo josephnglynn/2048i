@@ -1,6 +1,18 @@
+import 'dart:io';
+import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/api/settings.dart';
+import 'package:improved_2048/ui/themeEditor.dart';
+import 'package:improved_2048/ui/themes/baseClass.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _GetThemesType {
+  List<DropdownMenuItem<String>> themes;
+  String currentTheme;
+
+  _GetThemesType(this.themes, this.currentTheme);
+}
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -9,7 +21,40 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   double fontSize = Settings.fontSizeScale;
-  int themeIndex = Settings.themeIndex;
+
+  Future<_GetThemesType> getThemes() async {
+    List<DropdownMenuItem<String>> themes = [
+      DropdownMenuItem(
+        child: Text(
+          "Default Theme",
+        ),
+        value: "DefaultTheme",
+      ),
+      DropdownMenuItem(
+        child: Text(
+          "Material Theme",
+        ),
+        value: "MaterialTheme",
+      ),
+    ];
+    final prefs = await SharedPreferences.getInstance();
+    List<SquareColors> storageThemes = await Settings.getOtherSavedThemes();
+    storageThemes.forEach((element) {
+      themes.add(
+        DropdownMenuItem(
+          child: Text(
+            element.themeName,
+          ),
+          value: element.themeName,
+        ),
+      );
+    });
+
+    return _GetThemesType(
+      themes,
+      Settings.boardThemeValues.getThemeName(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +77,7 @@ class _SettingsPageState extends State<SettingsPage> {
           padding: EdgeInsets.all(20),
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Font Size Scale  :  $fontSize"),
                 SizedBox(
@@ -61,100 +106,199 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ],
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text("Color Scheme"),
-                  DropdownButton<int>(
-                    value: themeIndex,
-                    items: [
-                      DropdownMenuItem(
-                        child: Text("DefaultTheme"),
-                        value: 0,
-                      ),
-                      DropdownMenuItem(
-                        child: Text("Sean's Theme"),
-                        value: 1,
-                      ),
-                      DropdownMenuItem(
-                        child: Text("Custom Theme"),
-                        value: 2,
-                      ),
-                    ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                    "Movement Animation Length  :  ${ImportantValues.animationLength}"),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 3,
+                  child: TextFormField(
+                    initialValue: ImportantValues.animationLength.toString(),
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
                     onChanged: (value) async {
-                      await Settings.setTheme(value!);
-                      setState(() => themeIndex = value);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text("Show Number Of Moves Instead Of Time"),
-                  Switch(
-                    value: Settings.showMovesInsteadOfTime,
-                    onChanged: (value) async {
-                      await Settings.setShowMovesInsteadOfTime(value);
+                      if (value.length < 1) return;
+                      final asNumber = double.parse(value);
+                      await ImportantValues.setAnimationLength(asNumber);
                       setState(() {});
                     },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                      "Movement Animation Length  :  ${ImportantValues.animationLength}"),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 3,
-                    child: TextFormField(
-                      initialValue: ImportantValues.animationLength.toString(),
-                      textAlign: TextAlign.center,
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) async {
-                        if (value.length < 1) return;
-                        final asNumber = double.parse(value);
-                        await ImportantValues.setAnimationLength(asNumber);
-                        setState(() {});
-                      },
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                    "New Tile Animation Length  :  ${ImportantValues.newTileAnimationLength}"),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 3,
+                  child: TextFormField(
+                    initialValue:
+                        ImportantValues.newTileAnimationLength.toString(),
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) async {
+                      if (value.length < 1) return;
+                      final asNumber = double.parse(value);
+                      await ImportantValues.setNewTileAnimationLength(asNumber);
+                      setState(() {});
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                      "New Tile Animation Length  :  ${ImportantValues.newTileAnimationLength}"),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 3,
-                    child: TextFormField(
-                      initialValue: ImportantValues.newTileAnimationLength.toString(),
-                      textAlign: TextAlign.center,
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) async {
-                        if (value.length < 1) return;
-                        final asNumber = double.parse(value);
-                        await ImportantValues.setNewTileAnimationLength(asNumber);
-                        setState(() {});
-                      },
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Color Scheme"),
+                FutureBuilder<_GetThemesType>(
+                  future: getThemes(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return DropdownButton<String>(
+                        value: snapshot.data!.currentTheme,
+                        items: snapshot.data!.themes,
+                        onChanged: (value) async {
+                          if (value! == "MaterialTheme" ||
+                              value == "DefaultTheme") {
+                            await Settings.setThemeAsPreInstalledOne(
+                                value == "MaterialTheme" ? 1 : 0);
+                          } else {
+                            await Settings.setThemeAsNonInstalledOneFromName(
+                                value);
+                          }
+                          setState(() {});
+                        },
+                      );
+                    }
+                    return Text("LOADING THEMES");
+                  },
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Show Number Of Moves Instead Of Time"),
+                Switch(
+                  value: Settings.showMovesInsteadOfTime,
+                  onChanged: (value) async {
+                    await Settings.setShowMovesInsteadOfTime(value);
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    var dialog = AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      title: Text("Which theme?"),
+                      content: Scaffold(
+                        body: SafeArea(
+                          child: FutureBuilder<List<SquareColors>>(
+                            future: Settings.getOtherSavedThemes(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return ListView.builder(
+                                  itemBuilder: (context, index) => TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => ThemeEditor(
+                                            squareColors: snapshot.data![index],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      snapshot.data![index].themeName,
+                                    ),
+                                  ),
+                                  itemCount: snapshot.data!.length,
+                                );
+                              }
+                              return Text("Loading ...");
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                    showDialog(
+                      context: context,
+                      builder: (context) => dialog,
+                    );
+                  },
+                  child: Text(
+                    "Edit Custom Theme",
                   ),
-                ],
-              ),
-            ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    var dialog = AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      title: Text("Where from?"),
+                      content: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          TextButton(
+                            onPressed: () async {
+                              String? path = await FilesystemPicker.open(
+                                context: context,
+                                rootDirectory: Directory("/"),
+                                title: "Get Color Scheme",
+                                fsType: FilesystemType.file,
+                                pickText: "Use this color scheme",
+                              );
+                              await Settings.setThemeAsNonInstalledOneFromPath(
+                                  path!);
+                            },
+                            child: Text(
+                              "STORAGE",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ThemeEditor(),
+                              ),
+                            ),
+                            child: Text(
+                              "EDITOR",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              "ONLINE",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                    showDialog(
+                      context: context,
+                      builder: (context) => dialog,
+                    );
+                  },
+                  child: Text("Add Custom Theme"),
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -166,7 +310,7 @@ class _SettingsPageState extends State<SettingsPage> {
             TextButton(
               onPressed: () async {
                 await Settings.setFontSize(0.75);
-                await Settings.setTheme(0);
+
                 setState(() {
                   fontSize = Settings.fontSizeScale;
                 });

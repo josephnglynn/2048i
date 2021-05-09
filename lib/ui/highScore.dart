@@ -7,7 +7,7 @@ class HighScore {
   static int _whatByWhat = 1;
 
   static Future getHighScore(int whatByWhat) async {
-    highScore =  Settings.box.read("highScore$whatByWhat") ?? 0;
+    highScore =  Settings.storage.read("highScore$whatByWhat") ?? 0;
     _whatByWhat = whatByWhat;
   }
 
@@ -15,7 +15,7 @@ class HighScore {
   static Future setHighScore(int newHighScore, int whatByWhat) async {
     if (_whatByWhat != whatByWhat) await getHighScore(whatByWhat);
     if (newHighScore <= highScore) return;
-    await Settings.box.write("highScore$_whatByWhat", newHighScore);
+    await Settings.storage.write("highScore$_whatByWhat", newHighScore);
     highScore = newHighScore;
   }
 }

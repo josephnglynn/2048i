@@ -12,10 +12,10 @@ class Settings {
   static late double fontSizeScale;
   static late int themeIndex;
   static late bool showMovesInsteadOfTime;
-  static late GetStorage box;
+  static late GetStorage storage;
 
   static Future setFontSize(double _fontSizeScale) async {
-    Settings.box.write("fontSizeScale", _fontSizeScale);
+    Settings.storage.write("fontSizeScale", _fontSizeScale);
     fontSizeScale = _fontSizeScale;
   }
 
@@ -65,28 +65,28 @@ class Settings {
   }
 
   static Future setShowMovesInsteadOfTime(bool value) async {
-    await box.write("showMovesInsteadOfTime", value);
+    await storage.write("showMovesInsteadOfTime", value);
     Settings.showMovesInsteadOfTime = value;
   }
 
   static Future setThemeAsPreInstalledOne(int whichTheme) async {
     try {
-      await box.remove("CurrentTheme");
+      await storage.remove("CurrentTheme");
     } catch (e) {
       print(e);
     }
     if (whichTheme == 0) {
-      await box.write("MaterialTheme", false);
+      await storage.write("MaterialTheme", false);
       boardThemeValues = DefaultTheme();
     }
     if (whichTheme == 1) {
-      await box.write("MaterialTheme", true);
+      await storage.write("MaterialTheme", true);
       boardThemeValues = MaterialTheme();
     }
   }
 
   static Future<List<SquareColors>> getOtherSavedThemes() async {
-    List<String> otherThemes = box.read("themes") ?? [];
+    List<String> otherThemes = storage.read("themes") ?? [];
     List<SquareColors> squareColorsList = [];
     otherThemes.forEach((element) {
       squareColorsList.add(SquareColors.fromJson(element));
@@ -95,28 +95,28 @@ class Settings {
   }
 
   static Future<List<String>> getOtherSavedThemesAsString() async {
-    return box.read("themes") ?? [];
+    return storage.read("themes") ?? [];
   }
 
   static Future setThemeAsNonInstalledOneFromName(String name) async {
-    await box.write("CurrentTheme", name);
+    await storage.write("CurrentTheme", name);
     boardThemeValues = FromStorageTheme((await getOtherSavedThemes())
         .firstWhere((element) => element.themeName == name));
   }
 
   static Future init() async {
-    box = GetStorage();
+    storage = GetStorage();
 
-    String? themeName = box.read("CurrentTheme");
+    String? themeName = storage.read("CurrentTheme");
     if (themeName == null) {
-      box.read("MaterialTheme") ?? false
+      storage.read("MaterialTheme") ?? false
           ? await setThemeAsPreInstalledOne(1)
           : await setThemeAsPreInstalledOne(0);
     } else {
       await setThemeAsNonInstalledOneFromName(themeName);
     }
-    fontSizeScale = box.read("fontSizeScale") ?? 0.75;
-    showMovesInsteadOfTime = box.read("showMovesInsteadOfTime") ?? false;
+    fontSizeScale = storage.read("fontSizeScale") ?? 0.75;
+    showMovesInsteadOfTime = storage.read("showMovesInsteadOfTime") ?? false;
   }
 }
 
@@ -146,17 +146,17 @@ class ImportantValues {
   }
 
   static Future setAnimationLength(double value) async {
-    await Settings.box.write("animationLength", value);
+    await Settings.storage.write("animationLength", value);
     animationLength = value;
   }
 
   static Future setNewTileAnimationLength(double value) async {
-    await Settings.box.write("newTileAnimationLength", value);
+    await Settings.storage.write("newTileAnimationLength", value);
     newTileAnimationLength = value;
   }
 
   static Future init() async {
-    newTileAnimationLength = Settings.box.read("newTileAnimationLength") ?? 0.1;
-    animationLength = Settings.box.read("animationLength") ?? 0.1;
+    newTileAnimationLength = Settings.storage.read("newTileAnimationLength") ?? 0.1;
+    animationLength = Settings.storage.read("animationLength") ?? 0.1;
   }
 }

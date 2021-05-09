@@ -40,7 +40,7 @@ class BoardPainter extends CustomPainter {
   }
 
   static Future<List<List<BoardElement>>?> _checkCache(int whatByWhat) async {
-    List<List<int>>? integers = Settings.box.read("board$whatByWhat");
+    List<List<int>>? integers = Settings.storage.read("board$whatByWhat");
     if (integers == null) return null;
     List<List<BoardElement>> boardElements = [];
     for (int i = 0; i < integers.length; ++i) {
@@ -67,11 +67,11 @@ class BoardPainter extends CustomPainter {
         integers[i].add(_elements[i][k].value);
       }
     }
-    await Settings.box.write("board$whatByWhat", integers);
+    await Settings.storage.write("board$whatByWhat", integers);
   }
 
   static Future clearCache(int whatByWhat) async {
-    await Settings.box.remove("board$whatByWhat");
+    await Settings.storage.remove("board$whatByWhat");
   }
 
   static void undoMove() => _undo = true;

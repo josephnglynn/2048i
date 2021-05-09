@@ -182,7 +182,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
                     asStrings.add(element.toJson());
                   }
                 });
-                await  Settings.box.write("themes", asStrings);
+                await  Settings.storage.write("themes", asStrings);
                 await Settings.init();
                 Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
@@ -276,7 +276,7 @@ class __SetThemeNameState extends State<_SetThemeName> {
               otherPlaces.add(
                 squareColors.toJson(),
               );
-              await  Settings.box.write("themes", otherPlaces);
+              await  Settings.storage.write("themes", otherPlaces);
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                     builder: (context) => HomePage(4),

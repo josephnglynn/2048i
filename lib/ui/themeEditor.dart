@@ -139,61 +139,64 @@ class _ThemeEditorState extends State<ThemeEditor> {
           itemCount: squareColors.light.length,
         ),
       ),
-      bottomSheet: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          TextButton(
-            onPressed: () {
-              Color defaultColor =
-                  MediaQuery.of(context).platformBrightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black;
-              if (squareColors.light.length == 0) {
-                squareColors.light[0] = defaultColor;
-                squareColors.dark[0] = defaultColor;
-                return setState(() {});
-              }
-              squareColors
-                      .light[pow(2, squareColors.light.length - 1).toInt()] =
-                  defaultColor;
-              squareColors.dark[pow(2, squareColors.dark.length - 1).toInt()] =
-                  defaultColor;
-              setState(() {});
-            },
-            child: Text("Add new element"),
-          ),
-          TextButton(
-            onPressed: () async {
-              if (newTheme) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => _SetThemeName(squareColors),
-                  ),
-                );
-                return;
-              }
-              final prefs = await SharedPreferences.getInstance();
-              List<SquareColors> otherPlaces =
-                  await Settings.getOtherSavedThemes();
-              List<String> asStrings = [];
-              otherPlaces.forEach((element) {
-                if (element.themeName == squareColors.themeName) {
-                  asStrings.add(squareColors.toJson());
-                } else {
-                 asStrings.add(element.toJson());
+      bottomSheet: Padding(
+        padding: EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            TextButton(
+              onPressed: () {
+                Color defaultColor =
+                MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black;
+                if (squareColors.light.length == 0) {
+                  squareColors.light[0] = defaultColor;
+                  squareColors.dark[0] = defaultColor;
+                  return setState(() {});
                 }
-              });
-              await prefs.setStringList("themes", asStrings);
-              await Settings.init();
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => HomePage(4),
-                  ),
-                      (route) => false);
-            },
-            child: Text("Save theme"),
-          ),
-        ],
+                squareColors
+                    .light[pow(2, squareColors.light.length - 1).toInt()] =
+                    defaultColor;
+                squareColors.dark[pow(2, squareColors.dark.length - 1).toInt()] =
+                    defaultColor;
+                setState(() {});
+              },
+              child: Text("Add new element"),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (newTheme) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => _SetThemeName(squareColors),
+                    ),
+                  );
+                  return;
+                }
+                final prefs = await SharedPreferences.getInstance();
+                List<SquareColors> otherPlaces =
+                await Settings.getOtherSavedThemes();
+                List<String> asStrings = [];
+                otherPlaces.forEach((element) {
+                  if (element.themeName == squareColors.themeName) {
+                    asStrings.add(squareColors.toJson());
+                  } else {
+                    asStrings.add(element.toJson());
+                  }
+                });
+                await prefs.setStringList("themes", asStrings);
+                await Settings.init();
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => HomePage(4),
+                    ),
+                        (route) => false);
+              },
+              child: Text("Save theme"),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -97,7 +97,7 @@ class Settings {
   }
 
   static Future init() async {
-    storage = GetStorage("box");
+    storage = GetStorage();
 
 
     try {

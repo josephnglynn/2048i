@@ -306,8 +306,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                 pickText: "Use this color scheme",
                               );
                             }
+                            if (path == null) return;
                             Navigator.of(context).pop();
-                            File file = File(path!);
+                            File file = File(path);
                             String contents = await file.readAsString();
                             SquareColors sC = SquareColors.fromJson(contents);
                             if (!await Settings.canUseName(sC.themeName)) {

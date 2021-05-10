@@ -6,7 +6,7 @@ import 'package:improved_2048/api/settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init();
+  await GetStorage.init("box");
   await Settings.init();
   await ImportantValues.init();
 

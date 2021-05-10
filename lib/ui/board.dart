@@ -71,7 +71,7 @@ class BoardPainter extends CustomPainter {
         integers[i].add(_elements[i][k].value);
       }
     }
-    await Settings.storage.write("board$whatByWhat", integers);
+    Settings.storage.write("board$whatByWhat", integers);
   }
 
   static Future clearCache(int whatByWhat) async {

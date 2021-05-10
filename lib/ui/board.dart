@@ -23,6 +23,7 @@ class BoardPainter extends CustomPainter {
   static bool showDeath = false;
   static bool _hasSetScore = false;
   static bool _handlingNewTile = false;
+  static bool _dealingWithDeath = false;
   static bool _handlingMoveOfTiles = false;
   static Stopwatch _stopWatch = Stopwatch()..start();
 
@@ -261,6 +262,7 @@ class BoardPainter extends CustomPainter {
     _handlingCounter = 0;
     _hasSetScore = false;
     _handlingNewTile = false;
+    _dealingWithDeath = false;
     _handlingMoveOfTiles = false;
     _largestNumberLength = 1;
     _handlingNewTileCounter = 0;
@@ -350,9 +352,12 @@ class BoardPainter extends CustomPainter {
     if (_previous != size) _wrongSize(size);
 
     if (dead) {
-      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) async {
-        navigateOnDeath();
-      });
+      if (!_dealingWithDeath) {
+        _dealingWithDeath = true;
+        SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) async {
+          navigateOnDeath();
+        });
+      }
       return;
     }
 

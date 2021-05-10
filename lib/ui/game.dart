@@ -107,9 +107,6 @@ class _GameState extends State<Game> {
                     break;
                   case "Escape":
                     BoardPainter.dead = true;
-                    SchedulerBinding.instance!.scheduleFrameCallback(
-                      (timeStamp) => goBackToHomePage(),
-                    );
                     break;
                 }
                 if (direction != null)
@@ -233,9 +230,6 @@ class _GameState extends State<Game> {
       ),
       onWillPop: () {
         BoardPainter.dead = true;
-        SchedulerBinding.instance!.scheduleFrameCallback(
-          (timeStamp) => goBackToHomePage(),
-        );
         return Future.value(false);
       },
     );

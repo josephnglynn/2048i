@@ -78,7 +78,7 @@ class Settings {
   }
 
   static Future<List<SquareColors>> getOtherSavedThemes() async {
-    List<String> otherThemes = storage.read("themes") ?? [];
+    var otherThemes = storage.read("themes") ?? [];
     List<SquareColors> squareColorsList = [];
     otherThemes.forEach((element) {
       squareColorsList.add(SquareColors.fromJson(element));
@@ -108,7 +108,7 @@ class Settings {
       storageDirectoryPath = (await getApplicationDocumentsDirectory()).path;
     }
 
-    String? themeName = storage.read("CurrentTheme");
+    var themeName = storage.read("CurrentTheme");
     if (themeName == null) {
       storage.read("MaterialTheme") ?? false
           ? await setThemeAsPreInstalledOne(1)

@@ -41,8 +41,8 @@ class BoardPainter extends CustomPainter {
   }
 
   static Future<List<List<BoardElement>>?> _checkCache(int whatByWhat) async {
-    List<List<int>>? integers = Settings.storage.read("board$whatByWhat");
-    if (integers == null) return null;
+    var integers = Settings.storage.read("board$whatByWhat") ?? [];
+    if (integers.isEmpty) return null;
     List<List<BoardElement>> boardElements = [];
     for (int i = 0; i < integers.length; ++i) {
       boardElements.add([]);

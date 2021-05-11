@@ -1,4 +1,4 @@
-# improved_2048
+# 2048i
 
 [![Build Application For All Platforms](https://github.com/josephnglynn/Improved-2048/actions/workflows/main.yml/badge.svg)](https://github.com/josephnglynn/Improved-2048/actions/workflows/main.yml)
 

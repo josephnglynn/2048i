@@ -6,6 +6,8 @@ import 'package:improved_2048/ui/board.dart';
 import 'package:improved_2048/ui/game.dart';
 import 'package:improved_2048/ui/settingsPage.dart';
 
+import 'leaderBoard.dart';
+
 class HomePage extends StatefulWidget {
   final int sizeOfGrid;
   HomePage(this.sizeOfGrid);
@@ -176,17 +178,33 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        floatingActionButton: IconButton(
-          splashRadius: 1,
-          padding: EdgeInsets.only(top: 60),
-          icon: Icon(
-            Icons.settings,
-          ),
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => SettingsPage(),
-            ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Padding(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                splashRadius: 1,
+                padding: EdgeInsets.only(top: 60),
+                icon: Icon(
+                  Icons.leaderboard,
+                ),
+                onPressed: () => LeaderBoard.canSeeLeaderBoard(context),
+              ),
+              IconButton(
+                splashRadius: 1,
+                padding: EdgeInsets.only(top: 60),
+                icon: Icon(
+                  Icons.settings,
+                ),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPage(),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

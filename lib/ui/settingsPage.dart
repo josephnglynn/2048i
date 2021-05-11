@@ -301,6 +301,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                 );
                                 return;
                               }
+                              List<String> otherPlaces =
+                  await Settings.getOtherSavedThemesAsString();
+
+              otherPlaces.add(
+                sC.toJson(),
+              );
+              await  Settings.storage.write("themes", otherPlaces);
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => HomePage(4),

@@ -163,6 +163,11 @@ jobs:
         with:
           channel: 'beta'
 
+      - name: setup supabase
+        run: |
+          echo ${{ secrets.SUPABASE_KEY }} >> lib/api/supabase_info.dart
+          echo ${{ secrets.SUPABASE_URL }} >> lib/api/supabase_info.dart
+
       - name: Build Windows Build
         run: flutter config --enable-windows-desktop
       - name: Get Dependancies

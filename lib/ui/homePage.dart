@@ -6,7 +6,7 @@ import 'package:improved_2048/ui/board.dart';
 import 'package:improved_2048/ui/game.dart';
 import 'package:improved_2048/ui/settingsPage.dart';
 
-import 'leaderBoard.dart';
+import 'leaderBoardPage.dart';
 
 class HomePage extends StatefulWidget {
   final int sizeOfGrid;
@@ -190,7 +190,7 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(
                   Icons.leaderboard,
                 ),
-                onPressed: () => LeaderBoard.canSeeLeaderBoard(context),
+                onPressed: () => LeaderBoardPage.canSeeLeaderBoard(context),
               ),
               IconButton(
                 splashRadius: 1,

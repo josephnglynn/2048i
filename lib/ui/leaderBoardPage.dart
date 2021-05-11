@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:improved_2048/api/auth.dart';
 import 'package:improved_2048/ui/authenticationPage.dart';
 
-class LeaderBoard extends StatefulWidget {
+class LeaderBoardPage extends StatefulWidget {
   static void canSeeLeaderBoard(BuildContext context) {
     if (Auth.loggedIn) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => LeaderBoard(),
+          builder: (context) => LeaderBoardPage(),
         ),
       );
     } else {
@@ -17,10 +17,10 @@ class LeaderBoard extends StatefulWidget {
   }
 
   @override
-  _LeaderBoardState createState() => _LeaderBoardState();
+  _LeaderBoardPageState createState() => _LeaderBoardPageState();
 }
 
-class _LeaderBoardState extends State<LeaderBoard> {
+class _LeaderBoardPageState extends State<LeaderBoardPage> {
   @override
   Widget build(BuildContext context) {
     return Container();

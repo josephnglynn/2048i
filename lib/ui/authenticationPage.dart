@@ -31,15 +31,14 @@ class _AuthenticationDialogState extends State<AuthenticationDialog> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: EdgeInsets.only(
-                  left: 10,
-                  right: 10,
-                  bottom: MediaQuery.of(context).size.height / 3),
-              child: Text(
-                "Oop, you have to be logged in to access online services!",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  "Oop, you have to be logged in to access online services!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             Padding(

@@ -47,9 +47,12 @@ jobs:
       - name: Install Linux Build Tools
         run: sudo apt install ninja-build g++ clang cmake libgtk-3-dev libglu1-mesa pkg-config
       - name: setup supabase
+        env:
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
-          echo ${{ secrets.SUPABASE_KEY }} >> lib/api/supabase_info.dart
-          echo ${{ secrets.SUPABASE_URL }} >> lib/api/supabase_info.dart
+          echo "$SUPABASE_KEY" > lib/api/supabase_info.dart
+          echo "$SUPABASE_URL" >> lib/api/supabase_info.dart
       - name: Enable Linux Build For Flutter
         run: flutter config --enable-linux-desktop
       - name: Get Dependancies
@@ -170,7 +173,6 @@ jobs:
         run: |
           echo "$SUPABASE_KEY" > lib/api/supabase_info.dart
           echo "$SUPABASE_URL" >> lib/api/supabase_info.dart
-          cat lib/api/supabase_info.dart
 
       - name: Build Windows Build
         run: flutter config --enable-windows-desktop

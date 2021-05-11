@@ -12,7 +12,7 @@ void main() async {
 
   runApp(
     MaterialApp(
-      darkTheme: ThemeData.dark().copyWith(backgroundColor: Colors.black),
+      darkTheme: ThemeData.dark(),
       theme: ThemeData.light(),
       themeMode: ThemeMode.system,
       home: HomePage(4),

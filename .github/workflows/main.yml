@@ -165,7 +165,7 @@ jobs:
 
       - name: setup supabase
         env:
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
           echo $SUPABASE_KEY >> lib/api/supabase_info.dart

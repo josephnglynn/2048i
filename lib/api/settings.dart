@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:get_storage/get_storage.dart';
+import 'package:improved_2048/api/supabase_info.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
 import 'package:path/path.dart';
 import 'package:share/share.dart';
@@ -99,7 +100,7 @@ class Settings {
   }
 
   static Future init() async {
-    client = SupabaseClient("", "");
+    client = SupabaseClient(SUPABASE_URL, SUPABASE_KEY);
     storage = GetStorage();
 
     try {

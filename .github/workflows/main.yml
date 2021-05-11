@@ -51,7 +51,7 @@ jobs:
       - name: Get Dependancies
         run: flutter pub get
       - name: output signing key
-      - run: echo $SIGNING_KEY | base64 -d > android/app/key.jks
+        run: echo $SIGNING_KEY | base64 -d > android/app/key.jks
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
       - name: Build Android

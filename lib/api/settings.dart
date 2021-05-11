@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:improved_2048/ui/themes/baseClass.dart';
 import 'package:path/path.dart';
 import 'package:share/share.dart';
+import 'package:supabase/supabase.dart';
 
 class Settings {
   static late BoardThemeValues boardThemeValues;
@@ -13,6 +14,7 @@ class Settings {
   static late bool showMovesInsteadOfTime;
   static late GetStorage storage;
   static late String storageDirectoryPath;
+  static late SupabaseClient client;
 
   static Future setFontSize(double _fontSizeScale) async {
     Settings.storage.write("fontSizeScale", _fontSizeScale);
@@ -97,8 +99,8 @@ class Settings {
   }
 
   static Future init() async {
+    client = SupabaseClient("", "");
     storage = GetStorage();
-
 
     try {
       storageDirectoryPath = (await getExternalStorageDirectory() ??

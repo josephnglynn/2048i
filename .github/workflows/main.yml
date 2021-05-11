@@ -50,8 +50,17 @@ jobs:
         run: flutter config --enable-linux-desktop
       - name: Get Dependancies
         run: flutter pub get
+      - name: output signing key
+      - run: echo $SIGNING_KEY | base64 -d > android/app/key.jks
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
       - name: Build Android
         run: flutter build apk --split-per-abi
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PATH: key.jks
         
       - name: Upload Android arm64-v8a Build
         uses: actions/upload-release-asset@v1

@@ -61,6 +61,7 @@ class BoardPainter extends CustomPainter {
         );
       }
     }
+    points = Settings.storage.read("points$whatByWhat");
     return boardElements;
   }
 
@@ -73,10 +74,12 @@ class BoardPainter extends CustomPainter {
       }
     }
     Settings.storage.write("board$whatByWhat", integers);
+    Settings.storage.write("points$whatByWhat", points);
   }
 
   static Future clearCache(int whatByWhat) async {
     await Settings.storage.remove("board$whatByWhat");
+    await Settings.storage.remove("points$whatByWhat");
   }
 
   static void undoMove() => _undo = true;

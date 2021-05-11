@@ -3,7 +3,7 @@ import 'package:supabase/supabase.dart';
 
 class LeaderBoard{
   static void getLeaderBoard() {
-
+    
   }
 
 }

@@ -85,7 +85,6 @@ class BoardPainter extends CustomPainter {
   static void undoMove() => _undo = true;
 
   void _undoMove() {
-    moves--;
     _elements = [];
     for (int i = 0; i < _undoElements.length; ++i) {
       _elements.add([]);

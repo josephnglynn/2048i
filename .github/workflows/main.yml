@@ -51,8 +51,8 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
-          echo "$SUPABASE_KEY" > lib/api/supabase_info.dart
-          echo "$SUPABASE_URL" >> lib/api/supabase_info.dart
+          echo "const SUPABASE_KEY = '$SUPABASE_KEY'" >> lib/api/supabase_info.dart
+          echo "const SUPABASE_URL = '$SUPABASE_URL'" >> lib/api/supabase_info.dart
       - name: Enable Linux Build For Flutter
         run: flutter config --enable-linux-desktop
       - name: Get Dependancies
@@ -171,8 +171,8 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
-          echo "$SUPABASE_KEY" > lib/api/supabase_info.dart
-          echo "$SUPABASE_URL" >> lib/api/supabase_info.dart
+          echo "const SUPABASE_KEY = '$SUPABASE_KEY'" >> lib/api/supabase_info.dart
+          echo "const SUPABASE_URL = '$SUPABASE_URL'" >> lib/api/supabase_info.dart
 
       - name: Build Windows Build
         run: flutter config --enable-windows-desktop

@@ -48,11 +48,9 @@ jobs:
         run: sudo apt install ninja-build g++ clang cmake libgtk-3-dev libglu1-mesa pkg-config
       - name: setup supabase
         env:
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
         run: |
-          echo "const SUPABASE_KEY = '$SUPABASE_KEY';" >> lib/api/supabase_info.dart
-          echo "const SUPABASE_URL = '$SUPABASE_URL';" >> lib/api/supabase_info.dart
+          echo "const FIREBASE_KEY = '$FIREBASE_KEY';" >> lib/api/firebase_info.dart
       - name: Enable Linux Build For Flutter
         run: flutter config --enable-linux-desktop
       - name: Get Dependancies

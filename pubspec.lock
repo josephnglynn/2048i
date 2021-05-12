@@ -70,7 +70,7 @@ packages:
       name: cupertino_icons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -106,6 +106,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0-nullsafety.0"
+  firedart:
+    dependency: "direct main"
+    description:
+      name: firedart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.9.0+1"
+  fixnum:
+    dependency: transitive
+    description:
+      name: fixnum
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   flex_color_picker:
     dependency: "direct main"
     description:
@@ -156,13 +170,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
-  gotrue:
+  googleapis_auth:
     dependency: transitive
     description:
-      name: gotrue
+      name: googleapis_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1-dev.11"
+    version: "1.1.0"
+  grpc:
+    dependency: transitive
+    description:
+      name: grpc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0"
   http:
     dependency: transitive
     description:
@@ -170,6 +191,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.13.3"
+  http2:
+    dependency: transitive
+    description:
+      name: http2
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   http_parser:
     dependency: transitive
     description:
@@ -282,13 +310,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  postgrest:
-    dependency: transitive
-    description:
-      name: postgrest
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.0"
   process:
     dependency: transitive
     description:
@@ -296,13 +317,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.1"
-  realtime_client:
+  protobuf:
     dependency: transitive
     description:
-      name: realtime_client
+      name: protobuf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.8"
+    version: "2.0.0"
   share:
     dependency: "direct main"
     description:
@@ -310,6 +331,48 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  shared_preferences:
+    dependency: "direct main"
+    description:
+      name: shared_preferences
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5"
+  shared_preferences_linux:
+    dependency: transitive
+    description:
+      name: shared_preferences_linux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
+  shared_preferences_macos:
+    dependency: transitive
+    description:
+      name: shared_preferences_macos
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
+  shared_preferences_platform_interface:
+    dependency: transitive
+    description:
+      name: shared_preferences_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
+  shared_preferences_web:
+    dependency: transitive
+    description:
+      name: shared_preferences_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
+  shared_preferences_windows:
+    dependency: transitive
+    description:
+      name: shared_preferences_windows
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -329,13 +392,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
-  storage_client:
-    dependency: transitive
-    description:
-      name: storage_client
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.1-dev.1"
   stream_channel:
     dependency: transitive
     description:
@@ -350,13 +406,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
-  supabase:
-    dependency: "direct main"
-    description:
-      name: supabase
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.1-dev.14"
   term_glyph:
     dependency: transitive
     description:
@@ -382,13 +431,6 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.0"
-  web_socket_channel:
-    dependency: transitive
-    description:
-      name: web_socket_channel
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"

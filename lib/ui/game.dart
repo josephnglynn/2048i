@@ -56,9 +56,11 @@ class _GameState extends State<Game> {
     final smaller = width > height ? height : width;
 
     if (!BoardPainter.dead)
-      Future.delayed(Duration(seconds: 1), () => setState(() {})
+      Future.delayed(Duration(seconds: 1), () {
+        if (BoardPainter.moves != 0)
+        setState(() {});
       
-      );
+    }  );
 
     return WillPopScope(
       child: GestureDetector(

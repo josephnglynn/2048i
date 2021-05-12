@@ -6,6 +6,7 @@ import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/leaderBoardPage.dart';
 
 class AuthenticationDialog extends StatefulWidget {
+
   static Future showAuthDialog(BuildContext context) async {
     final dialog = AlertDialog(
       content: AuthenticationDialog(),

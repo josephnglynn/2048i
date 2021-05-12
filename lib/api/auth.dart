@@ -4,32 +4,42 @@ class Auth {
   static late bool loggedIn;
   static late String userName;
 
-  static Future<bool> login(String name, String password) async {
-    final result = await Settings.client.auth.signIn(
-      email: name,
-      password: password,
-    );
-    if (result.error != null) {
+  static Future<bool> signUp(String email, String name, String password) async {
+    try {
+      await Settings.firebaseAuth.signUp(email, password);
+
+      loggedIn = true;
+      Settings.storage.write("loggedIn", true);
+
+      userName = name;
+      Settings.storage.write("userName", name);
+
+      await Settings.firebaseAuth.updateProfile(displayName: name);
+
+      return true;
+    } catch (e) {
+      print(e);
       return false;
     }
-    userName = name;
-    loggedIn = true;
-    return true;
   }
 
-  static Future<bool> signUp(String name, String password) async {
-    final result = await Settings.client.auth.signUp(
-      name,
-      password,
-    );
-    if (result.error != null) {
+  static Future<bool> login(String email, String password) async {
+    try {
+      await Settings.firebaseAuth.signIn(email, password);
+
+      loggedIn = true;
+      Settings.storage.write("loggedIn", true);
+
+      final user = await Settings.firebaseAuth.getUser();
+      userName = user.displayName!;
+      Settings.storage.write("userName", user.displayName);
+
+      return true;
+    } catch (e) {
+      print(e);
       return false;
     }
-    userName = name;
-    loggedIn = true;
-    return true;
   }
-
 
   static Future init() async {
     loggedIn = Settings.storage.read("loggedIn") ?? false;

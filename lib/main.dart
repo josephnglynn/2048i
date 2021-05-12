@@ -13,6 +13,7 @@ void main() async {
   await ImportantValues.init();
   await Auth.init();
 
+
   runApp(
     MaterialApp(
       darkTheme: ThemeData.dark(),

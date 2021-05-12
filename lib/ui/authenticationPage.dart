@@ -293,7 +293,7 @@ class _SignUpState extends State<SignUp> {
                   );
                   return;
                 }
-                if (await Auth.signUp(email.text, "TODO", password.text)) {
+                if (await Auth.signUp(email.text, name.text, password.text)) {
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                           builder: (BuildContext context) => HomePage(4)),

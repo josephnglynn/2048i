@@ -2,7 +2,7 @@ import 'package:improved_2048/api/settings.dart';
 
 class Auth {
   static late bool loggedIn;
-  static late String userName;
+  static late String? userName;
 
   static Future<bool> signUp(String email, String name, String password) async {
     try {
@@ -43,6 +43,6 @@ class Auth {
 
   static Future init() async {
     loggedIn = Settings.storage.read("loggedIn") ?? false;
-    userName = Settings.storage.read("userName") ?? "";
+    userName = Settings.storage.read("userName");
   }
 }

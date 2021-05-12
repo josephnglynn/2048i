@@ -49,8 +49,10 @@ jobs:
       - name: setup supabase
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+          FIREBASE_ID: ${{ secrets.FIREBASE_ID }}
         run: |
           echo "const FIREBASE_KEY = '$FIREBASE_KEY';" >> lib/api/firebase_info.dart
+          echo "const FIREBASE_ID = '$FIREBASE_ID';" >> lib/api/firebase_info.dart
       - name: Enable Linux Build For Flutter
         run: flutter config --enable-linux-desktop
       - name: Get Dependancies

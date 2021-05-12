@@ -17,6 +17,7 @@ class Settings {
   static late GetStorage storage;
   static late String storageDirectoryPath;
   static late FirebaseAuth firebaseAuth;
+  static late Firestore firestore;
 
   static Future setFontSize(double _fontSizeScale) async {
     Settings.storage.write("fontSizeScale", _fontSizeScale);
@@ -102,7 +103,7 @@ class Settings {
 
   static Future init() async {
     firebaseAuth = FirebaseAuth.initialize(FIREBASE_KEY, await PreferencesStore.create());
-    
+    firestore = Firestore.initialize(FIREBASE_ID);
     storage = GetStorage();
 
     try {

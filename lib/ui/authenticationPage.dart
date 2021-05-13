@@ -58,6 +58,120 @@ class AuthenticationDialog {
 
 }
 
+
+class Login extends StatefulWidget {
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        iconTheme:
+            IconThemeData(color: Theme.of(context).textTheme.bodyText1!.color),
+        title: Text(
+          "Login",
+          style: TextStyle(color: Theme.of(context).textTheme.bodyText1!.color),
+        ),
+        elevation: 0,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 5,
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: email,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Email",
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: password,
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Password",
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomSheet: Padding(
+        padding: EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () async {
+                if (email.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Email must be non-null"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (password.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Password must be non-null"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (await Auth.login(email.text, password.text)) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => HomePage(4)),
+                      (route) => false);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => LeaderBoardPage(),
+                    ),
+                  );
+                  return;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Something went wrong",
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              },
+              child: Text(
+                "Continue",
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyText1!.color,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class SignUp extends StatefulWidget {
   @override
   _SignUpState createState() => _SignUpState();

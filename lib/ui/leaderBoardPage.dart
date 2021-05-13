@@ -27,41 +27,56 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Theme.of(context).textTheme.bodyText1!.color,
-        ),
-        title: Text(
-          "Leaderboard ${whatByWhat}x$whatByWhat",
-          style: TextStyle(
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        if (details.velocity.pixelsPerSecond.dx < 0) {
+          setState(() {
+            whatByWhat++;
+          });
+        } else {
+          if (whatByWhat == 3) return;
+          setState(() {
+            whatByWhat--;
+          });
+        }
+
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: IconThemeData(
             color: Theme.of(context).textTheme.bodyText1!.color,
           ),
+          title: Text(
+            "Leaderboard ${whatByWhat}x$whatByWhat",
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyText1!.color,
+            ),
+          ),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          elevation: 0,
         ),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: Align(
-          alignment: Alignment.center,
-          child: StreamBuilder<List<Document>>(
-            stream: Settings.firestore
-                .collection("users")
-                .document("scores")
-                .collection(whatByWhat.toString())
-                .stream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                  itemBuilder: (context, index) => Center(
-                    child: Text(
-                        "${snapshot.data![index].map["name"]} : ${snapshot.data![index].map["highScore"]}"),
-                  ),
-                  itemCount: snapshot.data!.length,
-                );
-              }
-              return Text("LOADING ...");
-            },
+        body: SafeArea(
+          child: Align(
+            alignment: Alignment.center,
+            child: FutureBuilder<List<Document>>(
+              future: Settings.firestore
+                  .collection("users")
+                  .document("scores")
+                  .collection(whatByWhat.toString())
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemBuilder: (context, index) => Center(
+                      child: Text(
+                          "${snapshot.data![index].map["name"]} : ${snapshot.data![index].map["highScore"]}"),
+                    ),
+                    itemCount: snapshot.data!.length,
+                  );
+                }
+                return Text("LOADING ...");
+              },
+            ),
           ),
         ),
       ),

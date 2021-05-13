@@ -5,44 +5,21 @@ import 'package:improved_2048/api/auth.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/leaderBoardPage.dart';
 
-class AuthenticationDialog extends StatefulWidget {
-
+class AuthenticationDialog {
   static Future showAuthDialog(BuildContext context) async {
-    final dialog = AlertDialog(
-      content: AuthenticationDialog(),
-    );
     await showDialog(
       context: context,
-      builder: (context) => dialog,
-    );
-  }
-
-  @override
-  _AuthenticationDialogState createState() => _AuthenticationDialogState();
-}
-
-class _AuthenticationDialogState extends State<AuthenticationDialog> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  "Oop, you have to be logged in to access online services!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextButton(
+      builder: (context) => AlertDialog(
+        content: Text(
+          "Oop, you have to be logged in to access online services!",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -57,10 +34,7 @@ class _AuthenticationDialogState extends State<AuthenticationDialog> {
                       fontSize: 25),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextButton(
+              TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -75,13 +49,15 @@ class _AuthenticationDialogState extends State<AuthenticationDialog> {
                       fontSize: 25),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          )
+        ],
       ),
     );
   }
+
 }
+
 
 class Login extends StatefulWidget {
   @override

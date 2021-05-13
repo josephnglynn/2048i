@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     return GestureDetector(
-      onVerticalDragEnd: (details) => details.velocity.pixelsPerSecond.dx < 0
+      onHorizontalDragEnd: (details) => details.velocity.pixelsPerSecond.dx < 0
           ? increaseGrid()
           : decreaseGrid(),
       child: Scaffold(

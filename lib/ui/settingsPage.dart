@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:improved_2048/api/auth.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/themeEditor.dart';
@@ -302,12 +303,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                 return;
                               }
                               List<String> otherPlaces =
-                  await Settings.getOtherSavedThemesAsString();
+                                  await Settings.getOtherSavedThemesAsString();
 
-              otherPlaces.add(
-                sC.toJson(),
-              );
-              await  Settings.storage.write("themes", otherPlaces);
+                              otherPlaces.add(
+                                sC.toJson(),
+                              );
+                              await Settings.storage
+                                  .write("themes", otherPlaces);
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => HomePage(4),
@@ -363,6 +365,25 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ],
             ),
+            Auth.loggedIn
+                ? TextButton(
+                    onPressed: () async {
+                      await Settings.storage.remove("loggedIn");
+                      await Settings.storage.remove("userName");
+                      Auth.userName = null;
+                      Auth.loggedIn = false;
+                      Settings.firebaseAuth.signOut();
+                      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => HomePage(4),), (route) => false);
+                    },
+                    child: Text(
+                      "Log out",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  )
+                : SizedBox(
+                    width: 1,
+                  ),
           ],
         ),
       ),
@@ -384,7 +405,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.red),
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -26,6 +26,7 @@ class HighScore {
             .document(Auth.userName!)
             .update({
           "highScore": highScore,
+          "name": Auth.userName,
         });
       } else {
         await Settings.firestore
@@ -35,6 +36,7 @@ class HighScore {
             .document(Auth.userName!)
             .create({
           "highScore": highScore,
+          "name": Auth.userName,
         });
       }
     } catch (e) {
@@ -57,7 +59,8 @@ class HighScore {
             .collection("$whatByWhat")
             .document(Auth.userName!)
             .get();
-        if (document.map["highScore"] > highScore) highScore = document.map["highScore"];
+        if (document.map["highScore"] > highScore)
+          highScore = document.map["highScore"];
       }
     } catch (e) {
       print(e);

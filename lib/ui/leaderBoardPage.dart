@@ -36,7 +36,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
           stream: Settings.firestore.collection("users").document("scores").collection(whatByWhat.toString()).stream,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListView.builder(itemBuilder: (context, index) => Text("$index"), itemCount: snapshot.data!.length,);
+              return ListView.builder(itemBuilder: (context, index) => Text("${snapshot.data![index].map["name"]} : ${snapshot.data![index].map["highScore"]}"), itemCount: snapshot.data!.length,);
             }
             return Text("LOADING ...");
           },

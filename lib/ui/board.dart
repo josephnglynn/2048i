@@ -15,6 +15,7 @@ class BoardPainter extends CustomPainter {
   static Size _previous = Size(0, 0);
   static int moves = 0;
   static int points = 0;
+  static int _previousPoints = 0;
   static int _largestNumberLength = 1;
   static double _handlingCounter = 0;
   static double _handlingNewTileCounter = 0;
@@ -85,6 +86,8 @@ class BoardPainter extends CustomPainter {
   static void undoMove() => _undo = true;
 
   void _undoMove() {
+    if (_undoElements.length == 0) return;
+    points = _previousPoints;
     _elements = [];
     for (int i = 0; i < _undoElements.length; ++i) {
       _elements.add([]);
@@ -152,6 +155,7 @@ class BoardPainter extends CustomPainter {
     if (_handlingMoveOfTiles || showDeath || _handlingNewTile) return;
     _handlingMoveOfTiles = true;
 
+    _previousPoints = points;
     moves++;
 
     int totalValueBefore = 0;
@@ -261,6 +265,7 @@ class BoardPainter extends CustomPainter {
     _previous = Size(0, 0);
     _rng = Random();
     _stopWatch.reset();
+    _previousPoints = 0;
     _handlingCounter = 0;
     _hasSetScore = false;
     _handlingNewTile = false;

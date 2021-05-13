@@ -31,15 +31,31 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Theme.of(context).textTheme.bodyText1!.color,
+        ),
+        title: Text(
+          "Leaderboard ${whatByWhat}x$whatByWhat",
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyText1!.color,
+          ),
+        ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0,
+      ),
       body: SafeArea(
-        child: StreamBuilder<List<Document>>(
-          stream: Settings.firestore.collection("users").document("scores").collection(whatByWhat.toString()).stream,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView.builder(itemBuilder: (context, index) => Text("${snapshot.data![index].map["name"]} : ${snapshot.data![index].map["highScore"]}"), itemCount: snapshot.data!.length,);
-            }
-            return Text("LOADING ...");
-          },
+        child: Align(
+          alignment: Alignment.center,
+          child: StreamBuilder<List<Document>>(
+            stream: Settings.firestore.collection("users").document("scores").collection(whatByWhat.toString()).stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(itemBuilder: (context, index) => Text("${snapshot.data![index].map["name"]} : ${snapshot.data![index].map["highScore"]}"), itemCount: snapshot.data!.length,);
+              }
+              return Text("LOADING ...");
+            },
+          ),
         ),
       ),
     );

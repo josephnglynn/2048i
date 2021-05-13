@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/api/settings.dart';
-
 import 'api/auth.dart';
+
 
 
 void main() async {
@@ -12,7 +12,6 @@ void main() async {
   await Settings.init();
   await ImportantValues.init();
   await Auth.init();
-
 
   runApp(
     MaterialApp(

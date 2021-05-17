@@ -25,21 +25,18 @@ class LeaderBoardPage extends StatefulWidget {
 class _LeaderBoardPageState extends State<LeaderBoardPage> {
   int whatByWhat = 4;
 
+  void increase() => setState(() => whatByWhat++);
+
+  void decrease() {
+    if (whatByWhat == 3) return;
+    setState(() => whatByWhat--);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragEnd: (details) {
-        if (details.velocity.pixelsPerSecond.dx < 0) {
-          setState(() {
-            whatByWhat++;
-          });
-        } else {
-          if (whatByWhat == 3) return;
-          setState(() {
-            whatByWhat--;
-          });
-        }
-
+        details.velocity.pixelsPerSecond.dx < 0 ? increase() : decrease();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -47,7 +44,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
             color: Theme.of(context).textTheme.bodyText1!.color,
           ),
           title: Text(
-            "Leaderboard ${whatByWhat}x$whatByWhat",
+            "Leaderboard",
             style: TextStyle(
               color: Theme.of(context).textTheme.bodyText1!.color,
             ),
@@ -66,17 +63,51 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                   .get(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+                  if (snapshot.data!.isEmpty) {
+                    return Text(
+                      'Oh no, no-one has made a highscore for ${whatByWhat}x$whatByWhat board\n😭',
+                      textAlign: TextAlign.center,
+                    );
+                  }
+
                   return ListView.builder(
-                    itemBuilder: (context, index) => Center(
-                      child: Text(
-                          "${snapshot.data![index].map["name"]} : ${snapshot.data![index].map["highScore"]}"),
-                    ),
+                    itemBuilder: (context, index) {
+                      bool itIsMe =
+                          snapshot.data![index].map["name"] == Auth.userName;
+                      return Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(
+                          itIsMe ? 20 : 10,
+                        ),
+                        color: itIsMe
+                            ? Color.fromRGBO(207, 94, 248, 1.0)
+                            : Theme.of(context).scaffoldBackgroundColor,
+                        child: Text(
+                          "${snapshot.data![index].map["name"]} : ${snapshot.data![index].map["highScore"]}",
+                        ),
+                      );
+                    },
                     itemCount: snapshot.data!.length,
                   );
                 }
                 return Text("LOADING ...");
               },
             ),
+          ),
+        ),
+        bottomSheet: Padding(
+          padding: EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                  onPressed: () => decrease(),
+                  icon: Icon(Icons.arrow_back_ios)),
+              Text("${whatByWhat}x$whatByWhat"),
+              IconButton(
+                  onPressed: () => increase(),
+                  icon: Icon(Icons.arrow_forward_ios)),
+            ],
           ),
         ),
       ),

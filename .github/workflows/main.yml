@@ -46,14 +46,6 @@ jobs:
           channel: 'beta'
       - name: Install Linux Build Tools
         run: sudo apt install ninja-build g++ clang cmake libgtk-3-dev libglu1-mesa pkg-config
-      - name: setup firebase
-        env:
-          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
-          FIREBASE_ID: ${{ secrets.FIREBASE_ID }}
-        run: |
-          touch lib/api/firebase_info.dart
-          echo "const FIREBASE_KEY = '$FIREBASE_KEY';" >> lib/api/firebase_info.dart
-          echo "const FIREBASE_ID = '$FIREBASE_ID';" >> lib/api/firebase_info.dart
       - name: Enable Linux Build For Flutter
         run: flutter config --enable-linux-desktop
       - name: Get Dependancies
@@ -166,14 +158,6 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: 'beta'
-
-      - name: setup firebase
-        env:
-          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
-          FIREBASE_ID: ${{ secrets.FIREBASE_ID }}
-        run: |
-          echo "const FIREBASE_KEY = '$FIREBASE_KEY';" >> lib/api/firebase_info.dart
-          echo "const FIREBASE_ID = '$FIREBASE_ID';" >> lib/api/firebase_info.dart
 
       - name: Build Windows Build
         run: flutter config --enable-windows-desktop

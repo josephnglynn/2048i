@@ -7,7 +7,11 @@ import 'package:improved_2048/api/auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init();
+  try {
+    await GetStorage.init();
+  } catch (e) {
+    print(e);
+  }
   await Settings.init();
   await ImportantValues.init();
   await Auth.init();
@@ -22,11 +26,12 @@ void main() async {
             backgroundColor: ThemeData.dark().scaffoldBackgroundColor,
             textTheme: TextTheme(
                 headline6:
-                GoogleFonts.openSans().copyWith(color: Colors.white)),
+                    GoogleFonts.openSans().copyWith(color: Colors.white)),
             iconTheme: IconThemeData(color: Colors.white)),
         dialogTheme: DialogTheme(
-            titleTextStyle: TextStyle(color: Colors.white,)
-        ),
+            titleTextStyle: TextStyle(
+          color: Colors.white,
+        )),
         textTheme: GoogleFonts.openSansTextTheme().copyWith(
           bodyText2: TextStyle(
             color: Colors.white,
@@ -61,12 +66,10 @@ void main() async {
           headline5: TextStyle(
             color: Colors.white,
           ),
-
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-              textStyle: TextStyle(foreground: Paint()..color = Colors.white)
-          ),
+              textStyle: TextStyle(foreground: Paint()..color = Colors.white)),
         ),
       ),
       themeMode: ThemeMode.system,

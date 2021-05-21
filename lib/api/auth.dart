@@ -1,10 +1,16 @@
 import 'package:improved_2048/api/settings.dart';
 
+class Result {
+  Object? error;
+  bool success;
+  Result(this.success, {this.error});
+}
+
 class Auth {
   static late bool loggedIn;
   static late String? userName;
 
-  static Future<bool> signUp(String email, String name, String password) async {
+  static Future<Result> signUp(String email, String name, String password) async {
     try {
       await Settings.firebaseAuth.signUp(email, password);
 
@@ -16,14 +22,14 @@ class Auth {
 
       await Settings.firebaseAuth.updateProfile(displayName: name);
 
-      return true;
+      return Result(true);
     } catch (e) {
       print(e);
-      return false;
+      return Result(false, error: e);
     }
   }
 
-  static Future<bool> login(String email, String password) async {
+  static Future<Result> login(String email, String password) async {
     try {
       await Settings.firebaseAuth.signIn(email, password);
 
@@ -34,10 +40,10 @@ class Auth {
       userName = user.displayName!;
       Settings.storage.write("userName", user.displayName);
 
-      return true;
+      return Result(true);
     } catch (e) {
       print(e);
-      return false;
+      return Result(false, error: e);
     }
   }
 

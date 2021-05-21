@@ -137,7 +137,8 @@ class _LoginState extends State<Login> {
                   );
                   return;
                 }
-                if (await Auth.login(email.text, password.text)) {
+                final result = await Auth.login(email.text, password.text);
+                if (result.success) {
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                           builder: (BuildContext context) => HomePage(4)),
@@ -152,7 +153,7 @@ class _LoginState extends State<Login> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      "Something went wrong",
+                      "ERROR: ${result.error}",
                     ),
                     backgroundColor: Colors.red,
                   ),
@@ -270,7 +271,8 @@ class _SignUpState extends State<SignUp> {
                   );
                   return;
                 }
-                if (await Auth.signUp(email.text, name.text, password.text)) {
+                final result = await Auth.signUp(email.text, name.text, password.text);
+                if (result.success) {
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                           builder: (BuildContext context) => HomePage(4)),
@@ -285,7 +287,7 @@ class _SignUpState extends State<SignUp> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      "Something went wrong",
+                      "ERROR: ${result.error}",
                     ),
                     backgroundColor: Colors.red,
                   ),

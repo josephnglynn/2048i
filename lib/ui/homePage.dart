@@ -10,6 +10,7 @@ import 'leaderBoardPage.dart';
 
 class HomePage extends StatefulWidget {
   final int sizeOfGrid;
+
   HomePage(this.sizeOfGrid);
 
   @override
@@ -18,8 +19,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int sizeOfGrid;
-  _HomePageState(this.sizeOfGrid);
 
+  _HomePageState(this.sizeOfGrid);
 
   @override
   Widget build(BuildContext context) {
@@ -173,6 +174,9 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(
                     color: Theme.of(context).textTheme.bodyText1!.color,
                   ),
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 ),
               ),
             ],

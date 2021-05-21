@@ -16,13 +16,21 @@ class PreferencesStore extends TokenStore {
   PreferencesStore._internal(this._prefs);
 
   @override
-  Token? read() => _prefs.containsKey(keyToken)
-      ? Token.fromMap(json.decode(_prefs.get(keyToken) as String))
-      : null;
+  Token? read() {
+    Object? object = _prefs.get(keyToken);
+    if (object != null) {
+      return Token.fromMap(json.decode(object as String));
+    }
+    return null;
+  }
 
   @override
-  void write(Token? token) =>
-      _prefs.setString(keyToken, json.encode(token!.toMap()));
+  void write(Token? token) {
+    if (token == null) {
+      return;
+    }
+    _prefs.setString(keyToken, json.encode(token.toMap()));
+  }
 
   @override
   void delete() => _prefs.remove(keyToken);

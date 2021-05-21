@@ -87,9 +87,6 @@ class _LoginState extends State<Login> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 5,
-              ),
               Padding(
                 padding: EdgeInsets.all(10),
                 child: TextField(
@@ -205,9 +202,6 @@ class _SignUpState extends State<SignUp> {
           child:  Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 5,
-              ),
               Padding(
                 padding: EdgeInsets.all(10),
                 child: TextField(

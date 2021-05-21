@@ -373,13 +373,17 @@ class _SettingsPageState extends State<SettingsPage> {
                       Auth.userName = null;
                       Auth.loggedIn = false;
                       Settings.firebaseAuth.signOut();
-                      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => HomePage(4),), (route) => false);
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(4),
+                          ),
+                          (route) => false);
                     },
                     child: Text(
                       "Log out",
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.red),
                     ),
+                    style: TextButton.styleFrom(backgroundColor: Colors.red),
                   )
                 : SizedBox(
                     width: 1,
@@ -403,8 +407,8 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Text(
                 "RESET ALL SETTINGS",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.red),
               ),
+              style: TextButton.styleFrom(backgroundColor: Colors.red),
             ),
           ],
         ),

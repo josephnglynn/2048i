@@ -20,6 +20,14 @@ void main() async {
     MaterialApp(
       theme: ThemeData.light().copyWith(
         textTheme: GoogleFonts.openSansTextTheme(),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+              textStyle: TextStyle(
+                foreground: Paint()..color = Colors.black,
+              ),
+              backgroundColor: Colors.purple
+          ),
+        ),
       ),
       darkTheme: ThemeData.dark().copyWith(
         appBarTheme: AppBarTheme(
@@ -69,7 +77,11 @@ void main() async {
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-              textStyle: TextStyle(foreground: Paint()..color = Colors.white)),
+            textStyle: TextStyle(
+              foreground: Paint()..color = Colors.white,
+            ),
+            backgroundColor: Colors.purple
+          ),
         ),
       ),
       themeMode: ThemeMode.system,

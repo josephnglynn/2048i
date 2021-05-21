@@ -82,34 +82,37 @@ class _LoginState extends State<Login> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height / 5,
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: email,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Email",
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 5,
+              ),
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  controller: email,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Email",
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: password,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Password",
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  controller: password,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Password",
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomSheet: Padding(
@@ -197,44 +200,47 @@ class _SignUpState extends State<SignUp> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height / 5,
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: email,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Email",
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child:  Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 5,
+              ),
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  controller: email,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Email",
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: name,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Name",
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  controller: name,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Name",
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: password,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Password",
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  controller: password,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Password",
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomSheet: Padding(

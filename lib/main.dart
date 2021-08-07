@@ -25,7 +25,6 @@ void main() async {
               textStyle: TextStyle(
                 foreground: Paint()..color = Colors.black,
               ),
-              backgroundColor: Colors.purple
           ),
         ),
       ),
@@ -80,7 +79,6 @@ void main() async {
             textStyle: TextStyle(
               foreground: Paint()..color = Colors.white,
             ),
-            backgroundColor: Colors.purple
           ),
         ),
       ),

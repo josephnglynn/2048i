@@ -4,9 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/api/auth.dart';
 import 'package:improved_2048/api/settings.dart';
+import 'package:improved_2048/themes/baseClass.dart';
 import 'package:improved_2048/ui/homePage.dart';
 import 'package:improved_2048/ui/themeEditor.dart';
-import 'package:improved_2048/ui/themes/baseClass.dart';
+
 import 'package:file_picker/file_picker.dart';
 
 class _GetThemesType {

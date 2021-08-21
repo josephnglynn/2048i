@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:improved_2048/api/settings.dart';
-import 'package:improved_2048/ui/highScore.dart';
+import 'package:improved_2048/api/highScore.dart';
 import 'package:improved_2048/ui/homePage.dart';
-import 'package:improved_2048/ui/types.dart';
+import 'package:improved_2048/types/types.dart';
 import 'board.dart';
 
 class Game extends StatefulWidget {
@@ -13,33 +13,31 @@ class Game extends StatefulWidget {
   Game(this.whatByWhat);
 
   @override
-  _GameState createState() => _GameState(whatByWhat);
+  _GameState createState() => _GameState();
 }
 
 class _GameState extends State<Game> {
   static const double padding = 20;
   static const double times2Padding = padding * 2;
 
-  final int whatByWhat;
   Stopwatch? stopwatch = Stopwatch()..start();
-
-  _GameState(this.whatByWhat);
 
   void goBackToHomePage() {
     SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
       BoardPainter.cleanUp();
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => HomePage(whatByWhat),
+          builder: (context) => HomePage(widget.whatByWhat),
         ),
         (route) => false,
       );
     });
   }
 
-  void reset() => SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) async {
+  void reset() =>
+      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) async {
         BoardPainter.cleanUp();
-        await BoardPainter.clearCache(whatByWhat);
+        await BoardPainter.clearCache(widget.whatByWhat);
       });
 
   @override
@@ -57,10 +55,8 @@ class _GameState extends State<Game> {
 
     if (!BoardPainter.dead)
       Future.delayed(Duration(seconds: 1), () {
-        if (BoardPainter.moves != 0)
-        setState(() {});
-      
-    }  );
+        if (BoardPainter.moves != 0) setState(() {});
+      });
 
     return WillPopScope(
       child: GestureDetector(
@@ -68,14 +64,14 @@ class _GameState extends State<Game> {
           if (details.primaryVelocity == 0) return;
           await BoardPainter.handleInput(
             details.primaryVelocity! < 0 ? Direction.Left : Direction.Right,
-            whatByWhat,
+            widget.whatByWhat,
           );
         },
         onVerticalDragEnd: (details) async {
           if (details.primaryVelocity == 0) return;
           await BoardPainter.handleInput(
             details.primaryVelocity! < 0 ? Direction.Up : Direction.Down,
-            whatByWhat,
+            widget.whatByWhat,
           );
         },
         child: Scaffold(
@@ -116,7 +112,7 @@ class _GameState extends State<Game> {
                 if (direction != null)
                   await BoardPainter.handleInput(
                     direction,
-                    whatByWhat,
+                    widget.whatByWhat,
                   );
               },
               child: Column(
@@ -150,7 +146,7 @@ class _GameState extends State<Game> {
                       height: smaller,
                       child: CustomPaint(
                         painter: BoardPainter(
-                          whatByWhat,
+                          widget.whatByWhat,
                           () {
                             BoardPainter.dead = true;
                             SchedulerBinding.instance!.scheduleFrameCallback(

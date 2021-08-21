@@ -5,7 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:improved_2048/api/firebase_info.dart';
 import 'package:firedart/firedart.dart';
 import 'package:improved_2048/api/preferencesStore.dart';
-import 'package:improved_2048/ui/themes/baseClass.dart';
+import 'package:improved_2048/themes/baseClass.dart';
 import 'package:path/path.dart';
 import 'package:share/share.dart';
 

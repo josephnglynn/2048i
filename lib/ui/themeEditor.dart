@@ -3,8 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:improved_2048/api/settings.dart';
+import 'package:improved_2048/themes/baseClass.dart';
 import 'package:improved_2048/ui/homePage.dart';
-import 'package:improved_2048/ui/themes/baseClass.dart';
+
 
 class ThemeEditor extends StatefulWidget {
   final SquareColors? squareColors;

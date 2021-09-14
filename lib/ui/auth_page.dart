@@ -2,8 +2,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/api/auth.dart';
-import 'package:improved_2048/ui/homePage.dart';
-import 'package:improved_2048/ui/leaderBoardPage.dart';
+import 'package:improved_2048/ui/home_page.dart';
+import 'package:improved_2048/ui/leader_board_page.dart';
 
 class AuthenticationDialog {
   static Future showAuthDialog(BuildContext context) async {
@@ -137,7 +137,7 @@ class _LoginState extends State<Login> {
                   );
                   return;
                 }
-                final result = await Auth.login(email.text, password.text);
+                final result = await Auth.get().login(email.text, password.text);
                 if (result.success) {
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
@@ -271,7 +271,7 @@ class _SignUpState extends State<SignUp> {
                   );
                   return;
                 }
-                final result = await Auth.signUp(email.text, name.text, password.text);
+                final result = await Auth.get().signUp(email.text, name.text, password.text);
                 if (result.success) {
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/types/types.dart';
-import '../api/highScore.dart';
+import '../api/high_score.dart';
 
 class BoardPainter extends CustomPainter {
   static List<List<BoardTile>> _board = [];
@@ -37,12 +37,12 @@ class BoardPainter extends CustomPainter {
 
   BoardPainter(this.whatByWhat, this.navigateOnDeath, this.setStuffOnParent)
       : super(repaint: _rePaint) {
-    ImportantValues.updateRadius(whatByWhat);
-    ImportantValues.updatePadding(whatByWhat);
+    Settings.get().updateRadius(whatByWhat);
+    Settings.get().updatePadding(whatByWhat);
   }
 
   static Future<List<List<BoardElement>>?> _checkCache(int whatByWhat) async {
-    var integers = Settings.storage.read("board$whatByWhat") ?? [];
+    var integers = Settings.get().storage.read("board$whatByWhat") ?? [];
     if (integers.isEmpty) return null;
     List<List<BoardElement>> boardElements = [];
     for (int i = 0; i < integers.length; ++i) {
@@ -62,7 +62,7 @@ class BoardPainter extends CustomPainter {
         );
       }
     }
-    points = Settings.storage.read("points$whatByWhat");
+    points = Settings.get().storage.read("points$whatByWhat");
     return boardElements;
   }
 
@@ -74,13 +74,13 @@ class BoardPainter extends CustomPainter {
         integers[i].add(_elements[i][k].value);
       }
     }
-    Settings.storage.write("board$whatByWhat", integers);
-    Settings.storage.write("points$whatByWhat", points);
+    Settings.get().storage.write("board$whatByWhat", integers);
+    Settings.get().storage.write("points$whatByWhat", points);
   }
 
   static Future clearCache(int whatByWhat) async {
-    await Settings.storage.remove("board$whatByWhat");
-    await Settings.storage.remove("points$whatByWhat");
+    await Settings.get().storage.remove("board$whatByWhat");
+    await Settings.get().storage.remove("points$whatByWhat");
   }
 
   static void undoMove() => _undo = true;
@@ -299,10 +299,10 @@ class BoardPainter extends CustomPainter {
         _board[i].add(
           BoardTile(
             MutableRectangle(
-              tileWidth * i + ImportantValues.halfPadding,
-              tileHeight * k + ImportantValues.halfPadding,
-              tileWidth - ImportantValues.padding,
-              tileHeight - ImportantValues.padding,
+              tileWidth * i + Settings.get().halfPadding,
+              tileHeight * k + Settings.get().halfPadding,
+              tileWidth - Settings.get().padding,
+              tileHeight - Settings.get().padding,
             ),
           ),
         );
@@ -331,10 +331,10 @@ class BoardPainter extends CustomPainter {
       for (int k = 0; k < whatByWhat; ++k) {
         _board[i][k] = BoardTile(
           MutableRectangle(
-            tileWidth * i + ImportantValues.halfPadding,
-            tileHeight * k + ImportantValues.halfPadding,
-            tileWidth - ImportantValues.padding,
-            tileHeight - ImportantValues.padding,
+            tileWidth * i + Settings.get().halfPadding,
+            tileHeight * k + Settings.get().halfPadding,
+            tileWidth - Settings.get().padding,
+            tileHeight - Settings.get().padding,
           ),
         );
       }
@@ -375,11 +375,11 @@ class BoardPainter extends CustomPainter {
 
     final tileWidth = size.width / whatByWhat;
     final tileHeight = size.height / whatByWhat;
-    final fontSize = tileHeight * Settings.fontSizeScale / _largestNumberLength;
+    final fontSize = tileHeight * Settings.get().fontSizeScale / _largestNumberLength;
 
     if (_handlingMoveOfTiles) {
       _handlingCounter += deltaT;
-      if (_handlingCounter > ImportantValues.animationLength) {
+      if (_handlingCounter > Settings.get().animationLength) {
         _handlingMoveOfTiles = false;
         _handlingCounter = 0;
         for (int i = 0; i < _elements.length; ++i) {
@@ -394,7 +394,7 @@ class BoardPainter extends CustomPainter {
 
     if (_handlingNewTile) {
       _handlingNewTileCounter += deltaT;
-      if (_handlingNewTileCounter > ImportantValues.newTileAnimationLength) {
+      if (_handlingNewTileCounter > Settings.get().newTileAnimationLength) {
         _handlingNewTile = false;
         _handlingNewTileCounter = 0;
 
@@ -416,7 +416,7 @@ class BoardPainter extends CustomPainter {
     }
 
     final clearTilePaint = Paint()
-      ..color = Settings.boardThemeValues.getSquareColors()[1] ?? Colors.grey;
+      ..color = Settings.get().boardThemeValues.getSquareColors()[1] ?? Colors.grey;
 
     for (int i = 0; i < whatByWhat; ++i) {
       for (int k = 0; k < whatByWhat; ++k) {
@@ -428,7 +428,7 @@ class BoardPainter extends CustomPainter {
               _board[i][k].dimensions.width,
               _board[i][k].dimensions.height,
             ),
-            ImportantValues.radius,
+            Settings.get().radius,
           ),
           clearTilePaint,
         );
@@ -440,30 +440,30 @@ class BoardPainter extends CustomPainter {
         if (_elements[i][k].value != 0) {
           if (_elements[i][k].animateElement) {
             final newTileRatio = _handlingNewTileCounter /
-                ImportantValues.newTileAnimationLength;
+                Settings.get().newTileAnimationLength;
             final normalRatio =
-                _handlingCounter / ImportantValues.animationLength;
+                _handlingCounter / Settings.get().animationLength;
             if (_elements[i][k].isNewTile) {
               //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
               Rect rect = Rect.fromLTWH(
                 tileWidth * i +
-                    ImportantValues.halfPadding +
+                    Settings.get().halfPadding +
                     tileWidth * 0.5 -
                     (newTileRatio * tileWidth * 0.5),
                 tileHeight * k +
-                    ImportantValues.halfPadding +
+                    Settings.get().halfPadding +
                     tileHeight * 0.5 -
                     (newTileRatio * tileHeight * 0.5),
-                (tileWidth - ImportantValues.padding) * newTileRatio,
-                (tileHeight - ImportantValues.padding) * newTileRatio,
+                (tileWidth - Settings.get().padding) * newTileRatio,
+                (tileHeight - Settings.get().padding) * newTileRatio,
               );
               canvas.drawRRect(
                 RRect.fromRectAndRadius(
                   rect,
-                  ImportantValues.radius,
+                  Settings.get().radius,
                 ),
                 Paint()
-                  ..color = Settings.boardThemeValues
+                  ..color = Settings.get().boardThemeValues
                           .getSquareColors()[_elements[i][k].value] ??
                       Color.fromRGBO(
                         _elements[i][k].value % 255,
@@ -495,23 +495,23 @@ class BoardPainter extends CustomPainter {
               //THIS MEANS IT SHOULD EXPAND FROM TINY TO BIG
               Rect rect = Rect.fromLTWH(
                 tileWidth * i +
-                    ImportantValues.halfPadding +
+                    Settings.get().halfPadding +
                     tileWidth * 0.5 -
                     (normalRatio * tileWidth * 0.5),
                 tileHeight * k +
-                    ImportantValues.halfPadding +
+                    Settings.get().halfPadding +
                     tileHeight * 0.5 -
                     (normalRatio * tileHeight * 0.5),
-                (tileWidth - ImportantValues.padding) * normalRatio,
-                (tileHeight - ImportantValues.padding) * normalRatio,
+                (tileWidth - Settings.get().padding) * normalRatio,
+                (tileHeight - Settings.get().padding) * normalRatio,
               );
               canvas.drawRRect(
                 RRect.fromRectAndRadius(
                   rect,
-                  ImportantValues.radius,
+                  Settings.get().radius,
                 ),
                 Paint()
-                  ..color = Settings.boardThemeValues
+                  ..color = Settings.get().boardThemeValues
                           .getSquareColors()[_elements[i][k].value] ??
                       Color.fromRGBO(
                         _elements[i][k].value % 255,
@@ -546,28 +546,28 @@ class BoardPainter extends CustomPainter {
                             (_elements[i][k].previousPosition!.i +
                                 (i - _elements[i][k].previousPosition!.i) *
                                     normalRatio) +
-                        ImportantValues.halfPadding,
+                        Settings.get().halfPadding,
                     tileHeight *
                             (_elements[i][k].previousPosition!.k +
                                 (k - _elements[i][k].previousPosition!.k) *
                                     normalRatio) +
-                        ImportantValues.halfPadding,
-                    tileWidth - ImportantValues.padding,
-                    tileHeight - ImportantValues.padding,
+                        Settings.get().halfPadding,
+                    tileWidth - Settings.get().padding,
+                    tileHeight - Settings.get().padding,
                   )
                 : Rect.fromLTWH(
-                    tileWidth * i + ImportantValues.halfPadding,
-                    tileHeight * k + ImportantValues.halfPadding,
-                    tileWidth - ImportantValues.padding,
-                    tileHeight - ImportantValues.padding,
+                    tileWidth * i + Settings.get().halfPadding,
+                    tileHeight * k + Settings.get().halfPadding,
+                    tileWidth - Settings.get().padding,
+                    tileHeight - Settings.get().padding,
                   );
             canvas.drawRRect(
               RRect.fromRectAndRadius(
                 rect,
-                ImportantValues.radius,
+                Settings.get().radius,
               ),
               Paint()
-                ..color = Settings.boardThemeValues
+                ..color = Settings.get().boardThemeValues
                         .getSquareColors()[_elements[i][k].value] ??
                     Color.fromRGBO(
                       _elements[i][k].value % 255,
@@ -597,18 +597,18 @@ class BoardPainter extends CustomPainter {
             continue;
           }
           Rect rect = Rect.fromLTWH(
-            tileWidth * i + ImportantValues.halfPadding,
-            tileHeight * k + ImportantValues.halfPadding,
-            tileWidth - ImportantValues.padding,
-            tileHeight - ImportantValues.padding,
+            tileWidth * i + Settings.get().halfPadding,
+            tileHeight * k + Settings.get().halfPadding,
+            tileWidth - Settings.get().padding,
+            tileHeight - Settings.get().padding,
           );
           canvas.drawRRect(
             RRect.fromRectAndRadius(
               rect,
-              ImportantValues.radius,
+              Settings.get().radius,
             ),
             Paint()
-              ..color = Settings.boardThemeValues
+              ..color = Settings.get().boardThemeValues
                       .getSquareColors()[_elements[i][k].value] ??
                   Color.fromRGBO(
                     _elements[i][k].value % 255,

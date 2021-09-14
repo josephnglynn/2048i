@@ -4,9 +4,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/board.dart';
 import 'package:improved_2048/ui/game.dart';
-import 'package:improved_2048/ui/settingsPage.dart';
+import 'package:improved_2048/ui/settings_page.dart';
 
-import 'leaderBoardPage.dart';
+import 'leader_board_page.dart';
 
 class HomePage extends StatefulWidget {
   final int sizeOfGrid;
@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Settings.boardThemeValues.updateDarkTheme();
+    Settings.get().boardThemeValues.updateDarkTheme();
 
     double width = MediaQuery.of(context).size.width - 150;
     double height = MediaQuery.of(context).size.height - 150;
@@ -112,12 +112,12 @@ class _HomePageState extends State<HomePage> {
                               alignment: Alignment.center,
                               child: Container(
                                 padding:
-                                    EdgeInsets.all(ImportantValues.halfPadding),
+                                    EdgeInsets.all(Settings.get().halfPadding),
                                 decoration: BoxDecoration(
-                                  color: Settings.boardThemeValues
+                                  color: Settings.get().boardThemeValues
                                       .getSquareColors()[0],
                                   borderRadius:
-                                      BorderRadius.all(ImportantValues.radius),
+                                      BorderRadius.all(Settings.get().radius),
                                 ),
                                 width: smaller,
                                 height: smaller,

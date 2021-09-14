@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:improved_2048/api/settings.dart';
-import 'package:improved_2048/api/highScore.dart';
-import 'package:improved_2048/ui/homePage.dart';
+import 'package:improved_2048/api/high_score.dart';
+import 'package:improved_2048/ui/home_page.dart';
 import 'package:improved_2048/types/types.dart';
 import 'board.dart';
 
@@ -129,7 +129,7 @@ class _GameState extends State<Game> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("score: ${BoardPainter.points}"),
-                        Text("highScore: ${HighScore.highScore}"),
+                        Text("highScore: ${HighScore.get().highScore}"),
                       ],
                     ),
                   ),
@@ -137,10 +137,10 @@ class _GameState extends State<Game> {
                     padding: EdgeInsets.only(left: padding, right: padding),
                     alignment: Alignment.center,
                     child: Container(
-                      padding: EdgeInsets.all(ImportantValues.halfPadding),
+                      padding: EdgeInsets.all(Settings.get().halfPadding),
                       decoration: BoxDecoration(
-                        color: Settings.boardThemeValues.getSquareColors()[0],
-                        borderRadius: BorderRadius.all(ImportantValues.radius),
+                        color: Settings.get().boardThemeValues.getSquareColors()[0],
+                        borderRadius: BorderRadius.all(Settings.get().radius),
                       ),
                       width: smaller,
                       height: smaller,
@@ -189,7 +189,7 @@ class _GameState extends State<Game> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          Settings.showMovesInsteadOfTime
+                          Settings.get().showMovesInsteadOfTime
                               ? "moves: ${BoardPainter.moves}"
                               : "time: ${stopwatch!.elapsed.inSeconds}",
                         ),

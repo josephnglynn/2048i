@@ -3,11 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:improved_2048/api/auth.dart';
 import 'package:improved_2048/api/settings.dart';
-import 'package:improved_2048/ui/authenticationPage.dart';
+import 'package:improved_2048/ui/auth_page.dart';
 
 class LeaderBoardPage extends StatefulWidget {
   static void canSeeLeaderBoard(BuildContext context) {
-    if (Auth.loggedIn) {
+    if (Auth.get().loggedIn) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => LeaderBoardPage(),
@@ -56,7 +56,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
           child: Align(
             alignment: Alignment.center,
             child: FutureBuilder<List<Document>>(
-              future: Settings.firestore
+              future: Settings.get().firestore
                   .collection("users")
                   .document("scores")
                   .collection(whatByWhat.toString())
@@ -73,7 +73,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                   return ListView.builder(
                     itemBuilder: (context, index) {
                       bool itIsMe =
-                          snapshot.data![index].map["name"] == Auth.userName;
+                          snapshot.data![index].map["name"] == Auth.get().userName;
                       return Container(
                         alignment: Alignment.center,
                         padding: EdgeInsets.all(

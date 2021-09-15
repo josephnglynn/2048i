@@ -23,7 +23,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  double fontSize = Settings.get().fontSizeScale;
+
 
   Future exportTheme(BuildContext context) async {
     String filePath = await Settings.get().exportTheme();
@@ -94,79 +94,8 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ListView(
           padding: EdgeInsets.all(20),
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Font Size Scale"),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width / 3,
-                  child: TextFormField(
-                    initialValue: fontSize.toString(),
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) async {
-                      if (value.length < 3) return;
-                      final asNumber = double.parse(value);
-                      if (asNumber > 0 && asNumber <= 1) {
-                        await Settings.get().setFontSize(asNumber);
-                        return setState(() {
-                          fontSize = asNumber;
-                        });
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("MUST BE : 0 < x < 1"),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Movement Animation Length"),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width / 3,
-                  child: TextFormField(
-                    initialValue: Settings.get().animationLength.toString(),
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) async {
-                      if (value.length < 1) return;
-                      final asNumber = double.parse(value);
-                      await Settings.get().setAnimationLength(asNumber);
-                      setState(() {});
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "New Tile Animation Length",
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width / 3,
-                  child: TextFormField(
-                    initialValue:
-                        Settings.get().newTileAnimationLength.toString(),
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) async {
-                      if (value.length < 1) return;
-                      final asNumber = double.parse(value);
-                      await Settings.get().setNewTileAnimationLength(asNumber);
-                      setState(() {});
-                    },
-                  ),
-                ),
-              ],
-            ),
+
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -402,11 +331,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             TextButton(
               onPressed: () async {
-                await Settings.get().setFontSize(0.75);
 
-                setState(() {
-                  fontSize = Settings.get().fontSizeScale;
-                });
               },
               child: Text(
                 "RESET ALL SETTINGS",

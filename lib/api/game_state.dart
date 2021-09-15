@@ -341,7 +341,7 @@ class GameState {
         if (length > _topNumberLength) {
           _topNumberLength = length;
           _fontSize =
-              _tileHeight * Settings.get().fontSizeScale / _topNumberLength;
+              _tileHeight / _topNumberLength;
         }
 
         row[i + 1].value = -1;
@@ -591,6 +591,6 @@ class GameState {
 
     _tileWidth = _size.width / _boardSize;
     _tileHeight = _size.height / _boardSize;
-    _fontSize = _tileHeight * Settings.get().fontSizeScale / _topNumberLength;
+    _fontSize = _tileHeight / _topNumberLength;
   }
 }

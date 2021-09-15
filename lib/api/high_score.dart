@@ -84,7 +84,7 @@ class HighScore {
     if (newHighScore <= highScore) return;
     await Settings.get()
         .storage
-        .write("highScore${_cachedHighScore}", newHighScore);
+        .write("highScore$_cachedHighScore", newHighScore);
     highScore = newHighScore;
     await tryAndUploadToDataBase(whatByWhat);
   }

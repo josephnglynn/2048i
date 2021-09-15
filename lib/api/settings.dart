@@ -11,7 +11,6 @@ import 'package:share/share.dart';
 
 class Settings {
   BoardThemeValues boardThemeValues;
-  double fontSizeScale;
   int themeIndex;
   bool showMovesInsteadOfTime;
   GetStorage storage;
@@ -21,21 +20,16 @@ class Settings {
 
   Radius radius = Radius.circular(5);
   double padding = 5;
-  double animationLength;
-  double newTileAnimationLength;
   late double halfPadding;
 
   Settings(
     this.boardThemeValues,
-    this.fontSizeScale,
     this.themeIndex,
     this.showMovesInsteadOfTime,
     this.storage,
     this.storageDirectoryPath,
     this.firebaseAuth,
     this.firestore,
-    this.newTileAnimationLength,
-    this.animationLength,
   ) {
     halfPadding = padding / 2;
   }
@@ -45,11 +39,6 @@ class Settings {
   static init() async => await _init();
 
   static Settings get() => _settings!;
-
-  Future setFontSize(double _fontSizeScale) async {
-    Settings.get().storage.write("fontSizeScale", _fontSizeScale);
-    get().fontSizeScale = _fontSizeScale;
-  }
 
   Future shareCurrentThemeToOtherApps() async {
     String fileName = "${get().boardThemeValues.getThemeName()}";
@@ -147,15 +136,6 @@ class Settings {
     get().halfPadding = newPadding / 2;
   }
 
-  Future setAnimationLength(double value) async {
-    await Settings.get().storage.write("animationLength", value);
-    get().animationLength = value;
-  }
-
-  Future setNewTileAnimationLength(double value) async {
-    await Settings.get().storage.write("newTileAnimationLength", value);
-    get().newTileAnimationLength = value;
-  }
 
   static Future _init() async {
     var firebaseAuth = FirebaseAuth.initialize(
@@ -184,21 +164,18 @@ class Settings {
             .firstWhere((element) => element.themeName == themeName),
       );
     }
-    var fontSizeScale = storage.read("fontSizeScale") ?? 0.75;
+
     var showMovesInsteadOfTime =
         storage.read("showMovesInsteadOfTime") ?? false;
 
     _settings = Settings(
       theme,
-      fontSizeScale,
       theme == MaterialTheme() ? 1 : 0,
       showMovesInsteadOfTime,
       storage,
       storageDirectoryPath,
       firebaseAuth,
       firestore,
-      storage.read("newTileAnimationLength") ?? 0.1,
-      storage.read("animationLength") ?? 0.1,
     );
   }
 }

@@ -42,7 +42,7 @@ class Settings {
 
   static Settings? _settings;
 
-  static init() async => _settings = await _init();
+  static init() async => await _init();
 
   static Settings get() => _settings!;
 
@@ -175,11 +175,11 @@ class Settings {
     }
 
     var themeName = storage.read("CurrentTheme");
-    var theme;
+    BoardThemeValues theme;
     if (themeName == null) {
-      storage.read("MaterialTheme") ?? false ? MaterialTheme() : DefaultTheme();
+     theme = storage.read("MaterialTheme") ?? false ? MaterialTheme() : DefaultTheme();
     } else {
-      FromStorageTheme(
+     theme = FromStorageTheme(
         (await storage.read("themes"))
             .firstWhere((element) => element.themeName == themeName),
       );

@@ -3,17 +3,18 @@ import 'package:improved_2048/api/settings.dart';
 
 class HighScore {
   int highScore = 0;
-  int _whatByWhat = 1;
-  static HighScore? _highScore;
+  int _cachedHighScore = 1;
 
-  static HighScore get() => _highScore!;
+  static HighScore _highScore = HighScore();
 
-  static Future getHighScore(int whatByWhat) async {
-    get().highScore = Settings.get().storage.read("highScore$whatByWhat") ?? 0;
-    get()._whatByWhat = whatByWhat;
+  static HighScore get() => _highScore;
+
+  Future getHighScore(int whatByWhat) async {
+    highScore = Settings.get().storage.read("highScore$whatByWhat") ?? 0;
+    _cachedHighScore = whatByWhat;
   }
 
-  static Future tryAndUploadToDataBase(int whatByWhat) async {
+  Future tryAndUploadToDataBase(int whatByWhat) async {
     if (Auth.get().userName == null) return;
     try {
       if (await Settings.get()
@@ -30,7 +31,7 @@ class HighScore {
             .collection("$whatByWhat")
             .document(Auth.get().userName!)
             .update({
-          "highScore": get().highScore,
+          "highScore": highScore,
           "name": Auth.get().userName,
         });
       } else {
@@ -41,7 +42,7 @@ class HighScore {
             .collection("$whatByWhat")
             .document(Auth.get().userName!)
             .create({
-          "highScore": get().highScore,
+          "highScore": highScore,
           "name": Auth.get().userName,
         });
       }
@@ -50,7 +51,7 @@ class HighScore {
     }
   }
 
-  static Future checkScoreOnDataBase(int whatByWhat) async {
+  Future checkScoreOnDataBase(int whatByWhat) async {
     if (Auth.get().userName == null) return;
     try {
       if (await Settings.get()
@@ -67,24 +68,24 @@ class HighScore {
             .collection("$whatByWhat")
             .document(Auth.get().userName!)
             .get();
-        if (document.map["highScore"] > get().highScore)
-          get().highScore = document.map["highScore"];
+        if (document.map["highScore"] > highScore)
+          highScore = document.map["highScore"];
       }
     } catch (e) {
       print(e);
     }
   }
 
-  static Future setHighScore(int newHighScore, int whatByWhat) async {
-    if (get()._whatByWhat != whatByWhat) {
+  Future setHighScore(int newHighScore, int whatByWhat) async {
+    if (_cachedHighScore != whatByWhat) {
       await getHighScore(whatByWhat);
       await checkScoreOnDataBase(whatByWhat);
     }
-    if (newHighScore <= get().highScore) return;
+    if (newHighScore <= highScore) return;
     await Settings.get()
         .storage
-        .write("highScore${get()._whatByWhat}", newHighScore);
-    get().highScore = newHighScore;
+        .write("highScore${_cachedHighScore}", newHighScore);
+    highScore = newHighScore;
     await tryAndUploadToDataBase(whatByWhat);
   }
 }

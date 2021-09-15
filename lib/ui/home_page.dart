@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:improved_2048/api/game_state.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/ui/board.dart';
 import 'package:improved_2048/ui/game.dart';
@@ -38,20 +38,12 @@ class _HomePageState extends State<HomePage> {
     final smaller = width > height ? height : width;
 
     void increaseGrid() {
-      BoardPainter.dead = true;
-      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
-        BoardPainter.cleanUp();
-        setState(() => sizeOfGrid++);
-      });
+      setState(() => sizeOfGrid++);
     }
 
     void decreaseGrid() {
       if (sizeOfGrid == 3) return;
-      BoardPainter.dead = true;
-      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
-        BoardPainter.cleanUp();
-        setState(() => sizeOfGrid--);
-      });
+      setState(() => sizeOfGrid--);
     }
 
     return GestureDetector(
@@ -114,7 +106,8 @@ class _HomePageState extends State<HomePage> {
                                 padding:
                                     EdgeInsets.all(Settings.get().halfPadding),
                                 decoration: BoxDecoration(
-                                  color: Settings.get().boardThemeValues
+                                  color: Settings.get()
+                                      .boardThemeValues
                                       .getSquareColors()[0],
                                   borderRadius:
                                       BorderRadius.all(Settings.get().radius),
@@ -122,8 +115,13 @@ class _HomePageState extends State<HomePage> {
                                 width: smaller,
                                 height: smaller,
                                 child: CustomPaint(
-                                  painter:
-                                      BoardPainter(sizeOfGrid, () {}, () {}),
+                                  painter: BoardPainter(
+                                    GameState(
+                                      sizeOfGrid,
+                                      (Function fn) {},
+                                      () {},
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),

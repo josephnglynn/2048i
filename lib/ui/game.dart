@@ -1,6 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:improved_2048/api/game_state.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/api/high_score.dart';
 import 'package:improved_2048/ui/home_page.dart';
@@ -16,29 +17,37 @@ class Game extends StatefulWidget {
   _GameState createState() => _GameState();
 }
 
-class _GameState extends State<Game> {
+class _GameState extends State<Game> with SingleTickerProviderStateMixin {
   static const double padding = 20;
   static const double times2Padding = padding * 2;
-
+  late GameState gameState;
+  late AnimationController controller;
+  late Animation<double> animation;
   Stopwatch? stopwatch = Stopwatch()..start();
 
-  void goBackToHomePage() {
-    SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) {
-      BoardPainter.cleanUp();
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => HomePage(widget.whatByWhat),
-        ),
-        (route) => false,
-      );
+  @override
+  void initState() {
+    controller = AnimationController(
+      vsync: this,
+      duration: GameState.animationDuration,
+    );
+    animation = Tween<double>(begin: 0, end: 1).animate(controller);
+    gameState = GameState(
+      widget.whatByWhat,
+      setState,
+      () {
+        controller.value = 0;
+        controller.animateTo(1, duration: GameState.animationDuration);
+        controller.forward();
+      },
+    );
+    controller.addListener(() {
+      gameState.animationValue = controller.value;
+      setState(() {});
     });
-  }
 
-  void reset() =>
-      SchedulerBinding.instance!.scheduleFrameCallback((timeStamp) async {
-        BoardPainter.cleanUp();
-        await BoardPainter.clearCache(widget.whatByWhat);
-      });
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -47,29 +56,46 @@ class _GameState extends State<Game> {
     super.dispose();
   }
 
+  Future restart() async {
+    await gameState.clearCache();
+    setState(() {
+      gameState = GameState(
+        widget.whatByWhat,
+        setState,
+        () {
+          controller.value = 0;
+          controller.animateTo(1, duration: GameState.animationDuration);
+          controller.forward();
+        },
+      );
+    });
+  }
+
+  void onInput(Direction direction, int boardSize) {
+    gameState.handleInput(
+      direction,
+      boardSize,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width - times2Padding;
     final height = MediaQuery.of(context).size.height - times2Padding - 50 - 50;
     final smaller = width > height ? height : width;
 
-    if (!BoardPainter.dead)
-      Future.delayed(Duration(seconds: 1), () {
-        if (BoardPainter.moves != 0) setState(() {});
-      });
-
     return WillPopScope(
       child: GestureDetector(
         onHorizontalDragEnd: (details) async {
           if (details.primaryVelocity == 0) return;
-          await BoardPainter.handleInput(
+          onInput(
             details.primaryVelocity! < 0 ? Direction.Left : Direction.Right,
             widget.whatByWhat,
           );
         },
         onVerticalDragEnd: (details) async {
           if (details.primaryVelocity == 0) return;
-          await BoardPainter.handleInput(
+          onInput(
             details.primaryVelocity! < 0 ? Direction.Up : Direction.Down,
             widget.whatByWhat,
           );
@@ -106,11 +132,16 @@ class _GameState extends State<Game> {
                     direction = Direction.Down;
                     break;
                   case "Escape":
-                    BoardPainter.dead = true;
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(widget.whatByWhat),
+                        ),
+                        (route) => false);
                     break;
                 }
                 if (direction != null)
-                  await BoardPainter.handleInput(
+                  onInput(
                     direction,
                     widget.whatByWhat,
                   );
@@ -128,7 +159,7 @@ class _GameState extends State<Game> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("score: ${BoardPainter.points}"),
+                        Text("score: ${gameState.points}"),
                         Text("highScore: ${HighScore.get().highScore}"),
                       ],
                     ),
@@ -139,37 +170,63 @@ class _GameState extends State<Game> {
                     child: Container(
                       padding: EdgeInsets.all(Settings.get().halfPadding),
                       decoration: BoxDecoration(
-                        color: Settings.get().boardThemeValues.getSquareColors()[0],
+                        color: Settings.get()
+                            .boardThemeValues
+                            .getSquareColors()[0],
                         borderRadius: BorderRadius.all(Settings.get().radius),
                       ),
                       width: smaller,
                       height: smaller,
                       child: CustomPaint(
                         painter: BoardPainter(
-                          widget.whatByWhat,
-                          () {
-                            BoardPainter.dead = true;
-                            SchedulerBinding.instance!.scheduleFrameCallback(
-                              (timeStamp) => goBackToHomePage(),
-                            );
-                          },
-                          () => setState(() {}),
+                          gameState,
                         ),
-                        child: BoardPainter.showDeath
+                        child: gameState.dead
                             ? Container(
                                 alignment: Alignment.center,
                                 child: TweenAnimationBuilder<double>(
                                   tween: Tween(begin: 0, end: 1),
                                   duration: Duration(seconds: 3),
-                                  builder: (context, value, child) => Text(
-                                    "Game Over",
-                                    style: TextStyle(
+                                  builder: (context, value, child) =>
+                                      BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                      sigmaX: 5 * value,
+                                      sigmaY: 5 * value,
+                                    ),
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
                                         color: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1!
-                                            .color!
-                                            .withOpacity(value),
-                                        fontSize: 40),
+                                            .scaffoldBackgroundColor,
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            "Game Over",
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1!
+                                                    .color!
+                                                    .withOpacity(value),
+                                                fontSize: 40),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async => restart(),
+                                            child: Text("Restart?"),
+                                            style: TextButton.styleFrom(
+                                              textStyle: TextStyle(
+                                                color: Colors.blueAccent
+                                                    .withOpacity(value),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               )
@@ -190,16 +247,13 @@ class _GameState extends State<Game> {
                       children: [
                         Text(
                           Settings.get().showMovesInsteadOfTime
-                              ? "moves: ${BoardPainter.moves}"
+                              ? "moves: ${gameState.moves}"
                               : "time: ${stopwatch!.elapsed.inSeconds}",
                         ),
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () => SchedulerBinding.instance!
-                                  .scheduleFrameCallback(
-                                (timeStamp) => BoardPainter.undoMove(),
-                              ),
+                              onPressed: () => gameState.undoMove(),
                               padding: EdgeInsets.zero,
                               alignment: Alignment.topCenter,
                               icon: Icon(
@@ -207,10 +261,7 @@ class _GameState extends State<Game> {
                               ),
                             ),
                             IconButton(
-                              onPressed: () => SchedulerBinding.instance!
-                                  .scheduleFrameCallback(
-                                (timeStamp) => reset(),
-                              ),
+                              onPressed: () async => await restart(),
                               padding: EdgeInsets.zero,
                               alignment: Alignment.topCenter,
                               icon: Icon(
@@ -229,7 +280,6 @@ class _GameState extends State<Game> {
         ),
       ),
       onWillPop: () {
-        BoardPainter.dead = true;
         return Future.value(false);
       },
     );

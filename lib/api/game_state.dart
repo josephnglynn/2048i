@@ -591,6 +591,6 @@ class GameState {
 
     _tileWidth = _size.width / _boardSize;
     _tileHeight = _size.height / _boardSize;
-    _fontSize = _tileHeight / _topNumberLength;
+    _fontSize = _tileHeight / _topNumberLength / 2;
   }
 }

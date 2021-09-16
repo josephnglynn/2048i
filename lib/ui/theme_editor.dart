@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/themes/baseClass.dart';
-import 'package:improved_2048/ui/homePage.dart';
+import 'package:improved_2048/ui/home_page.dart';
 
 
 class ThemeEditor extends StatefulWidget {
@@ -174,7 +174,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
                   return;
                 }
                 List<SquareColors> otherPlaces =
-                await Settings.getOtherSavedThemes();
+                await Settings.get().getOtherSavedThemes();
                 List<String> asStrings = [];
                 otherPlaces.forEach((element) {
                   if (element.themeName == squareColors.themeName) {
@@ -183,7 +183,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
                     asStrings.add(element.toJson());
                   }
                 });
-                await  Settings.storage.write("themes", asStrings);
+                await  Settings.get().storage.write("themes", asStrings);
                 await Settings.init();
                 Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
@@ -260,7 +260,7 @@ class __SetThemeNameState extends State<_SetThemeName> {
                 );
                 return;
               }
-              if (!await Settings.canUseName(textEditingController.text)) {
+              if (!await Settings.get().canUseName(textEditingController.text)) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -272,12 +272,12 @@ class __SetThemeNameState extends State<_SetThemeName> {
                 return;
               }
               List<String> otherPlaces =
-                  await Settings.getOtherSavedThemesAsString();
+                  await Settings.get().getOtherSavedThemesAsString();
               squareColors.themeName = textEditingController.text;
               otherPlaces.add(
                 squareColors.toJson(),
               );
-              await  Settings.storage.write("themes", otherPlaces);
+              await  Settings.get().storage.write("themes", otherPlaces);
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                     builder: (context) => HomePage(4),

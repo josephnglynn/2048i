@@ -2,11 +2,12 @@ import 'dart:io';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:improved_2048/api/auth.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/themes/baseClass.dart';
-import 'package:improved_2048/ui/homePage.dart';
-import 'package:improved_2048/ui/themeEditor.dart';
+import 'package:improved_2048/ui/home_page.dart';
+import 'package:improved_2048/ui/theme_editor.dart';
 
 import 'package:file_picker/file_picker.dart';
 
@@ -23,10 +24,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  double fontSize = Settings.fontSizeScale;
-
   Future exportTheme(BuildContext context) async {
-    String filePath = await Settings.exportTheme();
+    String filePath = await Settings.get().exportTheme();
     var dialog = AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),
@@ -56,7 +55,8 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     ];
 
-    List<SquareColors> storageThemes = await Settings.getOtherSavedThemes();
+    List<SquareColors> storageThemes =
+        await Settings.get().getOtherSavedThemes();
     storageThemes.forEach((element) {
       themes.add(
         DropdownMenuItem(
@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return _GetThemesType(
       themes,
-      Settings.boardThemeValues.getThemeName(),
+      Settings.get().boardThemeValues.getThemeName(),
     );
   }
 
@@ -97,72 +97,22 @@ class _SettingsPageState extends State<SettingsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Font Size Scale"),
+                Text("Animation speed ( ms )"),
                 SizedBox(
                   width: MediaQuery.of(context).size.width / 3,
                   child: TextFormField(
-                    initialValue: fontSize.toString(),
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) async {
-                      if (value.length < 3) return;
-                      final asNumber = double.parse(value);
-                      if (asNumber > 0 && asNumber <= 1) {
-                        await Settings.setFontSize(asNumber);
-                        return setState(() {
-                          fontSize = asNumber;
-                        });
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("MUST BE : 0 < x < 1"),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Movement Animation Length"),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width / 3,
-                  child: TextFormField(
-                    initialValue: ImportantValues.animationLength.toString(),
+                    initialValue: Settings.get().animationDuration.toString(),
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.number,
                     onChanged: (value) async {
                       if (value.length < 1) return;
-                      final asNumber = double.parse(value);
-                      await ImportantValues.setAnimationLength(asNumber);
+                      final asNumber = int.parse(value);
+                      await Settings.get().setAnimationDuration(asNumber);
                       setState(() {});
                     },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "New Tile Animation Length",
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width / 3,
-                  child: TextFormField(
-                    initialValue:
-                        ImportantValues.newTileAnimationLength.toString(),
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) async {
-                      if (value.length < 1) return;
-                      final asNumber = double.parse(value);
-                      await ImportantValues.setNewTileAnimationLength(asNumber);
-                      setState(() {});
-                    },
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
                   ),
                 ),
               ],
@@ -181,11 +131,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         onChanged: (value) async {
                           if (value! == "MaterialTheme" ||
                               value == "DefaultTheme") {
-                            await Settings.setThemeAsPreInstalledOne(
+                            await Settings.get().setThemeAsPreInstalledOne(
                                 value == "MaterialTheme" ? 1 : 0);
                           } else {
-                            await Settings.setThemeAsNonInstalledOneFromName(
-                                value);
+                            await Settings.get()
+                                .setThemeAsNonInstalledOneFromName(value);
                           }
                           setState(() {});
                         },
@@ -201,9 +151,9 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Text("Show Number Of Moves Instead Of Time"),
                 Switch(
-                  value: Settings.showMovesInsteadOfTime,
+                  value: Settings.get().showMovesInsteadOfTime,
                   onChanged: (value) async {
-                    await Settings.setShowMovesInsteadOfTime(value);
+                    await Settings.get().setShowMovesInsteadOfTime(value);
                     setState(() {});
                   },
                 ),
@@ -222,7 +172,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       content: Scaffold(
                         body: SafeArea(
                           child: FutureBuilder<List<SquareColors>>(
-                            future: Settings.getOtherSavedThemes(),
+                            future: Settings.get().getOtherSavedThemes(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return ListView.builder(
@@ -281,8 +231,9 @@ class _SettingsPageState extends State<SettingsPage> {
                               } else {
                                 path = await FilesystemPicker.open(
                                   context: context,
-                                  rootDirectory:
-                                      Directory(Settings.storageDirectoryPath),
+                                  rootDirectory: Directory(
+                                    Settings.get().storageDirectoryPath,
+                                  ),
                                   title: "Get Color Scheme",
                                   fsType: FilesystemType.file,
                                   pickText: "Use this color scheme",
@@ -293,7 +244,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               File file = File(path);
                               String contents = await file.readAsString();
                               SquareColors sC = SquareColors.fromJson(contents);
-                              if (!await Settings.canUseName(sC.themeName)) {
+                              if (!await Settings.get()
+                                  .canUseName(sC.themeName)) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
@@ -303,14 +255,16 @@ class _SettingsPageState extends State<SettingsPage> {
                                 );
                                 return;
                               }
-                              List<String> otherPlaces =
-                                  await Settings.getOtherSavedThemesAsString();
+                              List<String> otherPlaces = await Settings.get()
+                                  .getOtherSavedThemesAsString();
 
                               otherPlaces.add(
                                 sC.toJson(),
                               );
-                              await Settings.storage
-                                  .write("themes", otherPlaces);
+                              await Settings.get().storage.write(
+                                    "themes",
+                                    otherPlaces,
+                                  );
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => HomePage(4),
@@ -351,7 +305,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ? [
                       TextButton(
                         onPressed: () async =>
-                            await Settings.shareCurrentThemeToOtherApps(),
+                            await Settings.get().shareCurrentThemeToOtherApps(),
                         child: Text("Share current theme"),
                       ),
                       TextButton(
@@ -366,14 +320,14 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ],
             ),
-            Auth.loggedIn
+            Auth.get().loggedIn
                 ? TextButton(
                     onPressed: () async {
-                      await Settings.storage.remove("loggedIn");
-                      await Settings.storage.remove("userName");
-                      Auth.userName = null;
-                      Auth.loggedIn = false;
-                      Settings.firebaseAuth.signOut();
+                      await Settings.get().storage.remove("loggedIn");
+                      await Settings.get().storage.remove("userName");
+                      Auth.get().userName = null;
+                      Auth.get().loggedIn = false;
+                      Settings.get().firebaseAuth.signOut();
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                             builder: (context) => HomePage(4),
@@ -398,13 +352,7 @@ class _SettingsPageState extends State<SettingsPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
-              onPressed: () async {
-                await Settings.setFontSize(0.75);
-
-                setState(() {
-                  fontSize = Settings.fontSizeScale;
-                });
-              },
+              onPressed: () async {},
               child: Text(
                 "RESET ALL SETTINGS",
                 textAlign: TextAlign.center,

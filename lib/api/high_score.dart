@@ -2,41 +2,48 @@ import 'package:improved_2048/api/auth.dart';
 import 'package:improved_2048/api/settings.dart';
 
 class HighScore {
-  static int highScore = 0;
-  static int _whatByWhat = 1;
+  int highScore = 0;
+  int _cachedHighScore = 1;
 
-  static Future getHighScore(int whatByWhat) async {
-    highScore = Settings.storage.read("highScore$whatByWhat") ?? 0;
-    _whatByWhat = whatByWhat;
+  static HighScore _highScore = HighScore();
+
+  static HighScore get() => _highScore;
+
+  Future getHighScore(int whatByWhat) async {
+    highScore = Settings.get().storage.read("highScore$whatByWhat") ?? 0;
+    _cachedHighScore = whatByWhat;
   }
 
-  static Future tryAndUploadToDataBase(int whatByWhat) async {
-    if (Auth.userName == null) return;
+  Future tryAndUploadToDataBase(int whatByWhat) async {
+    if (Auth.get().userName == null) return;
     try {
-      if (await Settings.firestore
+      if (await Settings.get()
+          .firestore
           .collection("users")
           .document("scores")
           .collection("$whatByWhat")
-          .document(Auth.userName!)
+          .document(Auth.get().userName!)
           .exists) {
-        await Settings.firestore
+        await Settings.get()
+            .firestore
             .collection("users")
             .document("scores")
             .collection("$whatByWhat")
-            .document(Auth.userName!)
+            .document(Auth.get().userName!)
             .update({
           "highScore": highScore,
-          "name": Auth.userName,
+          "name": Auth.get().userName,
         });
       } else {
-        await Settings.firestore
+        await Settings.get()
+            .firestore
             .collection("users")
             .document("scores")
             .collection("$whatByWhat")
-            .document(Auth.userName!)
+            .document(Auth.get().userName!)
             .create({
           "highScore": highScore,
-          "name": Auth.userName,
+          "name": Auth.get().userName,
         });
       }
     } catch (e) {
@@ -44,20 +51,22 @@ class HighScore {
     }
   }
 
-  static Future checkScoreOnDataBase(int whatByWhat) async {
-    if (Auth.userName == null) return;
+  Future checkScoreOnDataBase(int whatByWhat) async {
+    if (Auth.get().userName == null) return;
     try {
-      if (await Settings.firestore
+      if (await Settings.get()
+          .firestore
           .collection("users")
           .document("scores")
           .collection("$whatByWhat")
-          .document(Auth.userName!)
+          .document(Auth.get().userName!)
           .exists) {
-        final document = await Settings.firestore
+        final document = await Settings.get()
+            .firestore
             .collection("users")
             .document("scores")
             .collection("$whatByWhat")
-            .document(Auth.userName!)
+            .document(Auth.get().userName!)
             .get();
         if (document.map["highScore"] > highScore)
           highScore = document.map["highScore"];
@@ -67,13 +76,15 @@ class HighScore {
     }
   }
 
-  static Future setHighScore(int newHighScore, int whatByWhat) async {
-    if (_whatByWhat != whatByWhat) {
+  Future setHighScore(int newHighScore, int whatByWhat) async {
+    if (_cachedHighScore != whatByWhat) {
       await getHighScore(whatByWhat);
       await checkScoreOnDataBase(whatByWhat);
     }
     if (newHighScore <= highScore) return;
-    await Settings.storage.write("highScore$_whatByWhat", newHighScore);
+    await Settings.get()
+        .storage
+        .write("highScore$_cachedHighScore", newHighScore);
     highScore = newHighScore;
     await tryAndUploadToDataBase(whatByWhat);
   }

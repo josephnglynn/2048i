@@ -9,60 +9,65 @@ class Result {
 }
 
 class Auth {
-  static late bool loggedIn;
-  static late String? userName;
+  bool loggedIn;
+  String? userName;
 
-  static Future<Result> changeName(String newName) async {
+  Auth(this.loggedIn, this.userName);
+
+  static Auth? _auth;
+
+  static Auth get() => _auth!;
+
+  Future<Result> changeName(String newName) async {
     try {
-     await nameIsAlright(newName, true);
-
-    } catch (e){
+      await nameIsAlright(newName, true);
+    } catch (e) {
       return Result(false, error: e);
     }
 
-    await Settings.firestore
+    await Settings.get().firestore
         .collection("userNames")
-        .document(userName!)
+        .document(get().userName!)
         .delete();
-    await Settings.firestore.collection("userNames").document(newName).update({
+    await Settings.get().firestore.collection("userNames").document(newName).update({
       "name": newName,
     });
-    await Settings.firebaseAuth.updateProfile(displayName: newName);
-    Settings.storage.write("userName", newName);
-    userName = newName;
+    await Settings.get().firebaseAuth.updateProfile(displayName: newName);
+    Settings.get().storage.write("userName", newName);
+    get().userName = newName;
     return Result(true);
   }
 
-  static Future<bool> nameIsAlright(
+  Future<bool> nameIsAlright(
       String userName, bool alreadyLoggedIn) async {
-    if (!alreadyLoggedIn) await Settings.firebaseAuth.signInAnonymously();
+    if (!alreadyLoggedIn) await Settings.get().firebaseAuth.signInAnonymously();
     final Page<Document> collection =
-        await Settings.firestore.collection("userNames").get();
+        await Settings.get().firestore.collection("userNames").get();
     for (var doc in collection) {
       if (doc.map["name"] == userName) {
-        if (!alreadyLoggedIn) Settings.firebaseAuth.signOut();
+        if (!alreadyLoggedIn) Settings.get().firebaseAuth.signOut();
         throw "Name is taken";
       }
     }
-    if (!alreadyLoggedIn) Settings.firebaseAuth.signOut();
+    if (!alreadyLoggedIn) Settings.get().firebaseAuth.signOut();
     return true;
   }
 
-  static Future<Result> signUp(
+  Future<Result> signUp(
       String email, String name, String password) async {
     try {
       await nameIsAlright(name, false);
 
-      await Settings.firebaseAuth.signUp(email, password);
+      await Settings.get().firebaseAuth.signUp(email, password);
 
-      loggedIn = true;
-      Settings.storage.write("loggedIn", true);
+      get().loggedIn = true;
+      Settings.get().storage.write("loggedIn", true);
 
-      userName = name;
-      Settings.storage.write("userName", name);
+      get().userName = name;
+      Settings.get().storage.write("userName", name);
 
-      await Settings.firebaseAuth.updateProfile(displayName: name);
-      await Settings.firestore.collection("userNames").document(name).update({
+      await Settings.get().firebaseAuth.updateProfile(displayName: name);
+      await Settings.get().firestore.collection("userNames").document(name).update({
         "name": name,
       });
 
@@ -73,16 +78,16 @@ class Auth {
     }
   }
 
-  static Future<Result> login(String email, String password) async {
+  Future<Result> login(String email, String password) async {
     try {
-      await Settings.firebaseAuth.signIn(email, password);
+      await Settings.get().firebaseAuth.signIn(email, password);
 
-      loggedIn = true;
-      Settings.storage.write("loggedIn", true);
+      get().loggedIn = true;
+      Settings.get().storage.write("loggedIn", true);
 
-      final user = await Settings.firebaseAuth.getUser();
-      userName = user.displayName!;
-      Settings.storage.write("userName", user.displayName);
+      final user = await Settings.get().firebaseAuth.getUser();
+      get().userName = user.displayName!;
+      Settings.get().storage.write("userName", user.displayName);
 
       return Result(true);
     } catch (e) {
@@ -92,7 +97,9 @@ class Auth {
   }
 
   static Future init() async {
-    loggedIn = Settings.storage.read("loggedIn") ?? false;
-    userName = Settings.storage.read("userName");
+    _auth = Auth(
+      Settings.get().storage.read("loggedIn") ?? false,
+      Settings.get().storage.read("userName"),
+    );
   }
 }

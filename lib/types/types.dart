@@ -1,6 +1,5 @@
 enum Direction { Left, Right, Up, Down }
-
-
+enum TileState { New, Same, Changed, Merged, Merging}
 
 class MutableRectangle {
   double left;
@@ -34,11 +33,10 @@ class Position {
 class BoardElement {
 
   int value;
-  bool isMerged;
-  bool isNewTile;
-  bool animateElement;
+  int increaseValue = 0;
+  Position previousPosition;
+  BoardElement? merging;
+  TileState tileState = TileState.Same;
 
-  Position? previousPosition;
-
-  BoardElement(this.value, this.animateElement, this.isNewTile, this.isMerged);
+  BoardElement(this.value, this.previousPosition);
 }

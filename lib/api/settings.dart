@@ -4,27 +4,45 @@ import 'dart:ui';
 import 'package:get_storage/get_storage.dart';
 import 'package:improved_2048/api/firebase_info.dart';
 import 'package:firedart/firedart.dart';
-import 'package:improved_2048/api/preferencesStore.dart';
+import 'package:improved_2048/api/pref_store.dart';
 import 'package:improved_2048/themes/baseClass.dart';
 import 'package:path/path.dart';
 import 'package:share/share.dart';
 
 class Settings {
-  static late BoardThemeValues boardThemeValues;
-  static late double fontSizeScale;
-  static late int themeIndex;
-  static late bool showMovesInsteadOfTime;
-  static late GetStorage storage;
-  static late String storageDirectoryPath;
-  static late FirebaseAuth firebaseAuth;
-  static late Firestore firestore;
+  BoardThemeValues boardThemeValues;
+  int themeIndex;
+  bool showMovesInsteadOfTime;
+  GetStorage storage;
+  String storageDirectoryPath;
+  FirebaseAuth firebaseAuth;
+  Firestore firestore;
+  int animationDuration;
 
-  static Future setFontSize(double _fontSizeScale) async {
-    Settings.storage.write("fontSizeScale", _fontSizeScale);
-    fontSizeScale = _fontSizeScale;
+  Radius radius = Radius.circular(5);
+  double padding = 5;
+  late double halfPadding;
+
+  Settings(
+    this.boardThemeValues,
+    this.themeIndex,
+    this.showMovesInsteadOfTime,
+    this.storage,
+    this.storageDirectoryPath,
+    this.firebaseAuth,
+    this.firestore,
+    this.animationDuration,
+  ) {
+    halfPadding = padding / 2;
   }
 
-  static Future shareCurrentThemeToOtherApps() async {
+  static Settings? _settings;
+
+  static init() async => await _init();
+
+  static Settings get() => _settings!;
+
+  Future shareCurrentThemeToOtherApps() async {
     String fileName = "${boardThemeValues.getThemeName()}";
     String filePath = join(storageDirectoryPath, fileName);
     File file = File(filePath);
@@ -35,7 +53,7 @@ class Settings {
     Share.shareFiles([filePath]);
   }
 
-  static Future<String> exportTheme() async {
+  Future<String> exportTheme() async {
     String fileName = "${boardThemeValues.getThemeName()}";
     String filePath = join(storageDirectoryPath, fileName);
     File file = File(filePath);
@@ -47,7 +65,7 @@ class Settings {
     return filePath;
   }
 
-  static Future<bool> canUseName(String name) async {
+  Future<bool> canUseName(String name) async {
     if (name == "DefaultTheme" ||
         name == "MaterialTheme" ||
         name == "Default Theme" ||
@@ -61,12 +79,12 @@ class Settings {
     return true;
   }
 
-  static Future setShowMovesInsteadOfTime(bool value) async {
+  Future setShowMovesInsteadOfTime(bool value) async {
     await storage.write("showMovesInsteadOfTime", value);
-    Settings.showMovesInsteadOfTime = value;
+    showMovesInsteadOfTime = value;
   }
 
-  static Future setThemeAsPreInstalledOne(int whichTheme) async {
+  Future setThemeAsPreInstalledOne(int whichTheme) async {
     try {
       await storage.remove("CurrentTheme");
     } catch (e) {
@@ -82,7 +100,7 @@ class Settings {
     }
   }
 
-  static Future<List<SquareColors>> getOtherSavedThemes() async {
+  Future<List<SquareColors>> getOtherSavedThemes() async {
     var otherThemes = storage.read("themes") ?? [];
     List<SquareColors> squareColorsList = [];
     otherThemes.forEach((element) {
@@ -91,51 +109,19 @@ class Settings {
     return squareColorsList;
   }
 
-  static Future<List<String>> getOtherSavedThemesAsString() async {
+  Future<List<String>> getOtherSavedThemesAsString() async {
     return storage.read("themes") ?? [];
   }
 
-  static Future setThemeAsNonInstalledOneFromName(String name) async {
+  Future setThemeAsNonInstalledOneFromName(String name) async {
     await storage.write("CurrentTheme", name);
-    boardThemeValues = FromStorageTheme((await getOtherSavedThemes())
-        .firstWhere((element) => element.themeName == name));
+    boardThemeValues = FromStorageTheme(
+      (await getOtherSavedThemes())
+          .firstWhere((element) => element.themeName == name),
+    );
   }
 
-  static Future init() async {
-    firebaseAuth = FirebaseAuth.initialize(FIREBASE_KEY, await PreferencesStore.create());
-    firestore = Firestore.initialize(FIREBASE_ID);
-    storage = GetStorage();
-
-    try {
-      storageDirectoryPath = (await getExternalStorageDirectory() ??
-              await getApplicationDocumentsDirectory())
-          .path;
-    } catch (e) {
-      storageDirectoryPath = (await getApplicationDocumentsDirectory()).path;
-    }
-
-    var themeName = storage.read("CurrentTheme");
-    if (themeName == null) {
-      storage.read("MaterialTheme") ?? false
-          ? await setThemeAsPreInstalledOne(1)
-          : await setThemeAsPreInstalledOne(0);
-    } else {
-      await setThemeAsNonInstalledOneFromName(themeName);
-    }
-    fontSizeScale = storage.read("fontSizeScale") ?? 0.75;
-    showMovesInsteadOfTime = storage.read("showMovesInsteadOfTime") ?? false;
-  }
-}
-
-class ImportantValues {
-  static Radius radius = Radius.circular(5);
-  static double padding = 5;
-  static double halfPadding = padding / 2;
-
-  static late double newTileAnimationLength;
-  static late double animationLength;
-
-  static void updateRadius(int size) {
+  void updateRadius(int size) {
     if (size > 10) {
       radius = Radius.circular(0);
       return;
@@ -146,25 +132,61 @@ class ImportantValues {
     );
   }
 
-  static void updatePadding(int size) {
+  Future setAnimationDuration(int value) async {
+    animationDuration = value;
+    storage.write("animationDuration", value);
+  }
+
+  void updatePadding(int size) {
     final newPadding = pow(0.8, size).toDouble() * 10;
     padding = newPadding;
     halfPadding = newPadding / 2;
   }
 
-  static Future setAnimationLength(double value) async {
-    await Settings.storage.write("animationLength", value);
-    animationLength = value;
-  }
+  static Future _init() async {
+    var firebaseAuth = FirebaseAuth.initialize(
+      FIREBASE_KEY,
+      await PreferencesStore.create(),
+    );
+    var firestore = Firestore.initialize(FIREBASE_ID);
+    var storage = GetStorage();
 
-  static Future setNewTileAnimationLength(double value) async {
-    await Settings.storage.write("newTileAnimationLength", value);
-    newTileAnimationLength = value;
-  }
+    String storageDirectoryPath;
+    try {
+      storageDirectoryPath = (await getExternalStorageDirectory() ??
+              await getApplicationDocumentsDirectory())
+          .path;
+    } catch (e) {
+      storageDirectoryPath = (await getApplicationDocumentsDirectory()).path;
+    }
 
-  static Future init() async {
-    newTileAnimationLength =
-        Settings.storage.read("newTileAnimationLength") ?? 0.1;
-    animationLength = Settings.storage.read("animationLength") ?? 0.1;
+    var themeName = storage.read("CurrentTheme");
+    BoardThemeValues theme;
+    if (themeName == null) {
+      theme = storage.read("MaterialTheme") ?? false
+          ? MaterialTheme()
+          : DefaultTheme();
+    } else {
+      theme = FromStorageTheme(
+        (await storage.read("themes"))
+            .firstWhere((element) => element.themeName == themeName),
+      );
+    }
+
+    var showMovesInsteadOfTime =
+        storage.read("showMovesInsteadOfTime") ?? false;
+
+    int ad = storage.read("animationDuration") ?? 250;
+
+    _settings = Settings(
+      theme,
+      theme == MaterialTheme() ? 1 : 0,
+      showMovesInsteadOfTime,
+      storage,
+      storageDirectoryPath,
+      firebaseAuth,
+      firestore,
+      ad,
+    );
   }
 }

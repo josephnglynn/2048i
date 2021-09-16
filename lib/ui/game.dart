@@ -27,20 +27,23 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    controller = AnimationController(
-      vsync: this,
-      duration: GameState.animationDuration,
-    );
-    animation = Tween<double>(begin: 0, end: 1).animate(controller);
     gameState = GameState(
       widget.whatByWhat,
       setState,
-      () {
+          () {
         controller.value = 0;
-        controller.animateTo(1, duration: GameState.animationDuration);
+        controller.animateTo(1, duration: gameState.animationDuration);
         controller.forward();
       },
     );
+
+    controller = AnimationController(
+      vsync: this,
+      duration: gameState.animationDuration,
+    );
+
+    animation = Tween<double>(begin: 0, end: 1).animate(controller);
+
     controller.addListener(() {
       gameState.animationValue = controller.value;
       setState(() {});
@@ -64,7 +67,7 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
         setState,
         () {
           controller.value = 0;
-          controller.animateTo(1, duration: GameState.animationDuration);
+          controller.animateTo(1, duration: gameState.animationDuration);
           controller.forward();
         },
       );

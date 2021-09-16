@@ -17,7 +17,7 @@ class Settings {
   String storageDirectoryPath;
   FirebaseAuth firebaseAuth;
   Firestore firestore;
-  double animationDuration;
+  int animationDuration;
 
   Radius radius = Radius.circular(5);
   double padding = 5;
@@ -132,7 +132,7 @@ class Settings {
     );
   }
 
-  Future setAnimationDuration(double value) async {
+  Future setAnimationDuration(int value) async {
     animationDuration = value;
     storage.write("animationDuration", value);
   }
@@ -176,7 +176,7 @@ class Settings {
     var showMovesInsteadOfTime =
         storage.read("showMovesInsteadOfTime") ?? false;
 
-    var ad = storage.read("animationDuration") ?? 0;
+    int ad = storage.read("animationDuration") ?? 250;
 
     _settings = Settings(
       theme,

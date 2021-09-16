@@ -8,7 +8,7 @@ import 'package:sprung/sprung.dart';
 import 'high_score.dart';
 
 class GameState {
-  static const animationDuration = Duration(milliseconds: 1000); //TODO MOVE
+  final animationDuration = Duration(milliseconds: Settings.get().animationDuration); //TODO MOVE
 
   List<List<BoardTile>> _board = [];
   List<List<BoardElement>> _elements = [];

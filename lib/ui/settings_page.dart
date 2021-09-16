@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:improved_2048/api/auth.dart';
 import 'package:improved_2048/api/settings.dart';
 import 'package:improved_2048/themes/baseClass.dart';
@@ -23,8 +24,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
-
   Future exportTheme(BuildContext context) async {
     String filePath = await Settings.get().exportTheme();
     var dialog = AlertDialog(
@@ -56,7 +55,8 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     ];
 
-    List<SquareColors> storageThemes = await Settings.get().getOtherSavedThemes();
+    List<SquareColors> storageThemes =
+        await Settings.get().getOtherSavedThemes();
     storageThemes.forEach((element) {
       themes.add(
         DropdownMenuItem(
@@ -94,8 +94,29 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ListView(
           padding: EdgeInsets.all(20),
           children: [
-
-
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Animation speed ( ms )"),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 3,
+                  child: TextFormField(
+                    initialValue: Settings.get().animationDuration.toString(),
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) async {
+                      if (value.length < 1) return;
+                      final asNumber = int.parse(value);
+                      await Settings.get().setAnimationDuration(asNumber);
+                      setState(() {});
+                    },
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                  ),
+                ),
+              ],
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -113,8 +134,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             await Settings.get().setThemeAsPreInstalledOne(
                                 value == "MaterialTheme" ? 1 : 0);
                           } else {
-                            await Settings.get().setThemeAsNonInstalledOneFromName(
-                                value);
+                            await Settings.get()
+                                .setThemeAsNonInstalledOneFromName(value);
                           }
                           setState(() {});
                         },
@@ -223,7 +244,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               File file = File(path);
                               String contents = await file.readAsString();
                               SquareColors sC = SquareColors.fromJson(contents);
-                              if (!await Settings.get().canUseName(sC.themeName)) {
+                              if (!await Settings.get()
+                                  .canUseName(sC.themeName)) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
@@ -233,8 +255,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 );
                                 return;
                               }
-                              List<String> otherPlaces =
-                                  await Settings.get().getOtherSavedThemesAsString();
+                              List<String> otherPlaces = await Settings.get()
+                                  .getOtherSavedThemesAsString();
 
                               otherPlaces.add(
                                 sC.toJson(),
@@ -330,9 +352,7 @@ class _SettingsPageState extends State<SettingsPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
-              onPressed: () async {
-
-              },
+              onPressed: () async {},
               child: Text(
                 "RESET ALL SETTINGS",
                 textAlign: TextAlign.center,

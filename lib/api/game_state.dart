@@ -8,7 +8,7 @@ import 'package:sprung/sprung.dart';
 import 'high_score.dart';
 
 class GameState {
-  final animationDuration = Duration(milliseconds: Settings.get().animationDuration); //TODO MOVE
+  final animationDuration = Duration(milliseconds: Settings.get().animationDuration);
 
   List<List<BoardTile>> _board = [];
   List<List<BoardElement>> _elements = [];
@@ -256,8 +256,8 @@ class GameState {
   }
 
   void died() {
+    dead = true;
     HighScore.get().setHighScore(points, _boardSize);
-    //TODO
   }
 
   void undoMove() {
@@ -457,7 +457,7 @@ class GameState {
 
         if (_haveTheyMadeAMistake()) {
           _updateState(() {
-            dead = true;
+            died();
           });
         }
 
@@ -469,7 +469,7 @@ class GameState {
           }),
         );
       },
-    ); // TODO
+    );
   }
 
   bool _haveTheyMadeAMistake() {

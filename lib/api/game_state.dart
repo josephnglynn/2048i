@@ -82,7 +82,7 @@ class GameState {
   }
 
   void _drawElements(Canvas canvas, int i, int k, bool merging) {
-    if (_elements[i][k].value == 0) return;
+    if (_elements[i][k].value == 0 && !_elements[i][k].shouldBeMinus1) return;
     double left = _tileWidth * i + Settings.get().halfPadding;
     double top = _tileHeight * k + Settings.get().halfPadding;
     final width = _tileWidth - Settings.get().padding;
@@ -344,7 +344,8 @@ class GameState {
               _tileHeight / _topNumberLength;
         }
 
-        row[i + 1].value = -1;
+        row[i + 1].value = 0;
+        row[i+1].shouldBeMinus1 = true;
         points += row[i].value;
       }
     }

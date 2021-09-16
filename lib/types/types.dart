@@ -34,6 +34,7 @@ class BoardElement {
 
   int value;
   int increaseValue = 0;
+  bool shouldBeMinus1 = false;
   Position previousPosition;
   BoardElement? merging;
   TileState tileState = TileState.Same;

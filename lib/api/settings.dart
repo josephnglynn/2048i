@@ -17,6 +17,7 @@ class Settings {
   String storageDirectoryPath;
   FirebaseAuth firebaseAuth;
   Firestore firestore;
+  double animationDuration;
 
   Radius radius = Radius.circular(5);
   double padding = 5;
@@ -30,6 +31,7 @@ class Settings {
     this.storageDirectoryPath,
     this.firebaseAuth,
     this.firestore,
+    this.animationDuration,
   ) {
     halfPadding = padding / 2;
   }
@@ -130,12 +132,16 @@ class Settings {
     );
   }
 
+  Future setAnimationDuration(double value) async {
+    animationDuration = value;
+    storage.write("animationDuration", value);
+  }
+
   void updatePadding(int size) {
     final newPadding = pow(0.8, size).toDouble() * 10;
     get().padding = newPadding;
     get().halfPadding = newPadding / 2;
   }
-
 
   static Future _init() async {
     var firebaseAuth = FirebaseAuth.initialize(
@@ -157,9 +163,11 @@ class Settings {
     var themeName = storage.read("CurrentTheme");
     BoardThemeValues theme;
     if (themeName == null) {
-     theme = storage.read("MaterialTheme") ?? false ? MaterialTheme() : DefaultTheme();
+      theme = storage.read("MaterialTheme") ?? false
+          ? MaterialTheme()
+          : DefaultTheme();
     } else {
-     theme = FromStorageTheme(
+      theme = FromStorageTheme(
         (await storage.read("themes"))
             .firstWhere((element) => element.themeName == themeName),
       );
@@ -167,6 +175,8 @@ class Settings {
 
     var showMovesInsteadOfTime =
         storage.read("showMovesInsteadOfTime") ?? false;
+
+    var ad = storage.read("animationDuration") ?? 0;
 
     _settings = Settings(
       theme,
@@ -176,6 +186,7 @@ class Settings {
       storageDirectoryPath,
       firebaseAuth,
       firestore,
+      ad,
     );
   }
 }

@@ -30,7 +30,7 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
     gameState = GameState(
       widget.whatByWhat,
       setState,
-          () {
+      () {
         controller.value = 0;
         controller.animateTo(1, duration: gameState.animationDuration);
         controller.forward();
@@ -283,6 +283,11 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
         ),
       ),
       onWillPop: () {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => HomePage(widget.whatByWhat),
+            ),
+            (route) => false);
         return Future.value(false);
       },
     );

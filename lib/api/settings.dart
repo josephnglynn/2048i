@@ -176,7 +176,7 @@ class Settings {
     var showMovesInsteadOfTime =
         storage.read("showMovesInsteadOfTime") ?? false;
 
-    int ad = storage.read("animationDuration") ?? 250;
+    int ad = storage.read("animationDuration") ?? 200;
 
     _settings = Settings(
       theme,

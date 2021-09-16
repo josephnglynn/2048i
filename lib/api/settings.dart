@@ -43,25 +43,25 @@ class Settings {
   static Settings get() => _settings!;
 
   Future shareCurrentThemeToOtherApps() async {
-    String fileName = "${get().boardThemeValues.getThemeName()}";
-    String filePath = join(get().storageDirectoryPath, fileName);
+    String fileName = "${boardThemeValues.getThemeName()}";
+    String filePath = join(storageDirectoryPath, fileName);
     File file = File(filePath);
     if (!await file.exists()) {
       await file.create(recursive: true);
     }
-    await file.writeAsString(get().boardThemeValues.toJson());
+    await file.writeAsString(boardThemeValues.toJson());
     Share.shareFiles([filePath]);
   }
 
   Future<String> exportTheme() async {
-    String fileName = "${get().boardThemeValues.getThemeName()}";
-    String filePath = join(get().storageDirectoryPath, fileName);
+    String fileName = "${boardThemeValues.getThemeName()}";
+    String filePath = join(storageDirectoryPath, fileName);
     File file = File(filePath);
     if (!await file.exists()) {
       await file.create(recursive: true);
       print("CREATING FILE");
     }
-    await file.writeAsString(get().boardThemeValues.toJson());
+    await file.writeAsString(boardThemeValues.toJson());
     return filePath;
   }
 
@@ -80,28 +80,28 @@ class Settings {
   }
 
   Future setShowMovesInsteadOfTime(bool value) async {
-    await get().storage.write("showMovesInsteadOfTime", value);
-    Settings.get().showMovesInsteadOfTime = value;
+    await storage.write("showMovesInsteadOfTime", value);
+    showMovesInsteadOfTime = value;
   }
 
   Future setThemeAsPreInstalledOne(int whichTheme) async {
     try {
-      await get().storage.remove("CurrentTheme");
+      await storage.remove("CurrentTheme");
     } catch (e) {
       print(e);
     }
     if (whichTheme == 0) {
-      await get().storage.write("MaterialTheme", false);
-      get().boardThemeValues = DefaultTheme();
+      await storage.write("MaterialTheme", false);
+      boardThemeValues = DefaultTheme();
     }
     if (whichTheme == 1) {
-      await get().storage.write("MaterialTheme", true);
-      get().boardThemeValues = MaterialTheme();
+      await storage.write("MaterialTheme", true);
+      boardThemeValues = MaterialTheme();
     }
   }
 
   Future<List<SquareColors>> getOtherSavedThemes() async {
-    var otherThemes = get().storage.read("themes") ?? [];
+    var otherThemes = storage.read("themes") ?? [];
     List<SquareColors> squareColorsList = [];
     otherThemes.forEach((element) {
       squareColorsList.add(SquareColors.fromJson(element));
@@ -110,12 +110,12 @@ class Settings {
   }
 
   Future<List<String>> getOtherSavedThemesAsString() async {
-    return get().storage.read("themes") ?? [];
+    return storage.read("themes") ?? [];
   }
 
   Future setThemeAsNonInstalledOneFromName(String name) async {
-    await get().storage.write("CurrentTheme", name);
-    get().boardThemeValues = FromStorageTheme(
+    await storage.write("CurrentTheme", name);
+    boardThemeValues = FromStorageTheme(
       (await getOtherSavedThemes())
           .firstWhere((element) => element.themeName == name),
     );
@@ -123,11 +123,11 @@ class Settings {
 
   void updateRadius(int size) {
     if (size > 10) {
-      get().radius = Radius.circular(0);
+      radius = Radius.circular(0);
       return;
     }
     final power = pow(0.8, size);
-    get().radius = Radius.circular(
+    radius = Radius.circular(
       power.toDouble() * 10,
     );
   }
@@ -139,8 +139,8 @@ class Settings {
 
   void updatePadding(int size) {
     final newPadding = pow(0.8, size).toDouble() * 10;
-    get().padding = newPadding;
-    get().halfPadding = newPadding / 2;
+    padding = newPadding;
+    halfPadding = newPadding / 2;
   }
 
   static Future _init() async {

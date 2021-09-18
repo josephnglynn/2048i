@@ -21,7 +21,7 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
   static const double padding = 20;
   static const double times2Padding = padding * 2;
   late GameState gameState;
-  late AnimationController controller;
+  late AnimationController? controller;
   late Animation<double> animation;
   Stopwatch? stopwatch = Stopwatch()..start();
 
@@ -31,9 +31,10 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
       widget.whatByWhat,
       setState,
       () {
-        controller.value = 0;
-        controller.animateTo(1, duration: gameState.animationDuration);
-        controller.forward();
+        if (controller == null) return;
+        controller!.value = 0;
+        controller!.animateTo(1, duration: gameState.animationDuration);
+        controller!.forward();
       },
     );
 
@@ -42,10 +43,11 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
       duration: gameState.animationDuration,
     );
 
-    animation = Tween<double>(begin: 0, end: 1).animate(controller);
+    animation = Tween<double>(begin: 0, end: 1).animate(controller!);
 
-    controller.addListener(() {
-      gameState.animationValue = controller.value;
+    controller!.addListener(() {
+      if (controller == null) return;
+      gameState.animationValue = controller!.value;
       setState(() {});
     });
 
@@ -56,7 +58,7 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
   void dispose() {
     stopwatch!.stop();
     stopwatch = null;
-    controller.dispose();
+    controller!.dispose();
     super.dispose();
   }
 
@@ -67,9 +69,10 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
         widget.whatByWhat,
         setState,
         () {
-          controller.value = 0;
-          controller.animateTo(1, duration: gameState.animationDuration);
-          controller.forward();
+          if (controller == null) return;
+          controller!.value = 0;
+          controller!.animateTo(1, duration: gameState.animationDuration);
+          controller!.forward();
         },
       );
     });

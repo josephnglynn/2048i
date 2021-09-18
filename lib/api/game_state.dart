@@ -337,6 +337,7 @@ class GameState {
         );
       }
     }
+    _saveToCache();
   }
 
   // Calling this assumes you don't care about elements
@@ -404,8 +405,13 @@ class GameState {
         }
 
         row[i + 1].value = 0;
-        _mergers.add(BoardElement(
-            row[i].value, row[i + 1].previousPosition, row[i].currentPosition));
+        _mergers.add(
+          BoardElement(
+            row[i].value,
+            row[i + 1].previousPosition,
+            row[i].currentPosition,
+          ),
+        );
         points += row[i].value;
       }
     }
@@ -494,26 +500,22 @@ class GameState {
 
     _saveToCache();
 
+    if (totalValueBefore == totalValueAfterwards) {
+      _handlingInput = false;
+      return;
+    }
+
     _animate();
 
     Future.delayed(
       animationDuration,
       () {
         _mergers = [];
-        _undoElements = [];
         for (int i = 0; i < _elements.length; ++i) {
-          _undoElements.add([]);
           for (int k = 0; k < _elements.length; ++k) {
             _elements[i][k].previousPosition = Position(i, k);
             _elements[i][k].tileState = TileState.Same;
             if (_elements[i][k].value < 0) _elements[i][k].value = 0;
-            _undoElements[i].add(
-              BoardElement(
-                _elements[i][k].value,
-                Position(i, k),
-                Position(i, k),
-              ),
-            );
           }
         }
 

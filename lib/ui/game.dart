@@ -56,6 +56,7 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
   void dispose() {
     stopwatch!.stop();
     stopwatch = null;
+    controller.dispose();
     super.dispose();
   }
 

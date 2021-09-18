@@ -442,9 +442,83 @@ class GameState {
     return invertedList;
   }
 
+  void _fixMergersWhenEmptyAbove(Direction direction) {
+    for (int m = 0; m < _mergers.length; ++m) {
+      List<BoardElement> array = [];
+      switch (direction) {
+        case Direction.Left:
+
+          for (int s = 0; s < _boardSize; ++s) {
+            array.add(_elements[s][_mergers[m].currentPosition.k]);
+          }
+          if (array[_mergers[m].currentPosition.i].value ==  _mergers[m].value && !(array[_mergers[m].currentPosition.i].taken ?? false) ) {
+            _elements[_mergers[m].currentPosition.i][_mergers[m].currentPosition.k].taken = true;
+            break;
+          }
+          for (int t = _mergers[m].currentPosition.i - 1; t >= 0; --t) {
+              if (array[t].value ==  _mergers[m].value && !(array[t].taken ?? false)) {
+                _elements[t][_mergers[m].currentPosition.k].taken = true;
+                _mergers[m].currentPosition.i = t;
+                break;
+              }
+          }
+          break;
+        case Direction.Right:
+          for (int s = 0; s < _boardSize; ++s) {
+            array.add(_elements[s][_mergers[m].currentPosition.k]);
+          }
+          if (array[_mergers[m].currentPosition.i].value  ==  _mergers[m].value  && !(array[_mergers[m].currentPosition.i].taken ?? false)) {
+            _elements[_mergers[m].currentPosition.i][_mergers[m].currentPosition.k].taken = true;
+            break;
+          }
+          for (int t = 0; t < array.length; ++t) {
+            if (array[t].value  ==  _mergers[m].value && !(array[t].taken ?? false)) {
+              _elements[t][_mergers[m].currentPosition.k].taken = true;
+              _mergers[m].currentPosition.i = t;
+              break;
+            }
+          }
+          break;
+        case Direction.Up:
+          for (int s = 0; s < _boardSize; ++s) {
+            array.add(_elements[_mergers[m].currentPosition.i][s]);
+          }
+          if (array[_mergers[m].currentPosition.k].value  ==  _mergers[m].value && !(array[_mergers[m].currentPosition.k].taken ?? false)) {
+            _elements[_mergers[m].currentPosition.i][_mergers[m].currentPosition.k].taken = true;
+            break;
+          }
+          for (int t = _mergers[m].currentPosition.k - 1; t >= 0; --t) {
+            if (array[t].value  ==  _mergers[m].value &&  !(array[t].taken ?? false)) {
+              _elements[_mergers[m].currentPosition.i][t].taken = true;
+              _mergers[m].currentPosition.k = t;
+              break;
+            }
+          }
+          break;
+        case Direction.Down:
+          for (int s = 0; s < _boardSize; ++s) {
+            array.add(_elements[_mergers[m].currentPosition.i][s]);
+          }
+          if (array[_mergers[m].currentPosition.k].value  ==  _mergers[m].value && !(array[_mergers[m].currentPosition.k].taken ?? false)) {
+            _elements[_mergers[m].currentPosition.i][_mergers[m].currentPosition.k].taken = true;
+            break;
+          }
+          for (int t = 0; t < array.length; ++t) {
+            if (array[t].value  ==  _mergers[m].value &&  !(array[t].taken ?? false)) {
+              _elements[_mergers[m].currentPosition.i][t].taken = true;
+              _mergers[m].currentPosition.k = t;
+              break;
+            }
+          }
+          break;
+      }
+    }
+  }
+
   void handleInput(Direction direction, int whatByWhat) {
     if (_handlingInput) return;
     _handlingInput = true;
+
 
     _mergers = [];
     _undoPoints = points;
@@ -459,6 +533,7 @@ class GameState {
         totalValueBefore += (k + i) * _elements[i][k].value;
         _elements[i][k].previousPosition = Position(i, k);
         _elements[i][k].tileState = TileState.Changed;
+        _elements[i][k].taken = null;
         _undoElements[i].add(
           BoardElement(
             _elements[i][k].value,
@@ -498,6 +573,7 @@ class GameState {
       }
     }
 
+    _fixMergersWhenEmptyAbove(direction);
     _saveToCache();
 
     if (totalValueBefore == totalValueAfterwards) {

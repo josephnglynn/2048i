@@ -31,6 +31,7 @@ class Position {
 }
 
 class BoardElement {
+  bool? taken;
   int value;
   Position currentPosition;
   Position previousPosition;

@@ -8,11 +8,13 @@ import 'package:sprung/sprung.dart';
 import 'high_score.dart';
 
 class GameState {
-  final animationDuration = Duration(milliseconds: Settings.get().animationDuration);
+  final animationDuration =
+      Duration(milliseconds: Settings.get().animationDuration);
 
   List<List<BoardTile>> _board = [];
   List<List<BoardElement>> _elements = [];
   List<List<BoardElement>> _undoElements = [];
+  List<BoardElement> _mergers = [];
 
   Random _rng = Random();
 
@@ -35,13 +37,12 @@ class GameState {
   double _tileHeight = 0;
   double _sprungValue = 0;
   double animationValue = 0;
-  
+
   Size _size = Size.zero;
 
   final _clearTilePaint = Paint()
     ..color =
         Settings.get().boardThemeValues.getSquareColors()[1] ?? Colors.grey;
-  
 
   GameState(
     this._boardSize,
@@ -71,18 +72,34 @@ class GameState {
     );
   }
 
-  List<int> _findFirstWhereWithIK(BoardElement element) {
-    for (int i = 0; i < _boardSize; ++i) {
-      for (int k = 0; k < _boardSize; ++k) {
-        if (element == _elements[i][k]) return [i, k];
-      }
-    }
-
-    return [];
-  }
+  Color? _getColorLerpElements(int i, int k, int v) =>
+      Color.lerp(
+          Settings.get().boardThemeValues.getSquareColors()[v] ??
+              Color.fromRGBO(
+                v,
+                v,
+                v,
+                1,
+              ),
+          Settings.get()
+                  .boardThemeValues
+                  .getSquareColors()[_elements[i][k].value] ??
+              Color.fromRGBO(
+                _elements[i][k].value,
+                _elements[i][k].value,
+                _elements[i][k].value,
+                1,
+              ),
+          _sprungValue) ??
+      Color.fromRGBO(
+        _elements[i][k].value,
+        _elements[i][k].value,
+        _elements[i][k].value,
+        1,
+      );
 
   void _drawElements(Canvas canvas, int i, int k, bool merging) {
-    if (_elements[i][k].value == 0 && !_elements[i][k].shouldBeMinus1) return;
+    if (_elements[i][k].value == 0) return;
     double left = _tileWidth * i + Settings.get().halfPadding;
     double top = _tileHeight * k + Settings.get().halfPadding;
     final width = _tileWidth - Settings.get().padding;
@@ -96,31 +113,16 @@ class GameState {
             height,
           );
 
-    List<int>? ref;
-    int? mergeValue;
+    int v = _elements[i][k].value ~/ 2;
+    Color? color;
 
     if (_handlingInput) {
+      if (_elements[i][k].tileState != TileState.Merged) {
+        color = Settings.get()
+            .boardThemeValues
+            .getSquareColors()[merging ? v : _elements[i][k].value];
+      }
       switch (_elements[i][k].tileState) {
-        case TileState.Merging:
-          ref = _findFirstWhereWithIK(_elements[i][k].merging!);
-          if (ref.isEmpty) return;
-          mergeValue = (_elements[ref[0]][ref[1]].value ~/ 2);
-          double oldLeft = _tileWidth * _elements[i][k].previousPosition.i +
-              Settings.get().halfPadding;
-          double oldTop = _tileHeight * _elements[i][k].previousPosition.k +
-              Settings.get().halfPadding;
-          rect = Rect.fromLTWH(
-            (_tileWidth * ref[0] + Settings.get().halfPadding - oldLeft) *
-                    _sprungValue +
-                oldLeft,
-            (_tileHeight * ref[1] + Settings.get().halfPadding - oldTop) *
-                    _sprungValue +
-                oldTop,
-            width,
-            height,
-          );
-
-          break;
         case TileState.New:
           rect = Rect.fromLTWH(
             left + width * (1 - _sprungValue) * 0.5,
@@ -138,7 +140,6 @@ class GameState {
           );
           break;
         case TileState.Merged:
-          mergeValue = _elements[i][k].value ~/ 2;
           double oldLeft = _tileWidth * _elements[i][k].previousPosition.i +
               Settings.get().halfPadding;
           double oldTop = _tileHeight * _elements[i][k].previousPosition.k +
@@ -149,6 +150,7 @@ class GameState {
             width,
             height,
           );
+          color = _getColorLerpElements(i, k, v);
           break;
         case TileState.Changed:
           double oldLeft = _tileWidth * _elements[i][k].previousPosition.i +
@@ -161,36 +163,19 @@ class GameState {
             width,
             height,
           );
-
           break;
       }
     } else {
-      if (_elements[i][k].value < 0) {
-        _elements[i][k].value = 0;
-        return;
-      }
+      color = Settings.get()
+          .boardThemeValues
+          .getSquareColors()[merging ? v : _elements[i][k].value];
     }
 
     int value;
     if (merging) {
-      value = mergeValue! % 255;
-      int text =
-          (((_elements[ref![0]][ref[1]].value - mergeValue) * _sprungValue) +
-                  mergeValue)
-              .floor();
-      if (text > _elements[i][k].increaseValue)
-        _elements[i][k].increaseValue = text;
+      value = v % 255;
     } else {
       value = _elements[i][k].value % 255;
-      if (_elements[i][k].tileState == TileState.Merged) {
-        int text =
-            (((_elements[i][k].value - mergeValue!) * _sprungValue) + mergeValue)
-                .floor();
-        if (text > _elements[i][k].increaseValue)
-          _elements[i][k].increaseValue = text;
-      } else {
-        _elements[i][k].increaseValue = _elements[i][k].value;
-      }
     }
 
     canvas.drawRRect(
@@ -199,8 +184,7 @@ class GameState {
         Settings.get().radius,
       ),
       Paint()
-        ..color = Settings.get().boardThemeValues.getSquareColors()[
-                merging ? mergeValue! : _elements[i][k].value] ??
+        ..color = color ??
             Color.fromRGBO(
               value,
               value,
@@ -209,17 +193,97 @@ class GameState {
             ),
     );
 
+    String text;
+    if (_handlingInput &&
+        (_elements[i][k].tileState == TileState.New ||
+            _elements[i][k].tileState == TileState.Merged)) {
+      text = (v + v * _sprungValue).ceil().toString();
+    } else {
+      text = _elements[i][k].value.toString();
+    }
+
     TextPainter scorePainter = TextPainter(
       textDirection: TextDirection.rtl,
       text: TextSpan(
-        text: _elements[i][k].increaseValue.toString(),
+        text: text,
         style: TextStyle(
           fontSize: _elements[i][k].tileState != TileState.New
-              ? _elements[i][k].tileState == TileState.Merged ||
-                      _elements[i][k].tileState == TileState.Merging
+              ? _elements[i][k].tileState == TileState.Merged
                   ? _fontSize * _sprungValue
                   : _fontSize
               : _fontSize * _sprungValue,
+        ),
+      ),
+    );
+    scorePainter.layout();
+    scorePainter.paint(
+      canvas,
+      Offset(
+        rect.left + rect.width / 2 - scorePainter.width / 2,
+        rect.top + rect.height / 2 - scorePainter.height / 2,
+      ),
+    );
+  }
+
+  void _drawMergers(Canvas canvas, int i) {
+    double left =
+        _tileWidth * _mergers[i].currentPosition.i + Settings.get().halfPadding;
+    double top = _tileHeight * _mergers[i].currentPosition.k +
+        Settings.get().halfPadding;
+    final width = _tileWidth - Settings.get().padding;
+    final height = _tileHeight - Settings.get().padding;
+
+    double oldLeft = _tileWidth * _mergers[i].previousPosition.i +
+        Settings.get().halfPadding;
+    double oldTop = _tileHeight * _mergers[i].previousPosition.k +
+        Settings.get().halfPadding;
+    final rect = Rect.fromLTWH(
+      (left - oldLeft) * _sprungValue + oldLeft,
+      (top - oldTop) * _sprungValue + oldTop,
+      width,
+      height,
+    );
+
+    int v = _mergers[i].value ~/ 2;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        rect,
+        Settings.get().radius,
+      ),
+      Paint()
+        ..color = Color.lerp(
+                Settings.get().boardThemeValues.getSquareColors()[v] ??
+                    Color.fromRGBO(
+                      v,
+                      v,
+                      v,
+                      1,
+                    ),
+                Settings.get()
+                        .boardThemeValues
+                        .getSquareColors()[_mergers[i].value] ??
+                    Color.fromRGBO(
+                      _mergers[i].value,
+                      _mergers[i].value,
+                      _mergers[i].value,
+                      1,
+                    ),
+                _sprungValue) ??
+            Color.fromRGBO(
+              _mergers[i].value,
+              _mergers[i].value,
+              _mergers[i].value,
+              1,
+            ),
+    );
+
+    TextPainter scorePainter = TextPainter(
+      textDirection: TextDirection.rtl,
+      text: TextSpan(
+        text: (v + v * _sprungValue).ceil().toString(),
+        style: TextStyle(
+          fontSize: _fontSize * _sprungValue,
         ),
       ),
     );
@@ -240,19 +304,15 @@ class GameState {
       }
     }
 
-    List<Function> missedOut = [];
-
     for (int i = 0; i < _boardSize; ++i) {
       for (int k = 0; k < _boardSize; ++k) {
-        if (_elements[i][k].tileState != TileState.Merging) {
-          missedOut.add(() => _drawElements(canvas, i, k, false));
-          continue;
-        }
-        _drawElements(canvas, i, k, true);
+        _drawElements(canvas, i, k, false);
       }
     }
 
-    missedOut.forEach((func) => func());
+    for (int i = 0; i < _mergers.length; ++i) {
+      _drawMergers(canvas, i);
+    }
   }
 
   void died() {
@@ -271,6 +331,7 @@ class GameState {
         _elements[i].add(
           BoardElement(
             _undoElements[i][k].value,
+            Position(i, k),
             Position(i, k),
           ),
         );
@@ -298,6 +359,7 @@ class GameState {
         _elements[i].add(
           BoardElement(
             data[i][k],
+            Position(i, k),
             Position(i, k),
           ),
         );
@@ -334,18 +396,16 @@ class GameState {
       if (row[i].value == row[i + 1].value) {
         row[i].value = row[i].value * 2;
         row[i].tileState = TileState.Merged;
-        row[i + 1].tileState = TileState.Merging;
-        row[i + 1].merging = row[i];
 
         var length = row[i].value.toString().length;
         if (length > _topNumberLength) {
           _topNumberLength = length;
-          _fontSize =
-              _tileHeight / _topNumberLength;
+          _fontSize = _tileHeight / _topNumberLength;
         }
 
         row[i + 1].value = 0;
-        row[i+1].shouldBeMinus1 = true;
+        _mergers.add(BoardElement(
+            row[i].value, row[i + 1].previousPosition, row[i].currentPosition));
         points += row[i].value;
       }
     }
@@ -356,7 +416,11 @@ class GameState {
     row.addAll(
       List.generate(
         zeroesToInsert,
-        (index) => BoardElement(0, Position(-1, -1)),
+        (index) => BoardElement(
+          0,
+          Position(-1, -1),
+          Position(-1, -1),
+        ),
       ),
     );
 
@@ -376,6 +440,7 @@ class GameState {
     if (_handlingInput) return;
     _handlingInput = true;
 
+    _mergers = [];
     _undoPoints = points;
     moves++;
 
@@ -391,6 +456,7 @@ class GameState {
         _undoElements[i].add(
           BoardElement(
             _elements[i][k].value,
+            Position(i, k),
             Position(i, k),
           ),
         );
@@ -422,9 +488,7 @@ class GameState {
     for (int i = 0; i < _elements.length; ++i) {
       for (int k = 0; k < _elements.length; ++k) {
         totalValueAfterwards += (k + i) * _elements[i][k].value;
-        if (_elements[i][k].previousPosition.i == -1) {
-          _elements[i][k].previousPosition = Position(i, k);
-        }
+        _elements[i][k].currentPosition = Position(i, k);
       }
     }
 
@@ -435,17 +499,18 @@ class GameState {
     Future.delayed(
       animationDuration,
       () {
+        _mergers = [];
         _undoElements = [];
         for (int i = 0; i < _elements.length; ++i) {
           _undoElements.add([]);
           for (int k = 0; k < _elements.length; ++k) {
-            totalValueBefore += (k + i) * _elements[i][k].value;
             _elements[i][k].previousPosition = Position(i, k);
             _elements[i][k].tileState = TileState.Same;
             if (_elements[i][k].value < 0) _elements[i][k].value = 0;
             _undoElements[i].add(
               BoardElement(
                 _elements[i][k].value,
+                Position(i, k),
                 Position(i, k),
               ),
             );
@@ -504,8 +569,10 @@ class GameState {
         ? 0
         : _rng.nextInt(possiblePlaces.length - 1);
 
-    _elements[possiblePlaces[index][0]][possiblePlaces[index][1]] = BoardElement(
+    _elements[possiblePlaces[index][0]][possiblePlaces[index][1]] =
+        BoardElement(
       2,
+      Position(possiblePlaces[index][0], possiblePlaces[index][1]),
       Position(possiblePlaces[index][0], possiblePlaces[index][1]),
     );
     _elements[possiblePlaces[index][0]][possiblePlaces[index][1]].tileState =
@@ -553,6 +620,7 @@ class GameState {
         _elements[i].add(
           BoardElement(
             0,
+            Position(i, k),
             Position(i, k),
           ),
         );

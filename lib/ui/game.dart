@@ -27,6 +27,7 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    super.initState();
     gameState = GameState(
       widget.whatByWhat,
       setState,
@@ -51,7 +52,6 @@ class _GameState extends State<Game> with SingleTickerProviderStateMixin {
       setState(() {});
     });
 
-    super.initState();
   }
 
   @override
